@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'models/user.dart';
 import 'themes/dark_theme.dart';
 import 'screens/login_screen.dart';
 
@@ -14,6 +15,8 @@ class MyApp extends StatelessWidget {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
+    // init singleton of user
+    User();
     return MaterialApp(
       title: 'Codeine',
       debugShowCheckedModeBanner: false,

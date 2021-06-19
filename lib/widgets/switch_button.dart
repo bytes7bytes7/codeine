@@ -45,10 +45,11 @@ class _SwitchButtonState extends State<SwitchButton>
             onTap: () {
               if (_controller.isCompleted) {
                 _controller.reverse();
+                widget.notifier.value = true;
               } else {
                 _controller.forward();
+                widget.notifier.value = false;
               }
-              widget.notifier.value = !widget.notifier.value;
             },
             child: Stack(
               children: [

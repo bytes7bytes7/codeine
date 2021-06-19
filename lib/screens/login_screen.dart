@@ -1,5 +1,8 @@
-import '../widgets/switch_button.dart';
 import 'package:flutter/material.dart';
+
+import '../widgets/switch_button.dart';
+import '../widgets/input_field.dart';
+import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -64,11 +67,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: Theme.of(context).textTheme.headline2,
                   ),
                   SizedBox(height: 20),
-                  _InputField(
+                  InputField(
                     label: 'Телефон',
                   ),
                   SizedBox(height: 15),
-                  _InputField(
+                  InputField(
                     label: 'Пароль',
                     obscureText: true,
                   ),
@@ -102,7 +105,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           color: Colors.transparent,
                           child: InkWell(
                             borderRadius: BorderRadius.circular(15),
-                            onTap: () {},
+                            onTap: () async{
+                              await AuthService.fetchUserData();
+                              await AuthService.checkCookie();
+                              // TODO: add text controllers & call AuthService.login()
+                              // await AuthService.login();
+                            },
                             child: Container(
                               width: double.infinity,
                               height: 65,
@@ -147,40 +155,3 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-class _InputField extends StatelessWidget {
-  const _InputField({
-    Key key,
-    @required this.label,
-    this.obscureText = false,
-  }) : super(key: key);
-
-  final String label;
-  final bool obscureText;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      elevation: 10,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      color: Colors.transparent,
-      shadowColor: Theme.of(context).focusColor,
-      child: TextField(
-        obscureText: obscureText,
-        controller: TextEditingController(),
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: Theme.of(context).scaffoldBackgroundColor,
-          labelText: label,
-          labelStyle: Theme.of(context).textTheme.subtitle1,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 28, vertical: 0),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-        ),
-      ),
-    );
-  }
-}
