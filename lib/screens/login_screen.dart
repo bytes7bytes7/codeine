@@ -1,0 +1,186 @@
+import '../widgets/switch_button.dart';
+import 'package:flutter/material.dart';
+
+class LoginScreen extends StatefulWidget {
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final ValueNotifier<bool> rememberNotifier = ValueNotifier(true);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        gradient: RadialGradient(
+          center: Alignment(-0.8, -1),
+          radius: 1,
+          colors: [
+            Theme.of(context).accentColor,
+            Theme.of(context).accentColor.withOpacity(0),
+          ],
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment(-0.5, 1),
+            radius: 0.7,
+            colors: [
+              Theme.of(context).highlightColor,
+              Theme.of(context).highlightColor.withOpacity(0),
+            ],
+          ),
+        ),
+        child: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).requestFocus(FocusNode());
+          },
+          child: Scaffold(
+            resizeToAvoidBottomInset: false,
+            extendBody: true,
+            backgroundColor: Colors.transparent,
+            body: Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(horizontal: 34),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'CODEINE',
+                          style: Theme.of(context).textTheme.headline1,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text(
+                    'Вход',
+                    style: Theme.of(context).textTheme.headline2,
+                  ),
+                  SizedBox(height: 20),
+                  _InputField(
+                    label: 'Телефон',
+                  ),
+                  SizedBox(height: 15),
+                  _InputField(
+                    label: 'Пароль',
+                    obscureText: true,
+                  ),
+                  SizedBox(height: 30),
+                  Row(
+                    children: [
+                      SwitchButton(
+                        notifier: rememberNotifier,
+                      ),
+                      Text(
+                        'Запомнить',
+                        style: Theme.of(context).textTheme.subtitle1,
+                      ),
+                    ],
+                  ),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton(
+                          child: Text(
+                            'Условия пользования',
+                            style:
+                                Theme.of(context).textTheme.subtitle1.copyWith(
+                                      decoration: TextDecoration.underline,
+                                    ),
+                          ),
+                          onPressed: () {},
+                        ),
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(15),
+                            onTap: () {},
+                            child: Container(
+                              width: double.infinity,
+                              height: 65,
+                              padding: const EdgeInsets.symmetric(vertical: 22),
+                              child: Center(
+                                child: Text(
+                                  'Войти',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .subtitle1
+                                      .copyWith(fontSize: 22),
+                                ),
+                              ),
+                              decoration: BoxDecoration(
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor,
+                                borderRadius: BorderRadius.circular(15),
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Theme.of(context).accentColor,
+                                    Theme.of(context)
+                                        .accentColor
+                                        .withOpacity(0),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _InputField extends StatelessWidget {
+  const _InputField({
+    Key key,
+    @required this.label,
+    this.obscureText = false,
+  }) : super(key: key);
+
+  final String label;
+  final bool obscureText;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      elevation: 10,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      color: Colors.transparent,
+      shadowColor: Theme.of(context).focusColor,
+      child: TextField(
+        obscureText: obscureText,
+        controller: TextEditingController(),
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Theme.of(context).scaffoldBackgroundColor,
+          labelText: label,
+          labelStyle: Theme.of(context).textTheme.subtitle1,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 28, vertical: 0),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+        ),
+      ),
+    );
+  }
+}
