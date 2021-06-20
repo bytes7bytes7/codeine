@@ -4,12 +4,9 @@ import '../widgets/switch_button.dart';
 import '../widgets/input_field.dart';
 import '../services/auth_service.dart';
 
-class LoginScreen extends StatefulWidget {
-  @override
-  _LoginScreenState createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
+class LoginScreen extends StatelessWidget {
+  final TextEditingController phoneOfEmailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
   final ValueNotifier<bool> rememberNotifier = ValueNotifier(true);
 
   @override
@@ -68,10 +65,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   SizedBox(height: 20),
                   InputField(
+                    controller: phoneOfEmailController,
                     label: 'Телефон',
                   ),
                   SizedBox(height: 15),
                   InputField(
+                    controller: passwordController,
                     label: 'Пароль',
                     obscureText: true,
                   ),
@@ -105,11 +104,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           color: Colors.transparent,
                           child: InkWell(
                             borderRadius: BorderRadius.circular(15),
-                            onTap: () async{
-                              await AuthService.fetchUserData();
-                              await AuthService.checkCookie();
-                              // TODO: add text controllers & call AuthService.login()
-                              // await AuthService.login();
+                            onTap: () async {
+                              await AuthService.login(
+                                  phoneOfEmailController.text,
+                                  passwordController.text);
                             },
                             child: Container(
                               width: double.infinity,
@@ -154,4 +152,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-

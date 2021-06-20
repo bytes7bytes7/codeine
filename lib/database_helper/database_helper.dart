@@ -79,6 +79,7 @@ class DatabaseHelper {
   }
 
   Future updateUser(User user) async {
+    assert (user.id!=null);
     final db = await database;
     List<Map<String, dynamic>> data = await db.query(
         "${ConstantDBData.userTableName}",
@@ -86,6 +87,9 @@ class DatabaseHelper {
         whereArgs: [user.id]);
     if (data.isNotEmpty) {
       Map<String, dynamic> map = user.toMap();
+      if(map['phoneOrEmail']==null){
+        map['phoneOrEmail']=data.first['phoneOrEmail'];
+      }
       await db.update("${ConstantDBData.userTableName}", map,
           where: "${ConstantDBData.id} = ?", whereArgs: [user.id]);
     }else{

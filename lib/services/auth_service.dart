@@ -1,21 +1,82 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
-import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
 
+import '../services/win1251_decoder.dart';
 import '../database_helper/database_helper.dart';
 import '../models/user.dart';
 import '../constants.dart';
 
-class AuthService {
+abstract class AuthService {
   static final User me = User();
 
-  static Future fetchUserData() async {
-    if (me.id != null) {
-      await me.dio.get('${ConstantHTTP.vkURL}id${me.id}');
+  static Future<bool> _setUserData(Response response) async {
+    String start = '', end = '', data;
+    data = response.data.toString();
+
+    // Check if login was successful
+    utf8.encode('onLoginDone').forEach((byte) {
+      start += byte.toString() + ', ';
+    });
+    if (!data.contains(start)) {
+      return false;
     }
+    start='';
+
+    // Get Json from html
+    utf8.encode('{Notifier.init(').forEach((byte) {
+      start += byte.toString() + ', ';
+    });
+
+    data = data.substring(data.indexOf(start) + start.length);
+
+    utf8.encode('if (window').forEach((byte) {
+      end += byte.toString() + ', ';
+    });
+
+    data = data.substring(0, data.indexOf(end));
+
+    end = '';
+    utf8.encode(')}').forEach((byte) {
+      end += byte.toString() + ', ';
+    });
+    data = data.substring(0, data.lastIndexOf(end)).replaceAll(' ', '');
+
+    if (data.endsWith(',')) {
+      data = data.substring(0, data.length - 1);
+    }
+
+    List<String> bytesStr = data.split(',');
+    bytesStr = bytesStr.map<String>((e) => e.trim()).toList();
+    Iterable<int> bytes = bytesStr.map<int>((e) => int.parse(e));
+
+    // Convert windows1251 bytes to string
+    data = Win1251Decoder.decode(bytes);
+    Map<String, dynamic> jsonData = json.decode(data);
+
+    me.id = jsonData['callsCredentials']['me']['peerId'];
+    me.link = jsonData['callsCredentials']['me']['link'];
+    me.name = jsonData['callsCredentials']['me']['name'];
+    me.firstName = jsonData['callsCredentials']['me']['firstName'];
+    me.lastName = jsonData['callsCredentials']['me']['lastName'];
+    me.shortName = jsonData['callsCredentials']['me']['shortName'];
+    me.sex = int.parse(jsonData['callsCredentials']['me']['sex']);
+    me.photo = jsonData['callsCredentials']['me']['photo'];
+    me.photo_100 = jsonData['callsCredentials']['me']['photo_100'];
+
+    await DatabaseHelper.db.updateUser(me);
+    return true;
+  }
+
+  static Future<bool> fetchUserData() async {
+    if (me.id != null) {
+      Response response = await me.dio.get('${ConstantHTTP.vkURL}id${me.id}',
+          options: Options(responseType: ResponseType.bytes));
+      return await _setUserData(response);
+    }
+    return false;
   }
 
   static Future checkCookie() async {
@@ -61,17 +122,15 @@ class AuthService {
         cookies = cookies.substring(0, cookies.length - 2);
         me.dio.options.headers['cookie'] = cookies;
       }
+    } else {
+      print('no cookies');
     }
-  }
-
-  static void showHeaders() async {
-    print(me.dio.options.headers);
   }
 
   static Future<bool> login(String phone, String password) async {
     await me.cookieJar.deleteAll();
 
-    me.phoneOrEmail=phone;
+    me.phoneOrEmail = phone;
     me.dio.options.headers = ConstantHTTP.headers;
     me.cookieJar.loadForRequest(Uri.parse(ConstantHTTP.vkLoginURL));
     Response response = await me.dio.get(ConstantHTTP.vkURL);
@@ -162,43 +221,12 @@ class AuthService {
     queryParams['to'] = 'aW5kZXgucGhw';
 
     // Try to log in
-    response = await me.dio.get(location, queryParameters: queryParams);
+    response = await me.dio.get(
+      location,
+      queryParameters: queryParams,
+      options: Options(responseType: ResponseType.bytes),
+    );
 
-    // TODO: decode response.data to utf-8
-
-    String loginData = response.data.toString();
-    bool success = loginData.contains('onLoginDone');
-
-    if (success) {
-      print('Login DONE!');
-      try {
-        String start = 'function () {Notifier.init(';
-        String end = 'if (window';
-        loginData = loginData.substring(
-            loginData.indexOf(start) + start.length, loginData.indexOf(end));
-        loginData = loginData.substring(0,loginData.lastIndexOf(')}'));
-
-        var jsonData = json.decode(loginData);
-
-        print(jsonData['callsCredentials']['me']);
-
-        me.id = jsonData['callsCredentials']['me']['peerId'];
-        me.link = jsonData['callsCredentials']['me']['link'];
-        me.name = jsonData['callsCredentials']['me']['name'];
-        me.firstName = jsonData['callsCredentials']['me']['firstName'];
-        me.lastName = jsonData['callsCredentials']['me']['lastName'];
-        me.shortName = jsonData['callsCredentials']['me']['shortName'];
-        me.sex = int.parse(jsonData['callsCredentials']['me']['sex']);
-        me.photo = jsonData['callsCredentials']['me']['photo'];
-        me.photo_100 = jsonData['callsCredentials']['me']['photo_100'];
-      } catch (e) {
-        print(e);
-        return false;
-      }
-      await DatabaseHelper.db.updateUser(me);
-      return true;
-    }
-    print('Login FAILED!');
-    return false;
+    return await _setUserData(response);
   }
 }

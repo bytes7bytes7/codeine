@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 class InputField extends StatelessWidget {
   const InputField({
     Key key,
+    @required this.controller,
     @required this.label,
     this.obscureText = false,
   }) : super(key: key);
 
+  final TextEditingController controller;
   final String label;
   final bool obscureText;
 
@@ -20,7 +22,7 @@ class InputField extends StatelessWidget {
       color: Colors.transparent,
       shadowColor: Theme.of(context).focusColor,
       child: TextField(
-        controller: TextEditingController(),
+        controller: controller,
         obscureText: obscureText,
         decoration: InputDecoration(
           filled: true,
@@ -28,7 +30,7 @@ class InputField extends StatelessWidget {
           labelText: label,
           labelStyle: Theme.of(context).textTheme.subtitle1,
           contentPadding:
-          const EdgeInsets.symmetric(horizontal: 28, vertical: 0),
+              const EdgeInsets.symmetric(horizontal: 28, vertical: 0),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15),
           ),
