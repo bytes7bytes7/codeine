@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 
 import 'models/user.dart';
 import 'themes/dark_theme.dart';
-import 'screens/login_screen.dart';
+import 'screens/splash_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
       title: 'Codeine',
       debugShowCheckedModeBanner: false,
       theme: darkTheme,
-      home: LoginScreen(
+      home: SplashScreen(
       ),
     );
   }

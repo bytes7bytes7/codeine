@@ -62,25 +62,9 @@ class LoginScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Row(
-                    children: [
-                      Text(
-                        'Вход',
-                        style: Theme.of(context).textTheme.headline2,
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.insert_drive_file,
-                        ),
-                        color: Colors.white,
-                        onPressed: () async {
-                          Directory dir =
-                              await getApplicationDocumentsDirectory();
-                          print(Directory(dir.path + '/.domains/').existsSync());
-                          print(Directory(dir.path + '/.index/').existsSync());
-                        },
-                      ),
-                    ],
+                  Text(
+                    'Вход',
+                    style: Theme.of(context).textTheme.headline2,
                   ),
                   SizedBox(height: 20),
                   InputField(
