@@ -23,7 +23,7 @@ class _SwitchButtonState extends State<SwitchButton>
   void initState() {
     super.initState();
     _controller =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
+        AnimationController(vsync: this, duration: Duration(milliseconds: 200));
     _animation = Tween(begin: 0.0, end: width - radius)
         .animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
   }

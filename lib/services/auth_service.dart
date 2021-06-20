@@ -67,6 +67,7 @@ abstract class AuthService {
     me.photo_100 = jsonData['callsCredentials']['me']['photo_100'];
 
     await DatabaseHelper.db.updateUser(me);
+    print('Login done');
     return true;
   }
 
@@ -80,35 +81,25 @@ abstract class AuthService {
   }
 
   static Future checkCookie() async {
-    if (me.cookieJar.domainCookies.isNotEmpty) {
+    if (me.cookieJar.domains.isNotEmpty) {
       print('me.cookieJar domains is NOT empty');
-      print(me.cookieJar.DomainsKey);
-      print(me.cookieJar.storage);
-      print(me.cookieJar.IndexKey);
-      print(me.cookieJar.persistSession);
-      print(me.cookieJar.ignoreExpires);
-      print(me.cookieJar.hostCookies);
-      print(me.cookieJar.domainCookies);
-      // Set userID
       String uid;
       try {
-        uid =
-            me.cookieJar.domainCookies[0]['login.vk.com']['/']['l'].toString();
+            uid = me.cookieJar.domains[0]['login.vk.com']['/']['l'].toString();
+            me.id = int.parse(uid.substring(uid.indexOf('l=')+2, uid.indexOf(';')));
+            print(me.id);
       } catch (e) {
         return;
       }
-      uid = uid.substring(uid.indexOf('l=') + 2);
-      uid = uid.substring(0, uid.indexOf(';'));
-      me.id = int.parse(uid);
 
       //Load header to me.dio client
       Map<String, String> headers = HashMap();
       headers.addAll(ConstantHTTP.headers);
       me.dio.options.headers = headers;
-      if (me.cookieJar.domainCookies != null) {
+      if (me.cookieJar.domains != null) {
         String cookies = headers['cookie'];
         Map<dynamic, dynamic> domains;
-        domains = HashMap.from(me.cookieJar.domainCookies[0]['vk.com']['/']);
+        domains = HashMap.from(me.cookieJar.domains[0]['vk.com']['/']);
         for (int i = 0; i < domains.keys.length; i++) {
           String key = domains.keys.toList()[i].toString();
           String value = domains[key].toString();
@@ -128,7 +119,7 @@ abstract class AuthService {
   }
 
   static Future<bool> login(String phone, String password) async {
-    await me.cookieJar.deleteAll();
+    me.cookieJar.deleteAll();
 
     me.phoneOrEmail = phone;
     me.dio.options.headers = ConstantHTTP.headers;
@@ -203,7 +194,10 @@ abstract class AuthService {
       }
     });
 
-    me.dio.options.headers['cookie'] = newCookies.join('; ');
+    Map<String, dynamic> headers = Map<String, dynamic>.from(me.dio.options.headers);
+    headers['cookie'] = newCookies.join('; ');
+
+    me.dio.options.headers = Map<String, dynamic>.from(headers);
 
     // Separate uri from parameters
     String location = response.headers['location'].first;

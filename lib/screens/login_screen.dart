@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../widgets/switch_button.dart';
 import '../widgets/input_field.dart';
@@ -59,9 +62,25 @@ class LoginScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Text(
-                    'Вход',
-                    style: Theme.of(context).textTheme.headline2,
+                  Row(
+                    children: [
+                      Text(
+                        'Вход',
+                        style: Theme.of(context).textTheme.headline2,
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.insert_drive_file,
+                        ),
+                        color: Colors.white,
+                        onPressed: () async {
+                          Directory dir =
+                              await getApplicationDocumentsDirectory();
+                          print(Directory(dir.path + '/.domains/').existsSync());
+                          print(Directory(dir.path + '/.index/').existsSync());
+                        },
+                      ),
+                    ],
                   ),
                   SizedBox(height: 20),
                   InputField(
@@ -105,9 +124,11 @@ class LoginScreen extends StatelessWidget {
                           child: InkWell(
                             borderRadius: BorderRadius.circular(15),
                             onTap: () async {
+                              await AuthService.checkCookie();
                               await AuthService.login(
                                   phoneOfEmailController.text,
                                   passwordController.text);
+                              await AuthService.checkCookie();
                             },
                             child: Container(
                               width: double.infinity,

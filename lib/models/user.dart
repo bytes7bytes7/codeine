@@ -7,8 +7,8 @@ import 'package:path_provider/path_provider.dart';
 
 class User {
   static final User _singleton = User._internal();
-  Dio _dio;
-  PersistCookieJar _cookieJar;
+  Dio dio;
+  PersistCookieJar cookieJar;
 
   factory User() {
     return _singleton;
@@ -19,22 +19,11 @@ class User {
   }
 
   _init() async {
-    _dio = Dio();
-    Directory tempDir = await getTemporaryDirectory();
-    _cookieJar = PersistCookieJar(
-      ignoreExpires: true,
-      storage: FileStorage(tempDir.path),
-    );
-    _dio.interceptors.add(CookieManager(_cookieJar));
-    _dio.options.followRedirects = true;
-  }
-
-  get dio {
-    return _dio;
-  }
-
-  get cookieJar {
-    return _cookieJar;
+    dio = Dio();
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    cookieJar = PersistCookieJar(dir: appDocDir.path + "./cookies/");
+    dio.interceptors.add(CookieManager(cookieJar));
+    dio.options.followRedirects = true;
   }
 
   int id;

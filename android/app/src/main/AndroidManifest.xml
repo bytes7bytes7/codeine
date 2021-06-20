@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="bytes7bytes7.codeine">
    <application
-        android:label="codeine"
+        android:label="CODEINE"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
