@@ -1,11 +1,7 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 
 import '../widgets/switch_button.dart';
 import '../widgets/input_field.dart';
-import '../services/auth_service.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController phoneOfEmailController = TextEditingController();
@@ -108,11 +104,7 @@ class LoginScreen extends StatelessWidget {
                           child: InkWell(
                             borderRadius: BorderRadius.circular(15),
                             onTap: () async {
-                              await AuthService.checkCookie();
-                              await AuthService.login(
-                                  phoneOfEmailController.text,
-                                  passwordController.text);
-                              await AuthService.checkCookie();
+                              // TODO: implement
                             },
                             child: Container(
                               width: double.infinity,
