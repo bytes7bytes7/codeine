@@ -4,36 +4,67 @@ class InputField extends StatelessWidget {
   const InputField({
     Key key,
     @required this.controller,
-    @required this.label,
+    @required this.errorNotifier,
+    @required this.hint,
     this.obscureText = false,
   }) : super(key: key);
 
   final TextEditingController controller;
-  final String label;
+  final ValueNotifier<String> errorNotifier;
+  final String hint;
   final bool obscureText;
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      elevation: 10,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      color: Colors.transparent,
-      shadowColor: Theme.of(context).focusColor,
-      child: TextField(
-        controller: controller,
-        obscureText: obscureText,
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: Theme.of(context).scaffoldBackgroundColor,
-          labelText: label,
-          labelStyle: Theme.of(context).textTheme.subtitle1,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 28, vertical: 0),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 34),
+      child: Material(
+        elevation: 10,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        color: Colors.transparent,
+        shadowColor: Theme.of(context).focusColor,
+        child: ValueListenableBuilder(
+          valueListenable: errorNotifier,
+          builder: (context, _, __) {
+            return TextFormField(
+              controller: controller,
+              obscureText: obscureText,
+              onChanged: (value) {
+                errorNotifier.value = null;
+              },
+              cursorColor: Theme.of(context).accentColor,
+              cursorWidth: 2,
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Theme.of(context).scaffoldBackgroundColor,
+                hintText: hint,
+                hintStyle: Theme.of(context).textTheme.subtitle1,
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: BorderSide(
+                    color: (errorNotifier.value != null)
+                        ? Theme.of(context).errorColor
+                        : Colors.transparent,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: BorderSide(
+                    color: (errorNotifier.value != null)
+                        ? Theme.of(context).errorColor
+                        : Theme.of(context).accentColor,
+                  ),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 28, vertical: 0),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
