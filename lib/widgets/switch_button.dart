@@ -69,7 +69,7 @@ class _SwitchButtonState extends State<SwitchButton>
                       height: 13,
                       decoration: BoxDecoration(
                         color: (widget.notifier.value)
-                            ? Theme.of(context).accentColor
+                            ? Theme.of(context).splashColor
                             : Theme.of(context).focusColor,
                         borderRadius: BorderRadius.circular(5),
                       ),
@@ -94,7 +94,7 @@ class _SwitchButtonState extends State<SwitchButton>
                             color: Theme.of(context).focusColor,
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                              color: Theme.of(context).accentColor,
+                              color: Theme.of(context).splashColor,
                             ),
                           ),
                         ),

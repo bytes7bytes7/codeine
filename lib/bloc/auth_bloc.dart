@@ -1,28 +1,30 @@
 import 'dart:async';
 
+import '../global/global_parameters.dart';
 import '../constants.dart';
 import '../repositories/auth_repository.dart';
 
 class AuthBloc {
-  AuthBloc(this._repository);
-
-  final AuthRepository _repository;
-  static StreamController _authStreamController;
+  static final StreamController _authStreamController = StreamController<AuthState>.broadcast();
+  static final AuthRepository _repository = AuthRepository();
 
   Stream<AuthState> get auth {
-    if (_authStreamController == null || _authStreamController.isClosed)
-      _authStreamController = StreamController<AuthState>.broadcast();
     return _authStreamController.stream;
   }
 
-  void dispose() {
+  static void dispose() {
+    print('dispose AuthBloc');
     _authStreamController.close();
   }
 
   Future logIn(String login, String password) async {
-    _authStreamController.sink.add(AuthState._authLoading());
+    if (_authStreamController != null && !_authStreamController.isClosed) {
+      _authStreamController.sink.add(AuthState._authLoading());
+    }
     _repository.logIn(login, password).then((status) {
-      if (!_authStreamController.isClosed)
+      if (status == AuthStatus.loggedIn) {
+        GlobalParameters.currentPage.value = 'HomeScreen';
+      } else if (!_authStreamController.isClosed)
         _authStreamController.sink.add(AuthState._authData(status));
     }).onError((error, stackTrace) {
       if (!_authStreamController.isClosed)
@@ -31,7 +33,9 @@ class AuthBloc {
   }
 
   Future confirm() async {
-    _authStreamController.sink.add(AuthState._authLoading());
+    if (_authStreamController != null && !_authStreamController.isClosed) {
+      _authStreamController.sink.add(AuthState._authLoading());
+    }
     _repository.confirm().then((status) {
       if (!_authStreamController.isClosed)
         _authStreamController.sink.add(AuthState._authData(status));
@@ -42,7 +46,9 @@ class AuthBloc {
   }
 
   Future logOut() async {
-    _authStreamController.sink.add(AuthState._authLoading());
+    if (_authStreamController != null && !_authStreamController.isClosed) {
+      _authStreamController.sink.add(AuthState._authLoading());
+    }
     AuthStatus status = _repository.logOut();
     if (!_authStreamController.isClosed)
       _authStreamController.sink.add(AuthState._authData(status));

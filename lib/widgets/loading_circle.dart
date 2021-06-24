@@ -4,11 +4,10 @@ class LoadingCircle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: SizedBox(
-        height: 50.0,
-        width: 50.0,
+      child: FittedBox(
         child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+          valueColor:
+          AlwaysStoppedAnimation<Color>(Theme.of(context).focusColor),
           strokeWidth: 2.0,
         ),
       ),

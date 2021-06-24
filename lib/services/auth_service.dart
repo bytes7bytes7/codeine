@@ -17,15 +17,19 @@ abstract class AuthService {
       Response response = await me.dio.get('${ConstantHTTP.vkURL}id${me.id}',
           options: Options(responseType: ResponseType.bytes));
       String data = response.data.toString();
-      AuthStatus status = _checkLogin(data);
-      if(status == AuthStatus.loggedIn){
-        await _setUserData(data);
-      }else if(status == AuthStatus.loggedOut){
+      AuthStatus status = AuthStatus.loggedIn;
+      String start = '';
+      utf8
+          .encode(
+              '<form method="POST" name="login" id="quick_login_form" action="https://login.vk.com/?act=login">')
+          .forEach((byte) {
+        start += byte.toString() + ', ';
+      });
+      if (data.contains(start)) {
+        status = AuthStatus.loggedOut;
       }else{
-        // need code
-        print("NEED CODE");
+        await _setUserData(data);
       }
-
       return status;
     }
     return AuthStatus.loggedOut;
@@ -177,24 +181,9 @@ abstract class AuthService {
     );
 
     String data = response.data.toString();
-
-    AuthStatus status = _checkLogin(data);
-    await _setUserData(data);
-    return status;
-  }
-
-  static AuthStatus _checkLogin(String data) {
-    String start = '';
-
-    utf8.encode('<form method="POST" name="login" id="quick_login_form" action="https://login.vk.com/?act=login">').forEach((byte) {
-      start += byte.toString() + ', ';
-    });
-    if(data.contains(start)){
-      return AuthStatus.loggedOut;
-    }
-
-    start = '';
+    AuthStatus status;
     // Check if login was successful
+    String start = '';
     utf8.encode('onLoginDone').forEach((byte) {
       start += byte.toString() + ', ';
     });
@@ -205,15 +194,19 @@ abstract class AuthService {
       });
       if (!data.contains(start)) {
         print('Login failed');
-        return AuthStatus.loggedOut;
+        status = AuthStatus.loggedOut;
       } else {
         // Need to confirm the code
         print('Confirmation code');
-        return AuthStatus.needCode;
+        status = AuthStatus.needCode;
       }
+    }else{
+      print('Login done');
+      status = AuthStatus.loggedIn;
+      await _setUserData(data);
     }
-    print('Login done');
-    return AuthStatus.loggedIn;
+
+    return status;
   }
 
   static Future<void> _setUserData(String data) async {

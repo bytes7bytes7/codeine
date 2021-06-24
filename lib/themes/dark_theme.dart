@@ -5,8 +5,9 @@ import '../constants.dart';
 final ThemeData darkTheme = ThemeData(
   scaffoldBackgroundColor: ConstantColors.scaffoldBackgroundColor,
   focusColor: ConstantColors.focusColor,
-  accentColor: ConstantColors.accentColor,
+  splashColor: ConstantColors.splashColor,
   highlightColor: ConstantColors.highlightColor,
+  errorColor: ConstantColors.errorColor,
   textTheme: TextTheme(
     headline1: TextStyle(
       fontSize: 46,
@@ -18,10 +19,20 @@ final ThemeData darkTheme = ThemeData(
       color: ConstantColors.focusColor,
       fontWeight: FontWeight.normal,
     ),
+    headline3: TextStyle(
+      fontSize: 23,
+      color: ConstantColors.focusColor,
+      fontWeight: FontWeight.normal,
+    ),
     subtitle1: TextStyle(
       fontSize: 16,
       color: ConstantColors.focusColor,
       fontWeight: FontWeight.normal,
+    ),
+    bodyText1: TextStyle(
+      fontSize: 18,
+      color: ConstantColors.focusColor,
+      fontWeight: FontWeight.bold,
     ),
   ),
 );
