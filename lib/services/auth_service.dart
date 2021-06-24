@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
 
@@ -83,9 +84,13 @@ abstract class AuthService {
     me.dio.options.headers = ConstantHTTP.headers;
     me.cookieJar.loadForRequest(Uri.parse(ConstantHTTP.vkLoginURL));
     Response response;
+
     try {
       response = await me.dio.get(ConstantHTTP.vkURL);
     }on DioError catch(e){
+      print(e.error);
+      print(e.message);
+      print(e.type);
       return e.error;
     }
 

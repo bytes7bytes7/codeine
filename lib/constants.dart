@@ -27,7 +27,8 @@ enum AuthStatus {
   errorCookies,
   loggedIn,
   needCode,
-  loggedOut
+  loggedOut,
+  noInternet,
 }
 
 abstract class ConstantHTTP {

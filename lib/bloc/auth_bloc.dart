@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import '../global/global_parameters.dart';
 import '../constants.dart';
 import '../repositories/auth_repository.dart';
 
