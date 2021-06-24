@@ -8,6 +8,8 @@ import '../widgets/input_field.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/bloc.dart';
 import '../constants.dart';
+import '../global/next_page_route.dart';
+import 'conditions_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -171,7 +173,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                           decoration: TextDecoration.underline,
                                         ),
                                   ),
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      NextPageRoute(
+                                        nextPage: ConditionsScreen(),
+                                      ),
+                                    );
+                                  },
                                 ),
                               ],
                             ),
@@ -208,25 +217,29 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: InkWell(
                             borderRadius: BorderRadius.circular(15),
                             onTap: () {
-                              if (pageController.page == 0) {
-                                if (loginController.text.isEmpty) {
-                                  loginNotifier.value = 'Пустое поле';
+                              if (!loading.value) {
+                                if (pageController.page == 0) {
+                                  if (loginController.text.isEmpty) {
+                                    loginNotifier.value = 'Пустое поле';
+                                  }
+                                  if (passwordController.text.isEmpty) {
+                                    passwordNotifier.value = 'Пустое поле';
+                                  }
+                                  if (loginController.text.isNotEmpty &&
+                                      passwordController.text.isNotEmpty) {
+                                    Bloc.authBloc.logIn(loginController.text,
+                                        passwordController.text);
+                                  }
+                                } else {
+                                  // TODO: implement it
+                                  print('NOT IMPLEMENTED');
                                 }
-                                if (passwordController.text.isEmpty) {
-                                  passwordNotifier.value = 'Пустое поле';
-                                }
-                                if (loginController.text.isNotEmpty &&
-                                    passwordController.text.isNotEmpty) {
-                                  Bloc.authBloc.logIn(loginController.text,
-                                      passwordController.text);
-                                }
-                              } else {
-                                // TODO: implement it
-                                print('NOT IMPLEMENTED');
                               }
                             },
                             child: Container(
                               width: double.infinity,
+                              // TODO: make something more flexible
+
                               height: Theme.of(context)
                                           .textTheme
                                           .headline3

@@ -12,6 +12,15 @@ abstract class ConstantColors {
   static const Color errorColor = Color(0xFFB53850);
 }
 
+abstract class ConstantData {
+  // Do not add: MainScreen, ConditionsScreen
+  static final Map<String, Widget> appDestinations = {
+    'SplashScreen': SplashScreen(),
+    'LoginScreen': LoginScreen(),
+    'HomeScreen': HomeScreen(),
+  };
+}
+
 enum AuthStatus {
   cookies,
   noCookies,
@@ -56,12 +65,4 @@ abstract class ConstantDBData {
   static const String photo = 'photo';
   static const String photo_100 = 'photo_100';
   static const String phoneOrEmail = 'phoneOrEmail';
-}
-
-abstract class ConstantData {
-  static final Map<String, Widget> appDestinations = {
-    'SplashScreen': SplashScreen(),
-    'LoginScreen': LoginScreen(),
-    'HomeScreen': HomeScreen(),
-  };
 }
