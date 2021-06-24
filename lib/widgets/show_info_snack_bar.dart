@@ -11,7 +11,7 @@ void showInfoSnackBar(BuildContext context, String info, IconData icon) {
       ),
       duration: const Duration(seconds: 1),
       backgroundColor:
-          Theme.of(context).scaffoldBackgroundColor.withOpacity(0.8),
+          Theme.of(context).scaffoldBackgroundColor.withOpacity(0.9),
       content: Row(
         children: [
           Container(

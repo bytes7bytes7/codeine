@@ -27,7 +27,7 @@ abstract class AuthService {
       });
       if (data.contains(start)) {
         status = AuthStatus.loggedOut;
-      }else{
+      } else {
         await _setUserData(data);
       }
       return status;
@@ -82,7 +82,12 @@ abstract class AuthService {
     me.phoneOrEmail = phone;
     me.dio.options.headers = ConstantHTTP.headers;
     me.cookieJar.loadForRequest(Uri.parse(ConstantHTTP.vkLoginURL));
-    Response response = await me.dio.get(ConstantHTTP.vkURL);
+    Response response;
+    try {
+      response = await me.dio.get(ConstantHTTP.vkURL);
+    }on DioError catch(e){
+      return e.error;
+    }
 
     // Get parameter remixstid
     List<String> fList = [],
@@ -200,7 +205,7 @@ abstract class AuthService {
         print('Confirmation code');
         status = AuthStatus.needCode;
       }
-    }else{
+    } else {
       print('Login done');
       status = AuthStatus.loggedIn;
       await _setUserData(data);
