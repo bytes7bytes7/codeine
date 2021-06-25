@@ -16,6 +16,7 @@ class MainScreen extends StatelessWidget {
       case AuthStatus.cookies:
         status = await AuthService.fetchUserData();
         switch(status){
+          case AuthStatus.noInternet:
           case AuthStatus.loggedIn:
             GlobalParameters.currentPage.value = 'HomeScreen';
             break;

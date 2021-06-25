@@ -14,8 +14,12 @@ class AuthRepository {
     return await AuthService.logIn(login, password);
   }
 
-  Future<AuthStatus> confirm() async {
-    return await AuthService.confirmationCode();
+  Future<AuthStatus> getCode() async {
+    return await AuthService.getCode();
+  }
+
+  Future<AuthStatus> confirmCode(String code) async {
+    return await AuthService.confirmCode(code);
   }
 
   AuthStatus logOut() {

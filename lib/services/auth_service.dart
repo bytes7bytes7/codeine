@@ -1,22 +1,39 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
-import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 import '../services/win1251_decoder.dart';
 import '../database/database_helper.dart';
 import '../models/user.dart';
 import '../constants.dart';
+import '../global/global_parameters.dart';
 
 abstract class AuthService {
   static final User me = User();
+  static String _hash = '';
+  static String _qHash = '';
 
   static Future<AuthStatus> fetchUserData() async {
     if (me.id != null) {
-      Response response = await me.dio.get('${ConstantHTTP.vkURL}id${me.id}',
-          options: Options(responseType: ResponseType.bytes));
+      Response response;
+      try {
+        response = await me.dio.get('${ConstantHTTP.vkURL}id${me.id}',
+            options: Options(responseType: ResponseType.bytes));
+      } on DioError catch (e) {
+        if (GlobalParameters.connectionStatus.value ==
+            ConnectivityResult.none) {
+          return AuthStatus.noInternet;
+        } else {
+          print('logIn error: ${e.error}');
+          print('logIn error: ${e.message}');
+          print('logIn error: ${e.type}');
+          return AuthStatus.unknownError;
+        }
+      }
+
       String data = response.data.toString();
       AuthStatus status = AuthStatus.loggedIn;
       String start = '';
@@ -87,11 +104,15 @@ abstract class AuthService {
 
     try {
       response = await me.dio.get(ConstantHTTP.vkURL);
-    }on DioError catch(e){
-      print(e.error);
-      print(e.message);
-      print(e.type);
-      return e.error;
+    } on DioError catch (e) {
+      if (GlobalParameters.connectionStatus.value == ConnectivityResult.none) {
+        return AuthStatus.noInternet;
+      } else {
+        print('logIn error: ${e.error}');
+        print('logIn error: ${e.message}');
+        print('logIn error: ${e.type}');
+        return AuthStatus.unknownError;
+      }
     }
 
     // Get parameter remixstid
@@ -126,17 +147,28 @@ abstract class AuthService {
 
     // 1st request
     var formData = FormData.fromMap(forms);
-    response = await me.dio.post(
-      ConstantHTTP.vkLoginURL,
-      queryParameters: {'act': 'login'},
-      data: formData,
-      options: Options(
-        followRedirects: true,
-        validateStatus: (status) {
-          return status < 500;
-        },
-      ),
-    );
+    try {
+      response = await me.dio.post(
+        ConstantHTTP.vkLoginURL,
+        queryParameters: {'act': 'login'},
+        data: formData,
+        options: Options(
+          followRedirects: true,
+          validateStatus: (status) {
+            return status < 500;
+          },
+        ),
+      );
+    } on DioError catch (e) {
+      if (GlobalParameters.connectionStatus.value == ConnectivityResult.none) {
+        return AuthStatus.noInternet;
+      } else {
+        print('logIn error: ${e.error}');
+        print('logIn error: ${e.message}');
+        print('logIn error: ${e.type}');
+        return AuthStatus.unknownError;
+      }
+    }
 
     // Make new cookies
     List<String> newCookies = [
@@ -182,13 +214,25 @@ abstract class AuthService {
     });
 
     queryParams['to'] = 'aW5kZXgucGhw';
+    _qHash = queryParams['__q_hash'];
 
     // 2nd request
-    response = await me.dio.get(
-      location,
-      queryParameters: queryParams,
-      options: Options(responseType: ResponseType.bytes),
-    );
+    try {
+      response = await me.dio.get(
+        location,
+        queryParameters: queryParams,
+        options: Options(responseType: ResponseType.bytes),
+      );
+    } on DioError catch (e) {
+      if (GlobalParameters.connectionStatus.value == ConnectivityResult.none) {
+        return AuthStatus.noInternet;
+      } else {
+        print('logIn error: ${e.error}');
+        print('logIn error: ${e.message}');
+        print('logIn error: ${e.type}');
+        return AuthStatus.unknownError;
+      }
+    }
 
     String data = response.data.toString();
     AuthStatus status;
@@ -266,16 +310,49 @@ abstract class AuthService {
     await DatabaseHelper.db.updateUser(me);
   }
 
-  static Future<AuthStatus> confirmationCode() async {
+  static Future<AuthStatus> getCode() async {
     Map<String, String> queryParams = {
       'act': 'authcheck',
     };
-    Response response = await me.dio.get(
-      '${ConstantHTTP.vkURL}login',
-      queryParameters: queryParams,
-      options: Options(responseType: ResponseType.bytes),
-    );
 
+    Response response;
+    try {
+      response = await me.dio.get(
+        '${ConstantHTTP.vkURL}login',
+        queryParameters: queryParams,
+        options: Options(responseType: ResponseType.bytes),
+      );
+    } on DioError catch (e) {
+      if (GlobalParameters.connectionStatus.value == ConnectivityResult.none) {
+        return AuthStatus.noInternet;
+      } else {
+        print('logIn error: ${e.error}');
+        print('logIn error: ${e.message}');
+        print('logIn error: ${e.type}');
+        return AuthStatus.unknownError;
+      }
+    }
+    String data = response.data.toString();
+
+    String start = '', end = '';
+    utf8.encode("window.Authcheck.init(\'").forEach((byte) {
+      start += byte.toString() + ', ';
+    });
+
+    data = data.substring(data.indexOf(start) + start.length);
+
+    end = '';
+    utf8.encode("\'").forEach((byte) {
+      end += byte.toString() + ', ';
+    });
+    data = data.substring(0, data.lastIndexOf(end));
+
+    // "hash" parameter for the next request's form data
+    _hash = data;
+    return AuthStatus.ok;
+  }
+
+  static Future<AuthStatus> confirmCode(String code) async {
     // https://vk.com/al_login.php?act=a_authcheck_code
     // POST
     // 200
@@ -286,26 +363,81 @@ abstract class AuthService {
     // 		    remember: 1
     Map<String, String> forms = HashMap();
 
-    throw Exception('Unfinished function!!!');
-
     forms['al'] = '1';
-    //forms['code'] = asdas;
-    //forms['hash']= dasdas;
-    // TODO: make it changeable
+    forms['code'] = code;
+    forms['hash'] = _hash;
     forms['remember'] = '1';
 
     var formData = FormData.fromMap(forms);
-    response = await me.dio.post(
-      '${ConstantHTTP.vkURL}/al_login.php',
-      queryParameters: {'act': 'a_authcheck_code'},
-      data: formData,
-      options: Options(
-        followRedirects: true,
-        validateStatus: (status) {
-          return status < 500;
-        },
-      ),
-    );
+    Response response;
+    try {
+      response = await me.dio.post(
+        '${ConstantHTTP.vkURL}al_login.php',
+        queryParameters: {'act': 'a_authcheck_code'},
+        data: formData,
+        options: Options(
+          responseType: ResponseType.bytes,
+          followRedirects: true,
+          validateStatus: (status) {
+            return status < 500;
+          },
+        ),
+      );
+    } on DioError catch (e) {
+      if (GlobalParameters.connectionStatus.value == ConnectivityResult.none) {
+        return AuthStatus.noInternet;
+      } else {
+        print('logIn error: ${e.error}');
+        print('logIn error: ${e.message}');
+        print('logIn error: ${e.type}');
+        return AuthStatus.unknownError;
+      }
+    }
+
+    // TODO: get remixttpid from cookies
+
+    String data = response.data.toString();
+
+    print(data);
+
+    // https://vk.com/login.php?act=slogin&to=aW5kZXgucGhw&s=1&__q_hash=2e938386a213d453d23163705ea80fb7&fast=1
+    // GET
+    // 302
+    // Query string parameters:
+    //    act: slogin
+    // 		to: aW5kZXgucGhw
+    // 		s: 1
+    // 		__q_hash: 2e938386a213d453d23163705ea80fb7
+    // 		fast: 1
+
+    Map<String, String> queryParams = {
+      'act': 'slogin',
+      'to': 'aW5kZXgucGhw',
+      's': '1',
+      '__q_hash': _qHash,
+      'fast': '1',
+    };
+
+    try {
+      response = await me.dio.get(
+        '${ConstantHTTP.vkURL}login.php',
+        queryParameters: queryParams,
+        options: Options(responseType: ResponseType.bytes),
+      );
+    } on DioError catch (e) {
+      if (GlobalParameters.connectionStatus.value == ConnectivityResult.none) {
+        return AuthStatus.noInternet;
+      } else {
+        print('logIn error: ${e.error}');
+        print('logIn error: ${e.message}');
+        print('logIn error: ${e.type}');
+        return AuthStatus.unknownError;
+      }
+    }
+
+    data = response.data.toString();
+
+    print(data);
   }
 
   static AuthStatus logOut() {

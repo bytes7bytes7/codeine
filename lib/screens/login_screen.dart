@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:codeine/global/global_parameters.dart';
+import 'package:codeine/models/user.dart';
+import 'package:codeine/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -12,6 +13,7 @@ import '../bloc/auth_bloc.dart';
 import '../bloc/bloc.dart';
 import '../constants.dart';
 import '../global/next_page_route.dart';
+import '../global/global_parameters.dart';
 import 'conditions_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -49,23 +51,30 @@ class _LoginScreenState extends State<LoginScreen> {
         loading.value = false;
         AuthDataState state = event;
         if (state.status == AuthStatus.needCode) {
+          loginNotifier.value = null;
+          passwordNotifier.value = null;
+          codeNotifier.value = null;
+          Bloc.authBloc.getCode();
           pageController.animateToPage(
             1,
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOutQuad,
           );
-          Bloc.authBloc.confirm();
+        } else if (state.status == AuthStatus.wrongCode) {
+          codeNotifier.value = 'Неверно';
         } else if (state.status == AuthStatus.loggedOut) {
-          loginNotifier.value = '';
-          passwordNotifier.value = '';
+          loginNotifier.value = 'Неверно';
+          passwordNotifier.value = 'Неверно';
         } else if (state.status == AuthStatus.loggedIn) {
           GlobalParameters.currentPage.value = 'HomeScreen';
-        }else if(state.status == AuthStatus.noInternet){
+        } else if (state.status == AuthStatus.noInternet) {
           showInfoSnackBar(
             context,
             'Нет интернета',
             Icons.wifi_off_outlined,
           );
+        } else if (state.status == AuthStatus.ok) {
+          // It means that verification code was got successfully
         }
       } else if (event is AuthErrorState) {
         loading.value = false;
@@ -172,7 +181,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                   Text(
                                     'Запомнить',
-                                    style: Theme.of(context).textTheme.subtitle1,
+                                    style:
+                                        Theme.of(context).textTheme.subtitle1,
                                   ),
                                 ],
                               ),
@@ -206,7 +216,18 @@ class _LoginScreenState extends State<LoginScreen> {
                                 hint: 'Код подтверждения',
                                 errorNotifier: codeNotifier,
                               ),
-                              Spacer(flex: 1),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.verified_outlined,
+                                  color: Theme.of(context).focusColor,
+                                ),
+                                onPressed: () async {
+                                  await AuthService.fetchUserData();
+                                  var u = User();
+                                  print(u);
+                                },
+                              ),
+                              SizedBox(height: 20),
                               TextButton(
                                 child: Text(
                                   'Выслать СМС',
@@ -218,6 +239,25 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                 ),
                                 onPressed: () {},
+                              ),
+                              Spacer(flex: 1),
+                              TextButton(
+                                child: Text(
+                                  'Отмена',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .subtitle1
+                                      .copyWith(
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                ),
+                                onPressed: () {
+                                  pageController.animateToPage(
+                                    0,
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeInOutQuad,
+                                  );
+                                },
                               ),
                             ],
                           ),
@@ -245,8 +285,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                       passwordController.text);
                                 }
                               } else {
-                                // TODO: implement it
-                                print('NOT IMPLEMENTED');
+                                if (codeController.text.isEmpty) {
+                                  codeNotifier.value = 'Пустое поле';
+                                } else {
+                                  Bloc.authBloc
+                                      .confirmCode(codeController.text);
+                                }
                               }
                             }
                           },
@@ -292,43 +336,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     SizedBox(height: 30),
-                    // StreamBuilder(
-                    //   stream: Bloc.authBloc.auth,
-                    //   initialData: AuthInitState(),
-                    //   builder: (context, snapshot) {
-                    //     if (snapshot.data is AuthInitState) {
-                    //       // pass
-                    //     } else if (snapshot.data is AuthLoadingState) {
-                    //       loading.value = true;
-                    //     } else if (snapshot.data is AuthDataState) {
-                    //       loading.value = false;
-                    //       AuthDataState state = snapshot.data;
-                    //       if (state.status == AuthStatus.needCode) {
-                    //         Bloc.authBloc.confirm();
-                    //         // TODO: move this code
-                    //
-                    //         pageController.animateToPage(
-                    //           1,
-                    //           duration: const Duration(milliseconds: 300),
-                    //           curve: Curves.easeInOutQuad,
-                    //         );
-                    //       } else if (state.status == AuthStatus.loggedOut) {
-                    //         loginNotifier.value = '';
-                    //         passwordNotifier.value = '';
-                    //       } else if (state.status == AuthStatus.loggedIn) {
-                    //         // auth_bloc redirects on HomeScreen
-                    //       }
-                    //     } else if (snapshot.data is AuthErrorState) {
-                    //       loading.value = false;
-                    //       showInfoSnackBar(
-                    //         context,
-                    //         'Ошибка',
-                    //         Icons.error_outline_outlined,
-                    //       );
-                    //     }
-                    //     return SizedBox.shrink();
-                    //   },
-                    // ),
                   ],
                 ),
               ),

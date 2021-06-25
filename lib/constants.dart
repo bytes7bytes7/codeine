@@ -22,13 +22,16 @@ abstract class ConstantData {
 }
 
 enum AuthStatus {
+  ok,
   cookies,
   noCookies,
   errorCookies,
   loggedIn,
   needCode,
+  wrongCode,
   loggedOut,
   noInternet,
+  unknownError,
 }
 
 abstract class ConstantHTTP {

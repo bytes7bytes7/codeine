@@ -28,9 +28,18 @@ class AuthBloc {
     });
   }
 
-  Future confirm() async {
-    _authStreamController.sink.add(AuthState._authLoading());
-    _repository.confirm().then((status) {
+  Future getCode() async {
+    _repository.getCode().then((status) {
+      if (!_authStreamController.isClosed)
+        _authStreamController.sink.add(AuthState._authData(status));
+    }).onError((error, stackTrace) {
+      if (!_authStreamController.isClosed)
+        _authStreamController.sink.add(AuthState._authError(error, stackTrace));
+    });
+  }
+
+  Future confirmCode(String code) async {
+    _repository.confirmCode(code).then((status) {
       if (!_authStreamController.isClosed)
         _authStreamController.sink.add(AuthState._authData(status));
     }).onError((error, stackTrace) {

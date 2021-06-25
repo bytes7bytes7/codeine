@@ -9,7 +9,7 @@ void showInfoSnackBar(BuildContext context, String info, IconData icon) {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
       ),
-      duration: const Duration(seconds: 1),
+      duration: const Duration(seconds: 2),
       backgroundColor:
           Theme.of(context).scaffoldBackgroundColor.withOpacity(0.9),
       content: Row(
