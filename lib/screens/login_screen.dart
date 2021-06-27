@@ -7,7 +7,6 @@ import 'package:flutter/widgets.dart';
 
 import '../widgets/loading_circle.dart';
 import '../widgets/show_info_snack_bar.dart';
-import '../widgets/switch_button.dart';
 import '../widgets/input_field.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/bloc.dart';
@@ -171,20 +170,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 hint: 'Пароль',
                                 obscureText: true,
                                 errorNotifier: passwordNotifier,
-                              ),
-                              SizedBox(height: 30),
-                              Row(
-                                children: [
-                                  SizedBox(width: 34),
-                                  SwitchButton(
-                                    notifier: rememberNotifier,
-                                  ),
-                                  Text(
-                                    'Запомнить',
-                                    style:
-                                        Theme.of(context).textTheme.subtitle1,
-                                  ),
-                                ],
                               ),
                               Spacer(flex: 1),
                               TextButton(

@@ -94,6 +94,41 @@ abstract class AuthService {
     return AuthStatus.noCookies;
   }
 
+  static void _updateCookie(Response response) {
+    List<String> setCookie = response.headers['set-cookie'];
+    Map<String, String> cookie = {};
+    String key, value;
+    for (String line in setCookie) {
+      key = line.substring(0, line.indexOf('='));
+      value = line.substring(line.indexOf('=') + 1, line.indexOf(';'));
+      cookie[key] = value;
+    }
+    Map<String, String> oldCookie = {};
+    me.dio.options.headers['cookie'].trim().split(';').forEach((pair) {
+      if (pair.isNotEmpty) {
+        pair = pair.trim();
+        String key = pair.substring(0, pair.indexOf('=')),
+            value = pair.substring(pair.indexOf('=') + 1);
+        oldCookie[key] = value;
+      }
+    });
+
+    oldCookie.addAll(cookie);
+
+    List<String> newCookie = [];
+    oldCookie.forEach((key, value) {
+      if(value!='DELETED') {
+        newCookie.add('$key=$value');
+      }
+    });
+
+    Map<String, dynamic> headers =
+        Map<String, dynamic>.from(me.dio.options.headers);
+    headers['cookie'] = newCookie.join('; ');
+
+    me.dio.options.headers = Map<String, dynamic>.from(headers);
+  }
+
   static Future<AuthStatus> logIn(String phone, String password) async {
     me.cookieJar.deleteAll();
 
@@ -114,6 +149,9 @@ abstract class AuthService {
         return AuthStatus.unknownError;
       }
     }
+    // TODO: In this response there are 2 remixlhk
+
+    _updateCookie(response);
 
     // Get parameter remixstid
     List<String> fList = [],
@@ -169,6 +207,7 @@ abstract class AuthService {
         return AuthStatus.unknownError;
       }
     }
+    _updateCookie(response);
 
     // Make new cookies
     List<String> newCookies = [
@@ -188,9 +227,11 @@ abstract class AuthService {
       'remixlhk=DELETED',
     ];
 
-    response.headers.forEach((name, values) {
-      if (name.contains('remixq')) {
-        newCookies.add(name + '=' + values.join());
+    response.headers['set-cookie'].forEach((line) {
+      if (line.contains('remixq_')) {
+        String key = line.substring(0, line.indexOf('='));
+        String value = line.substring(line.indexOf('=') + 1, line.indexOf(';'));
+        newCookies.add(key + '=' + value);
       }
     });
 
@@ -233,6 +274,7 @@ abstract class AuthService {
         return AuthStatus.unknownError;
       }
     }
+    _updateCookie(response);
 
     String data = response.data.toString();
     AuthStatus status;
@@ -332,6 +374,7 @@ abstract class AuthService {
         return AuthStatus.unknownError;
       }
     }
+    _updateCookie(response);
     String data = response.data.toString();
 
     String start = '', end = '';
@@ -353,14 +396,6 @@ abstract class AuthService {
   }
 
   static Future<AuthStatus> confirmCode(String code) async {
-    // https://vk.com/al_login.php?act=a_authcheck_code
-    // POST
-    // 200
-    // Query: act: a_authcheck_code
-    // Form:  al: 1
-    // 		    code: 959714
-    // 		    hash: 1624280078_fd9e1408d3701ac32e
-    // 		    remember: 1
     Map<String, String> forms = HashMap();
 
     forms['al'] = '1';
@@ -393,22 +428,9 @@ abstract class AuthService {
         return AuthStatus.unknownError;
       }
     }
+    _updateCookie(response);
 
     // TODO: get remixttpid from cookies
-
-    String data = response.data.toString();
-
-    print(data);
-
-    // https://vk.com/login.php?act=slogin&to=aW5kZXgucGhw&s=1&__q_hash=2e938386a213d453d23163705ea80fb7&fast=1
-    // GET
-    // 302
-    // Query string parameters:
-    //    act: slogin
-    // 		to: aW5kZXgucGhw
-    // 		s: 1
-    // 		__q_hash: 2e938386a213d453d23163705ea80fb7
-    // 		fast: 1
 
     Map<String, String> queryParams = {
       'act': 'slogin',
@@ -435,9 +457,9 @@ abstract class AuthService {
       }
     }
 
-    data = response.data.toString();
+    _updateCookie(response);
 
-    print(data);
+    print('end');
   }
 
   static AuthStatus logOut() {
