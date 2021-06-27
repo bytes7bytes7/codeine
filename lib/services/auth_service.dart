@@ -101,7 +101,8 @@ abstract class AuthService {
     for (String line in setCookie) {
       key = line.substring(0, line.indexOf('='));
       value = line.substring(line.indexOf('=') + 1, line.indexOf(';'));
-      cookie[key] = value;
+      cookie.putIfAbsent(key, () => value);
+      // cookie[key] = value;
     }
     Map<String, String> oldCookie = {};
     me.dio.options.headers['cookie'].trim().split(';').forEach((pair) {
@@ -112,6 +113,8 @@ abstract class AuthService {
         oldCookie[key] = value;
       }
     });
+
+    cookie['remixbdr'] = '0';
 
     oldCookie.addAll(cookie);
 
@@ -152,21 +155,6 @@ abstract class AuthService {
     // TODO: In this response there are 2 remixlhk
 
     _updateCookie(response);
-
-    // Get parameter remixstid
-    List<String> fList = [],
-        rawList = response.headers['set-cookie'].toString().split(',');
-    rawList.forEach((element) {
-      fList.addAll(element.split(';').map<String>((e) => e.trim()).toList());
-    });
-
-    Map<String, String> map = {};
-    fList.forEach((element) {
-      if (element.contains('=')) {
-        rawList = element.split('=');
-        map[rawList[0]] = rawList[1];
-      }
-    });
 
     // Get form data
     var document = parse(response.data);
@@ -210,34 +198,28 @@ abstract class AuthService {
     _updateCookie(response);
 
     // Make new cookies
-    List<String> newCookies = [
-      'remixbdr=0',
-      'remixsid=DELETED',
-      'remixusid=DELETED',
-      'remixstid=${map['remixstid']}',
-      'remixflash=0.0.0',
-      'remixscreen_width=1920',
-      'remixscreen_height=1080',
-      'remixscreen_dpr=1',
-      'remixscreen_depth=24',
-      'remixscreen_orient=1',
-      'remixscreen_winzoom=1',
-      'remixseenads=0',
-      'remixlang=0',
-      'remixlhk=DELETED',
-    ];
+    Map<String,String> newCookies = {
+      'remixbdr': '0',
+      'remixlang': '0',
+    };
 
-    response.headers['set-cookie'].forEach((line) {
-      if (line.contains('remixq_')) {
+    me.dio.options.headers['cookie'].split(';').forEach((line) {
+      if (line.isNotEmpty) {
+        line = line.trim();
         String key = line.substring(0, line.indexOf('='));
-        String value = line.substring(line.indexOf('=') + 1, line.indexOf(';'));
-        newCookies.add(key + '=' + value);
+        String value = line.substring(line.indexOf('=') + 1);
+        newCookies.addAll({key :value});
       }
+    });
+
+    List<String> cookieList = [];
+    newCookies.forEach((key, value) {
+      cookieList.add('$key=$value');
     });
 
     Map<String, dynamic> headers =
         Map<String, dynamic>.from(me.dio.options.headers);
-    headers['cookie'] = newCookies.join('; ');
+    headers['cookie'] = cookieList.join('; ');
 
     me.dio.options.headers = Map<String, dynamic>.from(headers);
 
@@ -391,7 +373,16 @@ abstract class AuthService {
     data = data.substring(0, data.lastIndexOf(end));
 
     // "hash" parameter for the next request's form data
-    _hash = data;
+    List<int> bytes = [];
+    data = data.trim();
+    data.split(',').forEach((byte) {
+      byte = byte.trim();
+      if(byte.isNotEmpty){
+        bytes.add(int.parse(byte));
+      }
+    });
+    _hash = utf8.decode(bytes);
+    print(_hash);
     return AuthStatus.ok;
   }
 
@@ -402,6 +393,9 @@ abstract class AuthService {
     forms['code'] = code;
     forms['hash'] = _hash;
     forms['remember'] = '1';
+
+    // TODO: should be: remixbdr=0
+    // TODO: try to select first remixlhk
 
     var formData = FormData.fromMap(forms);
     Response response;
@@ -430,19 +424,33 @@ abstract class AuthService {
     }
     _updateCookie(response);
 
-    // TODO: get remixttpid from cookies
+    String data = response.data.toString();
+    data = data.substring(1,data.length-1);
 
-    Map<String, String> queryParams = {
-      'act': 'slogin',
-      'to': 'aW5kZXgucGhw',
-      's': '1',
-      '__q_hash': _qHash,
-      'fast': '1',
-    };
+    List<int> bytes = [];
+    data.trim().split(',').forEach((byte) {
+      byte = byte.trim();
+      if(byte.isNotEmpty){
+        bytes.add(int.parse(byte));
+      }
+    });
 
+    var jsonData = json.decode(utf8.decode(bytes.sublist(4)));
+    String location = jsonData['payload'][1][0];
+
+    // TODO: fix it
+
+    location = location.substring(4,location.length-2);
+
+    Map<String, String> queryParams = {};
+    location.substring(location.indexOf('?')+1).split('&').forEach((pair) {
+      queryParams[pair.substring(pair.indexOf('='))] = pair.substring(pair.indexOf('=')+1);
+    });
+
+    location = location.substring(0, location.indexOf('?'));
     try {
       response = await me.dio.get(
-        '${ConstantHTTP.vkURL}login.php',
+        location,
         queryParameters: queryParams,
         options: Options(responseType: ResponseType.bytes),
       );

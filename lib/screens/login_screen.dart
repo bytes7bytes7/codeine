@@ -171,6 +171,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                 obscureText: true,
                                 errorNotifier: passwordNotifier,
                               ),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.delete,
+                                  color: Theme.of(context).focusColor,
+                                ),
+                                onPressed: () async {
+                                  AuthService.logOut();
+                                },
+                              ),
                               Spacer(flex: 1),
                               TextButton(
                                 child: Text(

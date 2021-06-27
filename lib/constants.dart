@@ -28,6 +28,7 @@ enum AuthStatus {
   errorCookies,
   loggedIn,
   needCode,
+  captcha,
   wrongCode,
   loggedOut,
   noInternet,
