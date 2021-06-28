@@ -1,10 +1,9 @@
 import 'dart:async';
 
-import 'package:codeine/models/user.dart';
-import 'package:codeine/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+import '../widgets/show_captcha_dialog.dart';
 import '../widgets/loading_circle.dart';
 import '../widgets/show_info_snack_bar.dart';
 import '../widgets/input_field.dart';
@@ -14,6 +13,8 @@ import '../constants.dart';
 import '../global/next_page_route.dart';
 import '../global/global_parameters.dart';
 import 'conditions_screen.dart';
+import '../models/user.dart';
+import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -61,6 +62,8 @@ class _LoginScreenState extends State<LoginScreen> {
           );
         } else if (state.status == AuthStatus.wrongCode) {
           codeNotifier.value = 'Неверно';
+        } else if (state.status == AuthStatus.captcha) {
+          showCaptchaDialog(context: context);
         } else if (state.status == AuthStatus.loggedOut) {
           loginNotifier.value = 'Неверно';
           passwordNotifier.value = 'Неверно';
@@ -293,9 +296,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             // TODO: make something more flexible
 
                             height:
-                                Theme.of(context).textTheme.headline3.fontSize *
-                                        2 +
-                                    20,
+                                Theme.of(context).textTheme.headline3.fontSize +
+                                    40,
                             padding: const EdgeInsets.symmetric(vertical: 20),
                             child: Center(
                               child: ValueListenableBuilder(

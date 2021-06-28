@@ -14,7 +14,7 @@ import '../global/global_parameters.dart';
 abstract class AuthService {
   static final User me = User();
   static String _hash = '';
-  static String _qHash = '';
+  static String captchaSID = '';
 
   static Future<AuthStatus> fetchUserData() async {
     if (me.id != null) {
@@ -237,7 +237,6 @@ abstract class AuthService {
     });
 
     queryParams['to'] = 'aW5kZXgucGhw';
-    _qHash = queryParams['__q_hash'];
 
     // 2nd request
     try {
@@ -394,9 +393,6 @@ abstract class AuthService {
     forms['hash'] = _hash;
     forms['remember'] = '1';
 
-    // TODO: should be: remixbdr=0
-    // TODO: try to select first remixlhk
-
     var formData = FormData.fromMap(forms);
     Response response;
     try {
@@ -435,22 +431,34 @@ abstract class AuthService {
       }
     });
 
-    var jsonData = json.decode(utf8.decode(bytes.sublist(4)));
+    String decoded = utf8.decode(bytes);
+    decoded = decoded.substring(4);
+
+    var jsonData = json.decode(decoded);
     String location = jsonData['payload'][1][0];
 
-    // TODO: fix it
+    // TODO: here jsonData can be smth like: {"payload":["2",["\"889784531685\"","0"]],"statsMeta":{"platform":"web2","st":false,"time":1624864729,"hash":"rr9Nqtl8ZlJzUPalJsFqVeZ5Us2xdmDdXuvstUe3QQg"},"loaderVersion":"13187849","langVersion":"7137"}
+    // TODO: 889784531685 maybe captcha sid
 
-    location = location.substring(4,location.length-2);
+    location = location.replaceAll('\\"', '');
+
+    try{
+      int.parse(location);
+      captchaSID = location;
+      return AuthStatus.captcha;
+    }catch(error){
+      // pass
+    }
 
     Map<String, String> queryParams = {};
     location.substring(location.indexOf('?')+1).split('&').forEach((pair) {
-      queryParams[pair.substring(pair.indexOf('='))] = pair.substring(pair.indexOf('=')+1);
+      queryParams[pair.substring(0,pair.indexOf('='))] = pair.substring(pair.indexOf('=')+1);
     });
 
     location = location.substring(0, location.indexOf('?'));
     try {
       response = await me.dio.get(
-        location,
+        '${ConstantHTTP.vkURL}$location',
         queryParameters: queryParams,
         options: Options(responseType: ResponseType.bytes),
       );
@@ -467,7 +475,26 @@ abstract class AuthService {
 
     _updateCookie(response);
 
-    print('end');
+    location = response.headers['location'].first;
+
+    try {
+      response = await me.dio.get(
+        '${ConstantHTTP.vkURL}$location',
+        queryParameters: queryParams,
+        options: Options(responseType: ResponseType.bytes),
+      );
+    } on DioError catch (e) {
+      if (GlobalParameters.connectionStatus.value == ConnectivityResult.none) {
+        return AuthStatus.noInternet;
+      } else {
+        print('logIn error: ${e.error}');
+        print('logIn error: ${e.message}');
+        print('logIn error: ${e.type}');
+        return AuthStatus.unknownError;
+      }
+    }
+
+    _updateCookie(response);
   }
 
   static AuthStatus logOut() {
