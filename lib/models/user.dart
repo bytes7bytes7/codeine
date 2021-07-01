@@ -6,16 +6,13 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:path_provider/path_provider.dart';
 
 class User {
-  static final User _singleton = User._internal();
-  Dio dio;
-  PersistCookieJar cookieJar;
+  static Dio dio;
+  static PersistCookieJar cookieJar;
 
-  factory User() {
-    return _singleton;
-  }
-
-  User._internal() {
-    _init();
+  init() async {
+    if (dio == null || cookieJar == null) {
+      await _init();
+    }
   }
 
   _init() async {
@@ -26,18 +23,18 @@ class User {
     dio.options.followRedirects = true;
   }
 
-  int id;
-  String link;
-  String name;
-  String firstName;
-  String lastName;
-  String shortName;
-  int sex;
-  String photo;
-  String photo_100;
-  String phoneOrEmail;
+  static int id;
+  static String link;
+  static String name;
+  static String firstName;
+  static String lastName;
+  static String shortName;
+  static int sex;
+  static String photo;
+  static String photo_100;
+  static String phoneOrEmail;
 
-  Map<String, dynamic> toMap() {
+  static Map<String, dynamic> toMap() {
     return {
       'id': id,
       'link': link,
@@ -53,19 +50,19 @@ class User {
   }
 
   static fromMap(Map<String, dynamic> map) {
-    _singleton.id = map['id'];
-    _singleton.link = map['link'];
-    _singleton.name = map['name'];
-    _singleton.firstName = map['firstName'];
-    _singleton.lastName = map['lastName'];
-    _singleton.shortName = map['shortName'];
-    _singleton.sex = map['sex'];
-    _singleton.photo = map['photo'];
-    _singleton.photo_100 = map['photo_100'];
-    _singleton.phoneOrEmail = map['phoneOrEmail'];
+    id = map['id'];
+    link = map['link'];
+    name = map['name'];
+    firstName = map['firstName'];
+    lastName = map['lastName'];
+    shortName = map['shortName'];
+    sex = map['sex'];
+    photo = map['photo'];
+    photo_100 = map['photo_100'];
+    phoneOrEmail = map['phoneOrEmail'];
   }
 
-  String toJson() => json.encode(toMap());
+  static String toJson() => json.encode(toMap());
 
-  fromJson(String str) => fromMap(json.decode(str));
+  static fromJson(String str) => fromMap(json.decode(str));
 }

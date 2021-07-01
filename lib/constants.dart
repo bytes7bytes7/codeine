@@ -7,6 +7,7 @@ import 'screens/home_screen.dart';
 abstract class ConstantColors {
   static const Color scaffoldBackgroundColor = Color(0xFF121421);
   static const Color focusColor = Color(0xFFEDEDED);
+  static const Color disabledColor = Color(0xFFC5C5C5);
   static const Color splashColor = Color(0xFF7F2BCF);
   static const Color highlightColor = Color(0xFFB538A7);
   static const Color errorColor = Color(0xFFB53850);

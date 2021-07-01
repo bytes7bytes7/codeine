@@ -5,6 +5,11 @@ import 'themes/dark_theme.dart';
 import 'screens/main_screen.dart';
 
 void main() {
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+    ),
+  );
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }

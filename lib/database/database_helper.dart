@@ -59,41 +59,40 @@ class DatabaseHelper {
   }
 
   // User methods
-  Future _addUser(User user) async {
+  Future _addUser() async {
     final db = await database;
     await db.rawInsert(
       "INSERT INTO ${ConstantDBData.userTableName} (${ConstantDBData.id}, ${ConstantDBData.link}, ${ConstantDBData.name}, ${ConstantDBData.firstName}, ${ConstantDBData.lastName}, ${ConstantDBData.shortName}, ${ConstantDBData.sex}, ${ConstantDBData.photo}, ${ConstantDBData.photo_100}, ${ConstantDBData.phoneOrEmail}) VALUES (?,?,?,?,?,?,?,?,?,?)",
       [
-        user.id,
-        user.link,
-        user.name,
-        user.firstName,
-        user.lastName,
-        user.shortName,
-        user.sex,
-        user.photo,
-        user.photo_100,
-        user.phoneOrEmail,
+        User.id,
+        User.link,
+        User.name,
+        User.firstName,
+        User.lastName,
+        User.shortName,
+        User.sex,
+        User.photo,
+        User.photo_100,
+        User.phoneOrEmail,
       ],
     );
   }
 
-  Future updateUser(User user) async {
-    assert (user.id!=null);
+  Future updateUser() async {
     final db = await database;
     List<Map<String, dynamic>> data = await db.query(
         "${ConstantDBData.userTableName}",
         where: "${ConstantDBData.id} = ?",
-        whereArgs: [user.id]);
+        whereArgs: [User.id]);
     if (data.isNotEmpty) {
-      Map<String, dynamic> map = user.toMap();
+      Map<String, dynamic> map = User.toMap();
       if(map['phoneOrEmail']==null){
         map['phoneOrEmail']=data.first['phoneOrEmail'];
       }
       await db.update("${ConstantDBData.userTableName}", map,
-          where: "${ConstantDBData.id} = ?", whereArgs: [user.id]);
+          where: "${ConstantDBData.id} = ?", whereArgs: [User.id]);
     }else{
-      await _addUser(user);
+      await _addUser();
     }
 
   }

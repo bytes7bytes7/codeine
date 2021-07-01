@@ -8,8 +8,8 @@ import '../global/global_parameters.dart';
 class MainScreen extends StatelessWidget {
   initSession() async {
     // init singleton of user
-    User();
-    await Future.delayed(const Duration(seconds: 2), () => null);
+    User u = User();
+    await u.init();
 
     AuthStatus status = await AuthService.checkCookie();
     switch(status){

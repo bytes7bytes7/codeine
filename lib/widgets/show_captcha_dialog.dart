@@ -17,81 +17,87 @@ Future<void> showCaptchaDialog({BuildContext context}) async {
           borderRadius: BorderRadius.circular(15),
         ),
         contentPadding: const EdgeInsets.all(0),
-        content: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            borderRadius: BorderRadius.circular(15),
-            gradient: LinearGradient(
-              colors: [
-                Theme.of(context).focusColor.withOpacity(0.2),
-                Theme.of(context).focusColor.withOpacity(0),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+        content: GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onTap: () {
+            FocusScope.of(context).requestFocus(FocusNode());
+          },
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              borderRadius: BorderRadius.circular(15),
+              gradient: LinearGradient(
+                colors: [
+                  Theme.of(context).focusColor.withOpacity(0.2),
+                  Theme.of(context).focusColor.withOpacity(0),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
             ),
-          ),
-          child: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Center(
-                        child: Text(
-                          'Введите код\nс картинки',
-                          style: Theme.of(context).textTheme.headline3,
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      SizedBox(height: 25),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.network(
-                          '${ConstantHTTP.vkURL}captcha.php?sid=${AuthService.captchaSID}&s=1',
-                          width: 190.0,
-                          height: 70.0,
-                          fit: BoxFit.fill,
-                          alignment: Alignment.center,
-                        ),
-                      ),
-                      SizedBox(height: 30),
-                      InputField(
-                        controller: captchaController,
-                        errorNotifier: errorNotifier,
-                        hint: 'Код',
-                      ),
-                      SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            child: Text(
-                              'Отмена',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline3,
-                            ),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
+            child: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Center(
+                          child: Text(
+                            'Введите код\nс картинки',
+                            style: Theme.of(context).textTheme.headline3,
+                            textAlign: TextAlign.center,
                           ),
-                          TextButton(
-                            child: Text(
-                              'Ок',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline3,
-                            ),
-                            onPressed: () {},
+                        ),
+                        SizedBox(height: 25),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.network(
+                            '${ConstantHTTP.vkURL}captcha.php?sid=${AuthService.captchaSID}&s=1',
+                            width: 190.0,
+                            height: 70.0,
+                            fit: BoxFit.fill,
+                            alignment: Alignment.center,
                           ),
-                        ],
-                      ),
-                    ],
+                        ),
+                        SizedBox(height: 30),
+                        InputField(
+                          controller: captchaController,
+                          errorNotifier: errorNotifier,
+                          hint: 'Код',
+                        ),
+                        SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                              child: Text(
+                                'Отмена',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline3,
+                              ),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            ),
+                            TextButton(
+                              child: Text(
+                                'Ок',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline3,
+                              ),
+                              onPressed: () {},
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

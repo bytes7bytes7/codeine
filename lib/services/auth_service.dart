@@ -12,15 +12,14 @@ import '../constants.dart';
 import '../global/global_parameters.dart';
 
 abstract class AuthService {
-  static final User me = User();
   static String _hash = '';
   static String captchaSID = '';
 
   static Future<AuthStatus> fetchUserData() async {
-    if (me.id != null) {
+    if (User.id != null) {
       Response response;
       try {
-        response = await me.dio.get('${ConstantHTTP.vkURL}id${me.id}',
+        response = await User.dio.get('${ConstantHTTP.vkURL}id${User.id}',
             options: Options(responseType: ResponseType.bytes));
       } on DioError catch (e) {
         if (GlobalParameters.connectionStatus.value ==
@@ -46,7 +45,7 @@ abstract class AuthService {
       if (data.contains(start)) {
         status = AuthStatus.loggedOut;
       } else {
-        await _setUserData(data);
+        await _setmeData(data);
       }
       return status;
     }
@@ -54,27 +53,27 @@ abstract class AuthService {
   }
 
   static Future<AuthStatus> checkCookie() async {
-    if (me.cookieJar.domains.isNotEmpty) {
-      print('me.cookieJar domains is NOT empty');
+    if (User.cookieJar.domains.isNotEmpty) {
+      print('User.cookieJar domains is NOT empty');
       String uid;
       try {
-        uid = me.cookieJar.domains[0]['login.vk.com']['/']['l'].toString();
-        me.id =
+        uid = User.cookieJar.domains[0]['login.vk.com']['/']['l'].toString();
+        User.id =
             int.parse(uid.substring(uid.indexOf('l=') + 2, uid.indexOf(';')));
-        print(me.id);
+        print(User.id);
       } catch (e) {
         print('checkCookie error');
         return AuthStatus.errorCookies;
       }
 
-      //Load header to me.dio client
+      //Load header to User.dio client
       Map<String, String> headers = HashMap();
       headers.addAll(ConstantHTTP.headers);
-      me.dio.options.headers = headers;
-      if (me.cookieJar.domains != null) {
+      User.dio.options.headers = headers;
+      if (User.cookieJar.domains != null) {
         String cookies = headers['cookie'];
         Map<dynamic, dynamic> domains;
-        domains = HashMap.from(me.cookieJar.domains[0]['vk.com']['/']);
+        domains = HashMap.from(User.cookieJar.domains[0]['vk.com']['/']);
         for (int i = 0; i < domains.keys.length; i++) {
           String key = domains.keys.toList()[i].toString();
           String value = domains[key].toString();
@@ -86,7 +85,7 @@ abstract class AuthService {
           cookies += value + '; ';
         }
         cookies = cookies.substring(0, cookies.length - 2);
-        me.dio.options.headers['cookie'] = cookies;
+        User.dio.options.headers['cookie'] = cookies;
       }
       return AuthStatus.cookies;
     }
@@ -105,7 +104,7 @@ abstract class AuthService {
       // cookie[key] = value;
     }
     Map<String, String> oldCookie = {};
-    me.dio.options.headers['cookie'].trim().split(';').forEach((pair) {
+    User.dio.options.headers['cookie'].trim().split(';').forEach((pair) {
       if (pair.isNotEmpty) {
         pair = pair.trim();
         String key = pair.substring(0, pair.indexOf('=')),
@@ -126,167 +125,13 @@ abstract class AuthService {
     });
 
     Map<String, dynamic> headers =
-        Map<String, dynamic>.from(me.dio.options.headers);
+        Map<String, dynamic>.from(User.dio.options.headers);
     headers['cookie'] = newCookie.join('; ');
 
-    me.dio.options.headers = Map<String, dynamic>.from(headers);
+    User.dio.options.headers = Map<String, dynamic>.from(headers);
   }
 
-  static Future<AuthStatus> logIn(String phone, String password) async {
-    me.cookieJar.deleteAll();
-
-    me.phoneOrEmail = phone;
-    me.dio.options.headers = ConstantHTTP.headers;
-    me.cookieJar.loadForRequest(Uri.parse(ConstantHTTP.vkLoginURL));
-    Response response;
-
-    try {
-      response = await me.dio.get(ConstantHTTP.vkURL);
-    } on DioError catch (e) {
-      if (GlobalParameters.connectionStatus.value == ConnectivityResult.none) {
-        return AuthStatus.noInternet;
-      } else {
-        print('logIn error: ${e.error}');
-        print('logIn error: ${e.message}');
-        print('logIn error: ${e.type}');
-        return AuthStatus.unknownError;
-      }
-    }
-    // TODO: In this response there are 2 remixlhk
-
-    _updateCookie(response);
-
-    // Get form data
-    var document = parse(response.data);
-    var parameters = document
-        .getElementById("quick_login_form")
-        .getElementsByTagName('input');
-    Map<String, String> forms = HashMap();
-    for (var p in parameters) {
-      if (p.attributes['name'] != null) {
-        forms[p.attributes['name']] = p.attributes['value'];
-      }
-    }
-    forms['to'] = 'bG9naW4/bT0xJmVtYWlsPWFzJnRvPWFXNWtaWGd1Y0dodw--';
-    forms['email'] = phone;
-    forms['pass'] = password;
-
-    // 1st request
-    var formData = FormData.fromMap(forms);
-    try {
-      response = await me.dio.post(
-        ConstantHTTP.vkLoginURL,
-        queryParameters: {'act': 'login'},
-        data: formData,
-        options: Options(
-          followRedirects: true,
-          validateStatus: (status) {
-            return status < 500;
-          },
-        ),
-      );
-    } on DioError catch (e) {
-      if (GlobalParameters.connectionStatus.value == ConnectivityResult.none) {
-        return AuthStatus.noInternet;
-      } else {
-        print('logIn error: ${e.error}');
-        print('logIn error: ${e.message}');
-        print('logIn error: ${e.type}');
-        return AuthStatus.unknownError;
-      }
-    }
-    _updateCookie(response);
-
-    // Make new cookies
-    Map<String,String> newCookies = {
-      'remixbdr': '0',
-      'remixlang': '0',
-    };
-
-    me.dio.options.headers['cookie'].split(';').forEach((line) {
-      if (line.isNotEmpty) {
-        line = line.trim();
-        String key = line.substring(0, line.indexOf('='));
-        String value = line.substring(line.indexOf('=') + 1);
-        newCookies.addAll({key :value});
-      }
-    });
-
-    List<String> cookieList = [];
-    newCookies.forEach((key, value) {
-      cookieList.add('$key=$value');
-    });
-
-    Map<String, dynamic> headers =
-        Map<String, dynamic>.from(me.dio.options.headers);
-    headers['cookie'] = cookieList.join('; ');
-
-    me.dio.options.headers = Map<String, dynamic>.from(headers);
-
-    // Separate uri from parameters
-    String location = response.headers['location'].first;
-    Map<String, String> queryParams = {};
-
-    List<String> params =
-        location.substring(location.indexOf('?') + 1).split('&');
-    location = location.substring(0, location.indexOf('?'));
-
-    params.forEach((element) {
-      List<String> keyValue = element.split('=');
-      queryParams.putIfAbsent(keyValue[0], () => keyValue[1]);
-    });
-
-    queryParams['to'] = 'aW5kZXgucGhw';
-
-    // 2nd request
-    try {
-      response = await me.dio.get(
-        location,
-        queryParameters: queryParams,
-        options: Options(responseType: ResponseType.bytes),
-      );
-    } on DioError catch (e) {
-      if (GlobalParameters.connectionStatus.value == ConnectivityResult.none) {
-        return AuthStatus.noInternet;
-      } else {
-        print('logIn error: ${e.error}');
-        print('logIn error: ${e.message}');
-        print('logIn error: ${e.type}');
-        return AuthStatus.unknownError;
-      }
-    }
-    _updateCookie(response);
-
-    String data = response.data.toString();
-    AuthStatus status;
-    // Check if login was successful
-    String start = '';
-    utf8.encode('onLoginDone').forEach((byte) {
-      start += byte.toString() + ', ';
-    });
-    if (!data.contains(start)) {
-      start = '';
-      utf8.encode('/login?act=authcheck').forEach((byte) {
-        start += byte.toString() + ', ';
-      });
-      if (!data.contains(start)) {
-        print('Login failed');
-        status = AuthStatus.loggedOut;
-      } else {
-        // Need to confirm the code
-        print('Confirmation code');
-        status = AuthStatus.needCode;
-      }
-    } else {
-      print('Login done');
-      status = AuthStatus.loggedIn;
-      await _setUserData(data);
-    }
-
-    return status;
-  }
-
-  static Future<void> _setUserData(String data) async {
+  static Future<void> _setmeData(String data) async {
     String start = '', end = '';
 
     // Get Json from html
@@ -320,17 +165,184 @@ abstract class AuthService {
     data = Win1251Decoder.decode(bytes);
     Map<String, dynamic> jsonData = json.decode(data);
 
-    me.id = jsonData['callsCredentials']['me']['peerId'];
-    me.link = jsonData['callsCredentials']['me']['link'];
-    me.name = jsonData['callsCredentials']['me']['name'];
-    me.firstName = jsonData['callsCredentials']['me']['firstName'];
-    me.lastName = jsonData['callsCredentials']['me']['lastName'];
-    me.shortName = jsonData['callsCredentials']['me']['shortName'];
-    me.sex = int.parse(jsonData['callsCredentials']['me']['sex']);
-    me.photo = jsonData['callsCredentials']['me']['photo'];
-    me.photo_100 = jsonData['callsCredentials']['me']['photo_100'];
+    User.id = jsonData['callsCredentials']['me']['peerId'];
+    User.link = jsonData['callsCredentials']['me']['link'];
+    User.name = jsonData['callsCredentials']['me']['name'];
+    User.firstName = jsonData['callsCredentials']['me']['firstName'];
+    User.lastName = jsonData['callsCredentials']['me']['lastName'];
+    User.shortName = jsonData['callsCredentials']['me']['shortName'];
+    User.sex = int.parse(jsonData['callsCredentials']['me']['sex']);
+    User.photo = jsonData['callsCredentials']['me']['photo'];
+    User.photo_100 = jsonData['callsCredentials']['me']['photo_100'];
 
-    await DatabaseHelper.db.updateUser(me);
+    await DatabaseHelper.db.updateUser();
+  }
+
+  static _firstPostLoginVk(FormData formData, Map<String, String> queryParameters)async{
+    Response response;
+    try {
+      response = await User.dio.post(
+        ConstantHTTP.vkLoginURL,
+        queryParameters: queryParameters,
+        data: formData,
+        options: Options(
+          followRedirects: true,
+          validateStatus: (status) {
+            return status < 500;
+          },
+        ),
+      );
+    } on DioError catch (e) {
+      if (GlobalParameters.connectionStatus.value == ConnectivityResult.none) {
+        return AuthStatus.noInternet;
+      } else {
+        print('logIn error: ${e.error}');
+        print('logIn error: ${e.message}');
+        print('logIn error: ${e.type}');
+        return AuthStatus.unknownError;
+      }
+    }
+
+    _updateCookie(response);
+
+    return response;
+  }
+
+  static Future<AuthStatus> logIn(String phone, String password) async {
+    User.cookieJar.deleteAll();
+
+    User.phoneOrEmail = phone;
+    User.dio.options.headers = ConstantHTTP.headers;
+    User.cookieJar.loadForRequest(Uri.parse(ConstantHTTP.vkLoginURL));
+    Response response;
+
+    try {
+      response = await User.dio.get(ConstantHTTP.vkURL);
+    } on DioError catch (e) {
+      if (GlobalParameters.connectionStatus.value == ConnectivityResult.none) {
+        return AuthStatus.noInternet;
+      } else {
+        print('logIn error: ${e.error}');
+        print('logIn error: ${e.message}');
+        print('logIn error: ${e.type}');
+        return AuthStatus.unknownError;
+      }
+    }
+    // TODO: In this response there are 2 remixlhk
+
+    _updateCookie(response);
+
+    // Get form data
+    var document = parse(response.data);
+    var parameters = document
+        .getElementById("quick_login_form")
+        .getElementsByTagName('input');
+    Map<String, String> forms = HashMap();
+    for (var p in parameters) {
+      if (p.attributes['name'] != null) {
+        forms[p.attributes['name']] = p.attributes['value'];
+      }
+    }
+    forms['to'] = 'bG9naW4/bT0xJmVtYWlsPWFzJnRvPWFXNWtaWGd1Y0dodw--';
+    forms['email'] = phone;
+    forms['pass'] = password;
+
+    // 1st request
+    var formData = FormData.fromMap(forms);
+    dynamic result = await _firstPostLoginVk(formData, {'act': 'login'});
+    if(result is Response){
+      response = result;
+    }else{
+      return result;
+    }
+
+    // Make new cookies
+    Map<String,String> newCookies = {
+      'remixbdr': '0',
+      'remixlang': '0',
+    };
+
+    User.dio.options.headers['cookie'].split(';').forEach((line) {
+      if (line.isNotEmpty) {
+        line = line.trim();
+        String key = line.substring(0, line.indexOf('='));
+        String value = line.substring(line.indexOf('=') + 1);
+        newCookies.addAll({key :value});
+      }
+    });
+
+    List<String> cookieList = [];
+    newCookies.forEach((key, value) {
+      cookieList.add('$key=$value');
+    });
+
+    Map<String, dynamic> headers =
+        Map<String, dynamic>.from(User.dio.options.headers);
+    headers['cookie'] = cookieList.join('; ');
+
+    User.dio.options.headers = Map<String, dynamic>.from(headers);
+
+    // Separate uri from parameters
+    String location = response.headers['location'].first;
+    Map<String, String> queryParams = {};
+
+    List<String> params =
+        location.substring(location.indexOf('?') + 1).split('&');
+    location = location.substring(0, location.indexOf('?'));
+
+    params.forEach((element) {
+      List<String> keyValue = element.split('=');
+      queryParams.putIfAbsent(keyValue[0], () => keyValue[1]);
+    });
+
+    queryParams['to'] = 'aW5kZXgucGhw';
+
+    // 2nd request
+    try {
+      response = await User.dio.get(
+        location,
+        queryParameters: queryParams,
+        options: Options(responseType: ResponseType.bytes),
+      );
+    } on DioError catch (e) {
+      if (GlobalParameters.connectionStatus.value == ConnectivityResult.none) {
+        return AuthStatus.noInternet;
+      } else {
+        print('logIn error: ${e.error}');
+        print('logIn error: ${e.message}');
+        print('logIn error: ${e.type}');
+        return AuthStatus.unknownError;
+      }
+    }
+    _updateCookie(response);
+
+    String data = response.data.toString();
+    // Check if login was successful
+    AuthStatus status;
+    String start = '';
+    utf8.encode('onLoginDone').forEach((byte) {
+      start += byte.toString() + ', ';
+    });
+    if (!data.contains(start)) {
+      start = '';
+      utf8.encode('/login?act=authcheck').forEach((byte) {
+        start += byte.toString() + ', ';
+      });
+      if (!data.contains(start)) {
+        print('Login failed');
+        status = AuthStatus.loggedOut;
+      } else {
+        // Need to confirm the code
+        print('Confirmation code');
+        status = AuthStatus.needCode;
+      }
+    } else {
+      print('Login done');
+      status = AuthStatus.loggedIn;
+      await _setmeData(data);
+    }
+
+    return status;
   }
 
   static Future<AuthStatus> getCode() async {
@@ -340,7 +352,7 @@ abstract class AuthService {
 
     Response response;
     try {
-      response = await me.dio.get(
+      response = await User.dio.get(
         '${ConstantHTTP.vkURL}login',
         queryParameters: queryParams,
         options: Options(responseType: ResponseType.bytes),
@@ -381,7 +393,6 @@ abstract class AuthService {
       }
     });
     _hash = utf8.decode(bytes);
-    print(_hash);
     return AuthStatus.ok;
   }
 
@@ -396,7 +407,7 @@ abstract class AuthService {
     var formData = FormData.fromMap(forms);
     Response response;
     try {
-      response = await me.dio.post(
+      response = await User.dio.post(
         '${ConstantHTTP.vkURL}al_login.php',
         queryParameters: {'act': 'a_authcheck_code'},
         data: formData,
@@ -440,7 +451,7 @@ abstract class AuthService {
     // TODO: here jsonData can be smth like: {"payload":["2",["\"889784531685\"","0"]],"statsMeta":{"platform":"web2","st":false,"time":1624864729,"hash":"rr9Nqtl8ZlJzUPalJsFqVeZ5Us2xdmDdXuvstUe3QQg"},"loaderVersion":"13187849","langVersion":"7137"}
     // TODO: 889784531685 maybe captcha sid
 
-    location = location.replaceAll('\\"', '');
+    location = location.replaceAll('\"', '');
 
     try{
       int.parse(location);
@@ -457,7 +468,7 @@ abstract class AuthService {
 
     location = location.substring(0, location.indexOf('?'));
     try {
-      response = await me.dio.get(
+      response = await User.dio.get(
         '${ConstantHTTP.vkURL}$location',
         queryParameters: queryParams,
         options: Options(responseType: ResponseType.bytes),
@@ -478,7 +489,7 @@ abstract class AuthService {
     location = response.headers['location'].first;
 
     try {
-      response = await me.dio.get(
+      response = await User.dio.get(
         '${ConstantHTTP.vkURL}$location',
         queryParameters: queryParams,
         options: Options(responseType: ResponseType.bytes),
@@ -498,8 +509,8 @@ abstract class AuthService {
   }
 
   static AuthStatus logOut() {
-    me.cookieJar.deleteAll();
-    me.dio.options.headers.clear();
+    User.cookieJar.deleteAll();
+    User.dio.options.headers.clear();
     return AuthStatus.loggedOut;
   }
 }
