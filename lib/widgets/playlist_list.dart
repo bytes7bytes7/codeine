@@ -85,7 +85,7 @@ class PlaylistCard extends StatelessWidget {
               ),
               Text(
                 playlist.albumName,
-                style: Theme.of(context).textTheme.bodyText2,
+                style: Theme.of(context).textTheme.bodyText1,
                 overflow: TextOverflow.ellipsis,
               ),
               Text(

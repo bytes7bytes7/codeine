@@ -52,6 +52,7 @@ class BottomMusicPlayer extends StatelessWidget {
                 ],
               ),
               Spacer(),
+              // TODO: place button on the center of songs' duration
               IconButton(
                 onPressed: () {},
                 icon: Icon(
