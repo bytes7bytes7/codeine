@@ -31,7 +31,7 @@ class HomeScreen extends StatelessWidget {
     Song(),
     Song(),
     Song(),
-    Song()
+    Song(),
   ];
 
   @override

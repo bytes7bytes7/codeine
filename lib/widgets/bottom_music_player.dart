@@ -1,8 +1,32 @@
 import 'package:codeine/models/song.dart';
+import 'package:codeine/widgets/player_wave.dart';
 import 'package:flutter/material.dart';
 
-class BottomMusicPlayer extends StatelessWidget {
-  final ValueNotifier<Song> songNotifier = ValueNotifier(Song());
+class BottomMusicPlayer extends StatefulWidget {
+  @override
+  State<BottomMusicPlayer> createState() => _BottomMusicPlayerState();
+}
+
+class _BottomMusicPlayerState extends State<BottomMusicPlayer>
+    with SingleTickerProviderStateMixin {
+  ValueNotifier<Song> songNotifier;
+  ValueNotifier<bool> playNotifier;
+  AnimationController _playAnimationController;
+
+  @override
+  void initState() {
+    songNotifier = ValueNotifier(Song());
+    playNotifier = ValueNotifier(false);
+    _playAnimationController =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _playAnimationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -11,57 +35,92 @@ class BottomMusicPlayer extends StatelessWidget {
       child: InkWell(
         onTap: () {},
         child: Container(
-          width: double.infinity,
-          height: 60,
-          padding: const EdgeInsets.symmetric(horizontal: 30),
-          decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            gradient: LinearGradient(
-              colors: [
-                Theme.of(context).splashColor,
-                Theme.of(context).splashColor.withOpacity(0.0),
-              ],
-              begin: Alignment.bottomCenter,
-              end: Alignment.topCenter,
-            ),
-          ),
-          child: Row(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          child: Stack(
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    songNotifier.value?.title,
-                    style: Theme.of(context).textTheme.bodyText1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    '${songNotifier.value.artists.sublist(1).fold<String>(songNotifier.value.artists.first, (prev, next) => prev += ', ' + next)}' +
-                        ((songNotifier.value.feat.isNotEmpty)
-                            ? ' feat ' +
-                                songNotifier.value.feat.sublist(1).fold<String>(
-                                    songNotifier.value.feat.first,
-                                    (prev, next) => prev += ', ' + next)
-                            : ''),
-                    style: Theme.of(context).textTheme.bodyText2.copyWith(
-                          color: Theme.of(context).disabledColor,
-                        ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-              Spacer(),
-              // TODO: place button on the center of songs' duration
-              IconButton(
-                onPressed: () {},
-                icon: Icon(
-                  Icons.play_arrow,
-                  size: 28,
+              PlayerWave(
+                config: CustomConfig(
+                  gradients: [
+                    [
+                      Theme.of(context).splashColor,
+                      Theme.of(context).splashColor.withOpacity(0.0),
+                    ],
+                    [
+                      Theme.of(context).splashColor,
+                      Theme.of(context).splashColor.withOpacity(0.0),
+                    ],
+                  ],
+                  durations: [7100, 9350],
+                  heightPercentages: [0.5, 0.52],
+                  blur: MaskFilter.blur(BlurStyle.solid, 5),
+                  gradientBegin: Alignment.bottomCenter,
+                  gradientEnd: Alignment.topCenter,
                 ),
-                color: Theme.of(context).focusColor,
-                padding: const EdgeInsets.symmetric(horizontal: 0),
-                splashRadius: 20,
+                waveAmplitude: 0,
+                backgroundColor: Colors.transparent,
+                size: Size(double.infinity, 60),
+              ),
+              Container(
+                width: double.infinity,
+                height: 60,
+                padding: const EdgeInsets.symmetric(horizontal: 30),
+                child: Row(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          songNotifier.value?.title,
+                          style: Theme.of(context).textTheme.bodyText1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          '${songNotifier.value.artists.sublist(1).fold<String>(songNotifier.value.artists.first, (prev, next) => prev += ', ' + next)}' +
+                              ((songNotifier.value.feat.isNotEmpty)
+                                  ? ' feat ' +
+                                      songNotifier.value.feat
+                                          .sublist(1)
+                                          .fold<String>(
+                                              songNotifier.value.feat.first,
+                                              (prev, next) =>
+                                                  prev += ', ' + next)
+                                  : ''),
+                          style: Theme.of(context).textTheme.bodyText2.copyWith(
+                                color: Theme.of(context).disabledColor,
+                              ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                    Spacer(),
+                    // TODO: place button on the center of songs' duration
+                    IconButton(
+                      color: Theme.of(context).focusColor,
+                      padding: const EdgeInsets.symmetric(horizontal: 0),
+                      splashRadius: 20,
+                      icon: ValueListenableBuilder(
+                        valueListenable: playNotifier,
+                        builder: (context, value, __) {
+                          return AnimatedIcon(
+                            icon: AnimatedIcons.play_pause,
+                            size: 30,
+                            progress: _playAnimationController,
+                            color: Theme.of(context).focusColor,
+                          );
+                        },
+                      ),
+                      onPressed: () {
+                        playNotifier.value = !playNotifier.value;
+                        if (playNotifier.value) {
+                          _playAnimationController.forward();
+                        } else {
+                          _playAnimationController.reverse();
+                        }
+                      },
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
