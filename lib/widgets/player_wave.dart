@@ -210,6 +210,8 @@ class _PlayerWaveState extends State<PlayerWave> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    _initAnimations();
+    print('build');
     return Container(
       color: widget.backgroundColor,
       child: Stack(

@@ -12,9 +12,13 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
   ValueNotifier<Song> songNotifier;
   ValueNotifier<bool> playNotifier;
   AnimationController _playAnimationController;
+  ValueNotifier<int> waveDuration;
+  ValueNotifier<double> waveHeightPercentage;
 
   @override
   void initState() {
+    waveDuration = ValueNotifier(10000);
+    waveHeightPercentage = ValueNotifier(0.7);
     songNotifier = ValueNotifier(Song());
     playNotifier = ValueNotifier(false);
     _playAnimationController =
@@ -38,27 +42,32 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
           color: Theme.of(context).scaffoldBackgroundColor,
           child: Stack(
             children: [
-              PlayerWave(
-                config: CustomConfig(
-                  gradients: [
-                    [
-                      Theme.of(context).splashColor,
-                      Theme.of(context).splashColor.withOpacity(0.0),
-                    ],
-                    [
-                      Theme.of(context).splashColor,
-                      Theme.of(context).splashColor.withOpacity(0.0),
-                    ],
-                  ],
-                  durations: [7100, 9350],
-                  heightPercentages: [0.5, 0.52],
-                  blur: MaskFilter.blur(BlurStyle.solid, 5),
-                  gradientBegin: Alignment.bottomCenter,
-                  gradientEnd: Alignment.topCenter,
-                ),
-                waveAmplitude: 0,
-                backgroundColor: Colors.transparent,
-                size: Size(double.infinity, 60),
+              ValueListenableBuilder(
+                valueListenable: waveDuration,
+                builder: (context, _, __) {
+                  return PlayerWave(
+                    config: CustomConfig(
+                      gradients: [
+                        [
+                          Theme.of(context).splashColor,
+                          Theme.of(context).splashColor.withOpacity(0.0),
+                        ],
+                        // [
+                        //   Theme.of(context).splashColor,
+                        //   Theme.of(context).splashColor.withOpacity(0.0),
+                        // ],
+                      ],
+                      durations: [waveDuration.value],
+                      heightPercentages: [waveHeightPercentage.value],
+                      blur: MaskFilter.blur(BlurStyle.solid, 5),
+                      gradientBegin: Alignment.bottomCenter,
+                      gradientEnd: Alignment.topCenter,
+                    ),
+                    waveAmplitude: 0,
+                    backgroundColor: Colors.transparent,
+                    size: Size(double.infinity, 60),
+                  );
+                },
               ),
               Container(
                 width: double.infinity,
@@ -113,8 +122,12 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
                       onPressed: () {
                         playNotifier.value = !playNotifier.value;
                         if (playNotifier.value) {
+                          waveDuration.value = 3000;
+                          waveHeightPercentage.value = 0.5;
                           _playAnimationController.forward();
                         } else {
+                          waveDuration.value = 10000;
+                          waveHeightPercentage.value = 0.7;
                           _playAnimationController.reverse();
                         }
                       },
