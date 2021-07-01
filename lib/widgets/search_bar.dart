@@ -23,7 +23,7 @@ class SearchBar extends StatelessWidget {
             gradient: LinearGradient(
               colors: [
                 Theme.of(context).splashColor,
-                Theme.of(context).splashColor.withOpacity(0),
+                Theme.of(context).highlightColor,
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,

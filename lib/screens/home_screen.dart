@@ -1,12 +1,38 @@
-import 'package:codeine/bloc/bloc.dart';
-import 'package:codeine/global/global_parameters.dart';
 import 'package:codeine/models/playlist.dart';
+import 'package:codeine/models/song.dart';
 import 'package:codeine/models/user.dart';
-import 'package:codeine/widgets/playlist_list.dart';
+import 'package:codeine/widgets/music_sliver.dart';
 import 'package:codeine/widgets/search_bar.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
+  final List<Playlist> playlists = [
+    Playlist(),
+    Playlist(),
+    Playlist(),
+    Playlist(),
+    Playlist(),
+  ];
+
+  final List<Song> songs = [
+    Song(),
+    Song(),
+    Song(),
+    Song(),
+    Song(),
+    Song(),
+    Song(),
+    Song(),
+    Song(),
+    Song(),
+    Song(),
+    Song(),
+    Song(),
+    Song(),
+    Song(),
+    Song()
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -21,35 +47,26 @@ class HomeScreen extends StatelessWidget {
           radius: 0.9,
         ),
       ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: SafeArea(
-          child: CustomScrollView(
-            physics: BouncingScrollPhysics(),
-            slivers: [
-              _Header(),
-              SearchBar(),
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    if (index == 0) {
-                      return PlaylistList(
-                        playlists: [
-                          Playlist(),
-                          Playlist(),
-                          Playlist(),
-                          Playlist(),
-                          Playlist(),
-                        ],
-                      );
-                    } else {
-                      return SizedBox.shrink();
-                    }
-                  },
-                  childCount: 2,
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () {
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: SafeArea(
+            child: CustomScrollView(
+              physics: BouncingScrollPhysics(),
+              slivers: [
+                _Header(),
+                SearchBar(),
+                MusicSliver(
+                  trackTitle: 'Мои треки',
+                  playlists: playlists,
+                  songs: songs,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -71,11 +88,12 @@ class _Header extends StatelessWidget {
           children: [
             Text(
               'CODEINE',
-              style: Theme.of(context).textTheme.headline3,
+              style:
+                  Theme.of(context).textTheme.headline3.copyWith(fontSize: 25),
             ),
             Spacer(),
             CircleAvatar(
-              radius: Theme.of(context).textTheme.headline3.fontSize / 1.25,
+              radius: 20,
               backgroundColor: Theme.of(context).splashColor,
               child: ClipOval(
                 child: Image.network(

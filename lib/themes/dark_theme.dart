@@ -22,7 +22,7 @@ final ThemeData darkTheme = ThemeData(
       fontWeight: FontWeight.normal,
     ),
     headline3: TextStyle(
-      fontSize: 23,
+      fontSize: 21,
       color: ConstantColors.focusColor,
       fontWeight: FontWeight.bold,
     ),

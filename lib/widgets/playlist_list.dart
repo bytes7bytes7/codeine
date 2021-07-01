@@ -40,9 +40,7 @@ class PlaylistList extends StatelessWidget {
               if (index == 0 || index == playlists.length + 1) {
                 return SizedBox(width: 22.0);
               } else {
-                return PlaylistCard(
-                  playlist: playlists[index - 1],
-                );
+                return PlaylistCard(playlist: playlists[index - 1]);
               }
             },
           ),
