@@ -11,6 +11,7 @@ class SongCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -34,29 +35,32 @@ class SongCard extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 20),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    song.title,
-                    style: Theme.of(context).textTheme.bodyText1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    '${song.artists.sublist(1).fold<String>(song.artists.first, (prev, next) => prev += ', ' + next)}' +
-                        ((song.feat.isNotEmpty)
-                            ? ' feat ' +
-                                song.feat.sublist(1).fold<String>(
-                                    song.feat.first,
-                                    (prev, next) => prev += ', ' + next)
-                            : ''),
-                    style: Theme.of(context).textTheme.bodyText2.copyWith(
-                          color: Theme.of(context).disabledColor,
-                        ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+              Container(
+                width: size.width * 0.5,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      song.title,
+                      style: Theme.of(context).textTheme.bodyText1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      '${song.artists.sublist(1).fold<String>(song.artists.first, (prev, next) => prev += ', ' + next)}' +
+                          ((song.feat.isNotEmpty)
+                              ? ' feat ' +
+                                  song.feat.sublist(1).fold<String>(
+                                      song.feat.first,
+                                      (prev, next) => prev += ', ' + next)
+                              : ''),
+                      style: Theme.of(context).textTheme.bodyText2.copyWith(
+                            color: Theme.of(context).disabledColor,
+                          ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
               Spacer(),
               Text(
