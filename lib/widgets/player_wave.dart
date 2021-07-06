@@ -2,33 +2,13 @@ import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/widgets.dart';
 
-enum ColorMode {
-  /// Waves with *single* **color** but different **alpha** and **amplitude**.
-  single,
-  /// Waves using *random* **color**, **alpha** and **amplitude**.
-  random,
-  /// Waves' colors must be set, and [colors]'s length must equal with [layers]
-  custom,
-}
-
-abstract class Config {
-  final ColorMode colorMode;
-
-  Config({this.colorMode});
-
-  void throwNullError(String colorModeStr, String configStr) {
-    throw FlutterError(
-        'When using `ColorMode.$colorModeStr`, `$configStr` must be set.');
-  }
-}
-
-class CustomConfig extends Config {
+class CustomConfig {
   final List<Color> colors;
   final List<List<Color>> gradients;
   final Alignment gradientBegin;
   final Alignment gradientEnd;
   final List<int> durations;
-  final List<double> heightPercentages;
+  final List<Animation<double>> heightPercentages;
   final MaskFilter blur;
 
   CustomConfig({
@@ -40,11 +20,11 @@ class CustomConfig extends Config {
     @required this.heightPercentages,
     this.blur,
   })  : assert(() {
-    if (colors == null && gradients == null) {
-      throw 'colors` or `gradients';
-    }
-    return true;
-  }()),
+          if (colors == null && gradients == null) {
+            throw 'colors` or `gradients';
+          }
+          return true;
+        }()),
         assert(() {
           if (gradients == null &&
               (gradientBegin != null || gradientEnd != null)) {
@@ -76,26 +56,16 @@ class CustomConfig extends Config {
           return true;
         }()),
         assert(colors == null || gradients == null,
-        'Cannot provide both colors and gradients.'),
-        super(colorMode: ColorMode.custom);
+            'Cannot provide both colors and gradients.');
 }
-
-class RandomConfig extends Config {
-  RandomConfig() : super(colorMode: ColorMode.random);
-}
-
-class SingleConfig extends Config {
-  SingleConfig() : super(colorMode: ColorMode.single);
-}
-
 
 class PlayerWave extends StatefulWidget {
-  final Config config;
+  final CustomConfig config;
   final Size size;
   final double waveAmplitude;
   final double wavePhase;
   final double waveFrequency;
-  final double heightPercentage;
+  final Animation<double> heightPercentage;
   final int duration;
   final Color backgroundColor;
 
@@ -107,7 +77,7 @@ class PlayerWave extends StatefulWidget {
     this.waveFrequency = 1.6,
     this.wavePhase = 10.0,
     this.backgroundColor,
-    this.heightPercentage = 0.2,
+    this.heightPercentage,
   });
 
   @override
@@ -122,71 +92,69 @@ class _PlayerWaveState extends State<PlayerWave> with TickerProviderStateMixin {
   Map<Animation<double>, AnimationController> valueList;
 
   _initAnimations() {
-    if (widget.config.colorMode == ColorMode.custom) {
-      _waveControllers =
-          (widget.config as CustomConfig).durations.map((duration) {
-            _waveAmplitudes.add(widget.waveAmplitude + 10);
-            return AnimationController(
-                vsync: this, duration: Duration(milliseconds: duration));
-          }).toList();
+    _waveControllers =
+        widget.config.durations.map((duration) {
+      _waveAmplitudes.add(widget.waveAmplitude + 10);
+      return AnimationController(
+          vsync: this, duration: Duration(milliseconds: duration));
+    }).toList();
 
-      _wavePhaseValues = _waveControllers.map((controller) {
-        CurvedAnimation _curve =
-        CurvedAnimation(parent: controller, curve: Curves.easeInOut);
-        Animation<double> value = Tween(
-          begin: widget.wavePhase,
-          end: 360 + widget.wavePhase,
-        ).animate(
-          _curve,
-        );
-        value.addStatusListener((status) {
-          switch (status) {
-            case AnimationStatus.completed:
-              controller.reverse();
-              break;
-            case AnimationStatus.dismissed:
-              controller.forward();
-              break;
-            default:
-              break;
-          }
-        });
-        controller.forward();
-        return value;
-      }).toList();
-    }
+    _wavePhaseValues = _waveControllers.map((controller) {
+      CurvedAnimation _curve =
+          CurvedAnimation(parent: controller, curve: Curves.easeInOut);
+      Animation<double> value = Tween(
+        begin: widget.wavePhase,
+        end: 360 + widget.wavePhase,
+      ).animate(
+        _curve,
+      );
+      value.addStatusListener((status) {
+        switch (status) {
+          case AnimationStatus.completed:
+            controller.reverse();
+            break;
+          case AnimationStatus.dismissed:
+            controller.forward();
+            break;
+          default:
+            break;
+        }
+      });
+      controller.forward();
+      return value;
+    }).toList();
   }
 
   _buildPaints() {
     List<Widget> paints = [];
-    if (widget.config.colorMode == ColorMode.custom) {
-      List<Color> _colors = (widget.config as CustomConfig).colors;
-      List<List<Color>> _gradients = (widget.config as CustomConfig).gradients;
-      Alignment begin = (widget.config as CustomConfig).gradientBegin;
-      Alignment end = (widget.config as CustomConfig).gradientEnd;
-      for (int i = 0; i < _wavePhaseValues.length; i++) {
-        paints.add(
-          Container(
-            child: CustomPaint(
-              painter: _CustomWavePainter(
-                color: _colors == null ? null : _colors[i],
-                gradient: _gradients == null ? null : _gradients[i],
-                gradientBegin: begin,
-                gradientEnd: end,
-                heightPercentage:
-                (widget.config as CustomConfig).heightPercentages[i],
-                repaint: _waveControllers[i],
-                waveFrequency: widget.waveFrequency,
-                wavePhaseValue: _wavePhaseValues[i],
-                waveAmplitude: _waveAmplitudes[i],
-                blur: (widget.config as CustomConfig).blur,
-              ),
-              size: widget.size,
+
+    List<Color> _colors = widget.config.colors;
+    List<List<Color>> _gradients = widget.config.gradients;
+    Alignment begin = widget.config.gradientBegin;
+    Alignment end = widget.config.gradientEnd;
+    for (int i = 0; i < _wavePhaseValues.length; i++) {
+      paints.add(
+        Container(
+          child: CustomPaint(
+            painter: _CustomWavePainter(
+              color: _colors == null ? null : _colors[i],
+              gradient: _gradients == null ? null : _gradients[i],
+              gradientBegin: begin,
+              gradientEnd: end,
+              heightPercentage:
+                  widget.config.heightPercentages[i],
+              repaint: _waveControllers[i],
+              waveFrequency: widget.waveFrequency,
+              wavePhaseValue: _wavePhaseValues[i],
+              waveAmplitude: _waveAmplitudes[i],
+              blur: widget.config.blur,
             ),
+            size: widget.size,
           ),
-        );
-      }
+        ),
+      );
     }
+
     return paints;
   }
 
@@ -210,8 +178,6 @@ class _PlayerWaveState extends State<PlayerWave> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    _initAnimations();
-    print('build');
     return Container(
       color: widget.backgroundColor,
       child: Stack(
@@ -241,7 +207,6 @@ class Layer {
 }
 
 class _CustomWavePainter extends CustomPainter {
-  final ColorMode colorMode;
   final Color color;
   final List<Color> gradient;
   final Alignment gradientBegin;
@@ -254,26 +219,25 @@ class _CustomWavePainter extends CustomPainter {
 
   double waveFrequency;
 
-  double heightPercentage;
+  Animation<double> heightPercentage;
 
   double _tempA = 0.0;
   double _tempB = 0.0;
   double viewWidth = 0.0;
   Paint _paint = Paint();
 
-  _CustomWavePainter(
-      {this.colorMode,
-        this.color,
-        this.gradient,
-        this.gradientBegin,
-        this.gradientEnd,
-        this.blur,
-        this.heightPercentage,
-        this.waveFrequency,
-        this.wavePhaseValue,
-        this.waveAmplitude,
-        Listenable repaint})
-      : super(repaint: repaint);
+  _CustomWavePainter({
+    this.color,
+    this.gradient,
+    this.gradientBegin,
+    this.gradientEnd,
+    this.blur,
+    this.heightPercentage,
+    this.waveFrequency,
+    this.wavePhaseValue,
+    this.waveAmplitude,
+    Listenable repaint,
+  }) : super(repaint: repaint);
 
   _setPaths(double viewCenterY, Size size, Canvas canvas) {
     Layer _layer = Layer(
@@ -305,13 +269,13 @@ class _CustomWavePainter extends CustomPainter {
     }
     if (_layer.gradient != null) {
       var rect = Offset.zero &
-      Size(size.width, size.height - viewCenterY * heightPercentage);
+          Size(size.width, size.height - viewCenterY * heightPercentage.value);
       _paint.shader = LinearGradient(
-          begin: gradientBegin == null
-              ? Alignment.bottomCenter
-              : gradientBegin,
-          end: gradientEnd == null ? Alignment.topCenter : gradientEnd,
-          colors: _layer.gradient)
+              begin: gradientBegin == null
+                  ? Alignment.bottomCenter
+                  : gradientBegin,
+              end: gradientEnd == null ? Alignment.topCenter : gradientEnd,
+              colors: _layer.gradient)
           .createShader(rect);
     }
     if (_layer.blur != null) {
@@ -324,7 +288,7 @@ class _CustomWavePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    double viewCenterY = size.height * (heightPercentage + 0.1);
+    double viewCenterY = size.height * (heightPercentage.value + 0.1);
     viewWidth = size.width;
     _setPaths(viewCenterY, size, canvas);
   }

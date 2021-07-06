@@ -311,7 +311,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       style: Theme.of(context)
                                           .textTheme
                                           .headline3
-                                          .copyWith(fontSize: 22),
+                                          .copyWith(fontWeight: FontWeight.normal),
                                     );
                                   }),
                             ),

@@ -1,6 +1,4 @@
-import 'package:codeine/models/song.dart';
-import 'package:codeine/widgets/player_wave.dart';
-import 'package:flutter/material.dart';
+part of 'music_player.dart';
 
 class BottomMusicPlayer extends StatefulWidget {
   @override
@@ -8,22 +6,47 @@ class BottomMusicPlayer extends StatefulWidget {
 }
 
 class _BottomMusicPlayerState extends State<BottomMusicPlayer>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   ValueNotifier<Song> songNotifier;
   ValueNotifier<bool> playNotifier;
   AnimationController _playAnimationController;
-  ValueNotifier<int> waveDuration;
-  ValueNotifier<double> waveHeightPercentage;
+
+  int waveDuration;
+  AnimationController _waveController;
+  CurvedAnimation waveCurve;
+  Animation<double> waveHeightPercentage;
 
   @override
   void initState() {
-    waveDuration = ValueNotifier(10000);
-    waveHeightPercentage = ValueNotifier(0.7);
+    super.initState();
+    waveDuration = 3000;
+    _waveController = AnimationController(
+        vsync: this, duration: Duration(milliseconds: waveDuration));
+    waveCurve =
+        CurvedAnimation(parent: _waveController, curve: Curves.easeInOut);
+    waveHeightPercentage = Tween(
+      begin: 0.75,
+      end: 0.45,
+    ).animate(
+      waveCurve,
+    );
+    // waveHeightPercentage.addStatusListener((status) {
+    //   switch (status) {
+    //     case AnimationStatus.completed:
+    //       _waveController.reverse();
+    //       break;
+    //     case AnimationStatus.dismissed:
+    //       _waveController.forward();
+    //       break;
+    //     default:
+    //       break;
+    //   }
+    // });
+
     songNotifier = ValueNotifier(Song());
     playNotifier = ValueNotifier(false);
     _playAnimationController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 500));
-    super.initState();
   }
 
   @override
@@ -42,32 +65,27 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
           color: Theme.of(context).scaffoldBackgroundColor,
           child: Stack(
             children: [
-              ValueListenableBuilder(
-                valueListenable: waveDuration,
-                builder: (context, _, __) {
-                  return PlayerWave(
-                    config: CustomConfig(
-                      gradients: [
-                        [
-                          Theme.of(context).splashColor,
-                          Theme.of(context).splashColor.withOpacity(0.0),
-                        ],
-                        // [
-                        //   Theme.of(context).splashColor,
-                        //   Theme.of(context).splashColor.withOpacity(0.0),
-                        // ],
-                      ],
-                      durations: [waveDuration.value],
-                      heightPercentages: [waveHeightPercentage.value],
-                      blur: MaskFilter.blur(BlurStyle.solid, 5),
-                      gradientBegin: Alignment.bottomCenter,
-                      gradientEnd: Alignment.topCenter,
-                    ),
-                    waveAmplitude: 0,
-                    backgroundColor: Colors.transparent,
-                    size: Size(double.infinity, 60),
-                  );
-                },
+              PlayerWave(
+                config: CustomConfig(
+                  gradients: [
+                    [
+                      Theme.of(context).splashColor,
+                      Theme.of(context).splashColor.withOpacity(0.0),
+                    ],
+                    // [
+                    //   Theme.of(context).splashColor,
+                    //   Theme.of(context).splashColor.withOpacity(0.0),
+                    // ],
+                  ],
+                  durations: [10000],
+                  heightPercentages: [waveHeightPercentage],
+                  blur: MaskFilter.blur(BlurStyle.solid, 5),
+                  gradientBegin: Alignment.bottomCenter,
+                  gradientEnd: Alignment.topCenter,
+                ),
+                waveAmplitude: 0,
+                backgroundColor: Colors.transparent,
+                size: Size(double.infinity, 60),
               ),
               Container(
                 width: double.infinity,
@@ -122,12 +140,10 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
                       onPressed: () {
                         playNotifier.value = !playNotifier.value;
                         if (playNotifier.value) {
-                          waveDuration.value = 3000;
-                          waveHeightPercentage.value = 0.5;
+                          _waveController.forward();
                           _playAnimationController.forward();
                         } else {
-                          waveDuration.value = 10000;
-                          waveHeightPercentage.value = 0.7;
+                          _waveController.reverse();
                           _playAnimationController.reverse();
                         }
                       },
