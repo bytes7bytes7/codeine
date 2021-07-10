@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:codeine/models/song.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -17,6 +18,8 @@ abstract class GlobalParameters {
       ValueNotifier(ConnectivityResult.none);
   static final ValueNotifier<String> currentPage =
       ValueNotifier('SplashScreen');
+  static final ValueNotifier<Song> currentSong = ValueNotifier(Song());
+  static final ValueNotifier<double> songSeconds = ValueNotifier(0.0);
 
   static Future<void> initConnectivity() async {
     ConnectivityResult result;

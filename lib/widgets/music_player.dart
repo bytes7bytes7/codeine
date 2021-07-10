@@ -1,13 +1,14 @@
-import 'package:codeine/widgets/song_slider.dart';
 import 'package:snapping_sheet/snapping_sheet.dart';
 import 'package:codeine/models/song.dart';
 import 'package:codeine/widgets/player_wave.dart';
 import 'package:flutter/material.dart';
 import 'package:codeine/constants.dart';
+import 'package:codeine/global/global_parameters.dart';
 
 part 'bottom_music_player.dart';
-
 part 'middle_music_player.dart';
+part 'song_slider.dart';
+part 'gradient_rect_slider_track_shape.dart';
 
 class MusicPlayer extends StatefulWidget {
   const MusicPlayer({
@@ -26,6 +27,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
   final ValueNotifier<double> bottomPlayerOpacity = ValueNotifier(1.0);
   final SnappingSheetController snappingSheetController =
   SnappingSheetController();
+  final ValueNotifier<int> progress = ValueNotifier(0);
 
   @override
   Widget build(BuildContext context) {

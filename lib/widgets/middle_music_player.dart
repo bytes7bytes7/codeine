@@ -1,16 +1,15 @@
 part of 'music_player.dart';
 
 class MiddleMusicPlayer extends StatelessWidget {
-  const MiddleMusicPlayer({
+  MiddleMusicPlayer({
     Key key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    const double horizontalPadding = 30.0;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: horizontalPadding),
+      padding: const EdgeInsets.symmetric(horizontal: 30.0),
       child: Column(
         children: [
           Icon(
@@ -48,23 +47,27 @@ class MiddleMusicPlayer extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 15, bottom: 10),
             child: SongSlider(
-              horizontalPadding: horizontalPadding,
               firstColor: Color(0xFF26FF56),
               secondColor: Color(0xFF2CDEFF),
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '1:56',
-                style: Theme.of(context).textTheme.subtitle1,
-              ),
-              Text(
-                '2:49',
-                style: Theme.of(context).textTheme.subtitle1,
-              ),
-            ],
+          ValueListenableBuilder(
+            valueListenable: GlobalParameters.songSeconds,
+            builder: (context, percent, child) {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    Song.time(GlobalParameters.songSeconds.value.toInt()),
+                    style: Theme.of(context).textTheme.subtitle1,
+                  ),
+                  Text(
+                    GlobalParameters.currentSong.value.duration,
+                    style: Theme.of(context).textTheme.subtitle1,
+                  ),
+                ],
+              );
+            }
           ),
           SizedBox(height: 10),
           Row(
