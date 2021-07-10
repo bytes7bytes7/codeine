@@ -6,8 +6,13 @@ import 'package:codeine/constants.dart';
 import 'package:codeine/global/global_parameters.dart';
 
 part 'bottom_music_player.dart';
+
 part 'middle_music_player.dart';
+
+part 'top_music_player.dart';
+
 part 'song_slider.dart';
+
 part 'gradient_rect_slider_track_shape.dart';
 
 class MusicPlayer extends StatefulWidget {
@@ -23,10 +28,11 @@ class MusicPlayer extends StatefulWidget {
 }
 
 class _MusicPlayerState extends State<MusicPlayer> {
-  final ValueNotifier<double> playerOpacity = ValueNotifier(1.0);
+  final ValueNotifier<double> topPlayerOpacity = ValueNotifier(0.0);
+  final ValueNotifier<double> middlePlayerOpacity = ValueNotifier(0.0);
   final ValueNotifier<double> bottomPlayerOpacity = ValueNotifier(1.0);
   final SnappingSheetController snappingSheetController =
-  SnappingSheetController();
+      SnappingSheetController();
   final ValueNotifier<int> progress = ValueNotifier(0);
 
   @override
@@ -34,8 +40,8 @@ class _MusicPlayerState extends State<MusicPlayer> {
     Size size = MediaQuery.of(context).size;
     return SnappingSheet(
       controller: snappingSheetController,
-      initialSnappingPosition:
-          SnappingPosition.pixels(positionPixels: ConstantData.playerHeight),
+      initialSnappingPosition: SnappingPosition.pixels(
+          positionPixels: ConstantData.bottomPlayerHeight),
       lockOverflowDrag: true,
       child: SafeArea(
         child: widget.backgroundBody,
@@ -75,10 +81,26 @@ class _MusicPlayerState extends State<MusicPlayer> {
                   child: Column(
                     children: [
                       ValueListenableBuilder(
-                        valueListenable: bottomPlayerOpacity,
+                        valueListenable: topPlayerOpacity,
                         builder: (context, percent, child) {
                           return Opacity(
-                            opacity: 1.0 - percent,
+                            opacity: percent,
+                            child: TopMusicPlayer(),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                SingleChildScrollView(
+                  physics: NeverScrollableScrollPhysics(),
+                  child: Column(
+                    children: [
+                      ValueListenableBuilder(
+                        valueListenable: middlePlayerOpacity,
+                        builder: (context, percent, child) {
+                          return Opacity(
+                            opacity: percent,
                             child: MiddleMusicPlayer(),
                           );
                         },
@@ -92,7 +114,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
                     return Opacity(
                       opacity: percent,
                       child: BottomMusicPlayer(
-                        playerHeight: ConstantData.playerHeight,
+                        playerHeight: ConstantData.bottomPlayerHeight,
                         opacityNotifier: bottomPlayerOpacity,
                         snappingSheetController: snappingSheetController,
                       ),
@@ -105,23 +127,33 @@ class _MusicPlayerState extends State<MusicPlayer> {
         ),
       ),
       onSnapCompleted: (sheetPosition, snappingPosition) {
-        if (sheetPosition.pixels >= ConstantData.playerHeight &&
-            sheetPosition.pixels <= size.height * 0.3) {
-          double hundredPercent = size.height * 0.3 - ConstantData.playerHeight;
-          double percent =
-              hundredPercent - sheetPosition.pixels + ConstantData.playerHeight;
-          bottomPlayerOpacity.value = percent / hundredPercent;
-        } else {
+        if(sheetPosition.pixels == ConstantData.bottomPlayerHeight){
+          bottomPlayerOpacity.value = 1.0;
+          middlePlayerOpacity.value = 0.0;
+          topPlayerOpacity.value = 0.0;
+        }else if(sheetPosition.pixels == ConstantData.middlePlayerHeight){
           bottomPlayerOpacity.value = 0.0;
+          middlePlayerOpacity.value = 1.0;
+          topPlayerOpacity.value = 0.0;
+        }else{
+          bottomPlayerOpacity.value = 0.0;
+          middlePlayerOpacity.value = 0.0;
+          topPlayerOpacity.value = 1.0;
         }
       },
       onSheetMoved: (sheetPosition) {
-        if (sheetPosition.pixels >= ConstantData.playerHeight &&
-            sheetPosition.pixels <= size.height * 0.3) {
-          double hundredPercent = size.height * 0.3 - ConstantData.playerHeight;
-          double percent =
-              hundredPercent - sheetPosition.pixels + ConstantData.playerHeight;
+        if (sheetPosition.pixels <= ConstantData.middlePlayerHeight) {
+          double hundredPercent = ConstantData.middlePlayerHeight - ConstantData.bottomPlayerHeight;
+          double percent = hundredPercent - sheetPosition.pixels + ConstantData.bottomPlayerHeight;
           bottomPlayerOpacity.value = percent / hundredPercent;
+          middlePlayerOpacity.value = 1.0 - bottomPlayerOpacity.value;
+        } else if (sheetPosition.pixels <= size.height) {
+          double hundredPercent = size.height - ConstantData.middlePlayerHeight;
+          double percent = hundredPercent - sheetPosition.pixels + ConstantData.middlePlayerHeight;
+          middlePlayerOpacity.value = percent / hundredPercent;
+          topPlayerOpacity.value = 1.0 - middlePlayerOpacity.value;
+        } else {
+          print(sheetPosition.pixels);
         }
       },
     );

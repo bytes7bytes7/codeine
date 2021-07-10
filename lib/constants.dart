@@ -17,16 +17,17 @@ abstract class ConstantColors {
 }
 
 abstract class ConstantData {
-  static final double playerHeight = 60.0;
+  static const double bottomPlayerHeight = 60.0;
+  static const double middlePlayerHeight = 300.0;
   static final List<SnappingPosition> snappingPositions = [
     SnappingPosition.pixels(
-      positionPixels: playerHeight,
+      positionPixels: bottomPlayerHeight,
       snappingCurve: Curves.easeOutQuart,
       snappingDuration: Duration(milliseconds: 500),
       grabbingContentOffset: GrabbingContentOffset.top,
     ),
     SnappingPosition.pixels(
-      positionPixels: 300,
+      positionPixels: middlePlayerHeight,
       snappingCurve: Curves.easeOutQuart,
       snappingDuration: Duration(milliseconds: 500),
     ),

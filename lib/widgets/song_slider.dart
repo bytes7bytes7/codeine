@@ -22,8 +22,8 @@ class SongSlider extends StatelessWidget {
               firstColor: firstColor,
               secondColor: secondColor,
             ),
-            trackHeight: 1.5,
-            thumbShape: RoundSliderThumbShape(enabledThumbRadius: 8.0),
+            trackHeight: 2,
+            thumbShape: RoundSliderThumbShape(enabledThumbRadius: 6.0),
             overlayShape: RoundSliderOverlayShape(overlayRadius: 14.0),
             // TODO: doesn't work
             overlayColor: firstColor.withOpacity(0.25),

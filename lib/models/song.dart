@@ -3,12 +3,12 @@ import 'dart:math';
 class Song {
   Song({
     this.id,
-    this.title = 'Hot (feat. Gunna)',
-    this.artists = const ['Young Thug'],
-    this.feat = const ['Gunna'],
-    this.duration = '3:13',
+    this.title = 'Betrayed',
+    this.artists = const ['Lil Xan'],
+    this.feat = const [],
+    this.duration = '3:07',
     this.imageUrl =
-        'https://sun9-13.userapi.com/impf/c852036/v852036929/19d6a4/7qLtXSimrjI.jpg?size=80x80&quality=96&sign=207574208226036961a54d5022a1424d&type=audio',
+        'https://sun2-12.userapi.com/impf/c858328/v858328801/fa147/_QSE1Uz9MxA.jpg?size=592x592&quality=96&sign=b947a9c2f93af37a8b161071fe00109d&type=audio',
   });
 
   int id;
