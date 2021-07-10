@@ -1,7 +1,7 @@
 import 'package:codeine/screens/error_screen.dart';
 import 'package:codeine/screens/no_internet_screen.dart';
-import 'package:codeine/widgets/music_player.dart';
 import 'package:flutter/material.dart';
+import 'package:snapping_sheet/snapping_sheet.dart';
 
 import 'screens/login_screen.dart';
 import 'screens/splash_screen.dart';
@@ -17,6 +17,26 @@ abstract class ConstantColors {
 }
 
 abstract class ConstantData {
+  static final double playerHeight = 60.0;
+  static final List<SnappingPosition> snappingPositions = [
+    SnappingPosition.pixels(
+      positionPixels: playerHeight,
+      snappingCurve: Curves.easeOutQuart,
+      snappingDuration: Duration(milliseconds: 500),
+      grabbingContentOffset: GrabbingContentOffset.top,
+    ),
+    SnappingPosition.pixels(
+      positionPixels: 300,
+      snappingCurve: Curves.easeOutQuart,
+      snappingDuration: Duration(milliseconds: 500),
+    ),
+    SnappingPosition.factor(
+      positionFactor: 1.0,
+      snappingCurve: Curves.easeOutQuart,
+      snappingDuration: Duration(milliseconds: 500),
+      grabbingContentOffset: GrabbingContentOffset.bottom,
+    ),
+  ];
   // Do not add: MainScreen, ConditionsScreen
   static final Map<String, Widget> appDestinations = {
     'SplashScreen': SplashScreen(),

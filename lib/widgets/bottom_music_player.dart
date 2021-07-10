@@ -3,12 +3,14 @@ part of 'music_player.dart';
 class BottomMusicPlayer extends StatefulWidget {
   const BottomMusicPlayer({
     Key key,
+    @required this.snappingSheetController,
     @required this.playerHeight,
     @required this.opacityNotifier,
   }) : super(key: key);
 
   final double playerHeight;
   final ValueNotifier<double> opacityNotifier;
+  final SnappingSheetController snappingSheetController;
 
   @override
   State<BottomMusicPlayer> createState() => _BottomMusicPlayerState();
@@ -68,7 +70,9 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: () {},
+              onTap: () {
+                widget.snappingSheetController.snapToPosition(ConstantData.snappingPositions[1]);
+              },
               child: Container(
                 color: Theme.of(context).scaffoldBackgroundColor,
                 child: Stack(
