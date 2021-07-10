@@ -1,3 +1,5 @@
+import 'package:codeine/screens/error_screen.dart';
+import 'package:codeine/screens/no_internet_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'screens/login_screen.dart';
@@ -19,6 +21,8 @@ abstract class ConstantData {
     'SplashScreen': SplashScreen(),
     'LoginScreen': LoginScreen(),
     'HomeScreen': HomeScreen(),
+    'NoInternetScreen': NoInternetScreen(),
+    'ErrorScreen' : ErrorScreen(),
   };
 }
 

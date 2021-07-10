@@ -19,9 +19,11 @@ abstract class AuthService {
     if (User.id != null) {
       Response response;
       try {
-        response = await User.dio.get('${ConstantHTTP.vkURL}id${User.id}',
-            options: Options(responseType: ResponseType.bytes));
-      } on DioError catch (e) {
+        response = await User.dio.get(
+          '${ConstantHTTP.vkURL}id${User.id}',
+          options: Options(responseType: ResponseType.bytes,followRedirects:false),
+        );
+      } catch (e) {
         if (GlobalParameters.connectionStatus.value ==
             ConnectivityResult.none) {
           return AuthStatus.noInternet;
@@ -45,7 +47,7 @@ abstract class AuthService {
       if (data.contains(start)) {
         status = AuthStatus.loggedOut;
       } else {
-        await _setmeData(data);
+        await _setUserData(data);
       }
       return status;
     }
@@ -119,7 +121,7 @@ abstract class AuthService {
 
     List<String> newCookie = [];
     oldCookie.forEach((key, value) {
-      if(value!='DELETED') {
+      if (value != 'DELETED') {
         newCookie.add('$key=$value');
       }
     });
@@ -131,7 +133,7 @@ abstract class AuthService {
     User.dio.options.headers = Map<String, dynamic>.from(headers);
   }
 
-  static Future<void> _setmeData(String data) async {
+  static Future<void> _setUserData(String data) async {
     String start = '', end = '';
 
     // Get Json from html
@@ -178,7 +180,8 @@ abstract class AuthService {
     await DatabaseHelper.db.updateUser();
   }
 
-  static _firstPostLoginVk(FormData formData, Map<String, String> queryParameters)async{
+  static _firstPostLoginVk(
+      FormData formData, Map<String, String> queryParameters) async {
     Response response;
     try {
       response = await User.dio.post(
@@ -250,14 +253,14 @@ abstract class AuthService {
     // 1st request
     var formData = FormData.fromMap(forms);
     dynamic result = await _firstPostLoginVk(formData, {'act': 'login'});
-    if(result is Response){
+    if (result is Response) {
       response = result;
-    }else{
+    } else {
       return result;
     }
 
     // Make new cookies
-    Map<String,String> newCookies = {
+    Map<String, String> newCookies = {
       'remixbdr': '0',
       'remixlang': '0',
     };
@@ -267,7 +270,7 @@ abstract class AuthService {
         line = line.trim();
         String key = line.substring(0, line.indexOf('='));
         String value = line.substring(line.indexOf('=') + 1);
-        newCookies.addAll({key :value});
+        newCookies.addAll({key: value});
       }
     });
 
@@ -339,7 +342,7 @@ abstract class AuthService {
     } else {
       print('Login done');
       status = AuthStatus.loggedIn;
-      await _setmeData(data);
+      await _setUserData(data);
     }
 
     return status;
@@ -388,7 +391,7 @@ abstract class AuthService {
     data = data.trim();
     data.split(',').forEach((byte) {
       byte = byte.trim();
-      if(byte.isNotEmpty){
+      if (byte.isNotEmpty) {
         bytes.add(int.parse(byte));
       }
     });
@@ -432,12 +435,12 @@ abstract class AuthService {
     _updateCookie(response);
 
     String data = response.data.toString();
-    data = data.substring(1,data.length-1);
+    data = data.substring(1, data.length - 1);
 
     List<int> bytes = [];
     data.trim().split(',').forEach((byte) {
       byte = byte.trim();
-      if(byte.isNotEmpty){
+      if (byte.isNotEmpty) {
         bytes.add(int.parse(byte));
       }
     });
@@ -453,17 +456,18 @@ abstract class AuthService {
 
     location = location.replaceAll('\"', '');
 
-    try{
+    try {
       int.parse(location);
       captchaSID = location;
       return AuthStatus.captcha;
-    }catch(error){
+    } catch (error) {
       // pass
     }
 
     Map<String, String> queryParams = {};
-    location.substring(location.indexOf('?')+1).split('&').forEach((pair) {
-      queryParams[pair.substring(0,pair.indexOf('='))] = pair.substring(pair.indexOf('=')+1);
+    location.substring(location.indexOf('?') + 1).split('&').forEach((pair) {
+      queryParams[pair.substring(0, pair.indexOf('='))] =
+          pair.substring(pair.indexOf('=') + 1);
     });
 
     location = location.substring(0, location.indexOf('?'));

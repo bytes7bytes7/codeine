@@ -23,6 +23,10 @@ class MainScreen extends StatelessWidget {
           case AuthStatus.loggedOut:
             GlobalParameters.currentPage.value = 'LoginScreen';
             break;
+          case AuthStatus.unknownError:
+            print('unknown error');
+            GlobalParameters.currentPage.value = 'ErrorScreen';
+            break;
           default:
             print('AuthStatus = $status');
             throw Exception('initSession error!!!');
@@ -34,6 +38,14 @@ class MainScreen extends StatelessWidget {
       case AuthStatus.errorCookies:
         print('initSession errorCookies');
         GlobalParameters.currentPage.value = 'LoginScreen';
+        break;
+      case AuthStatus.noInternet:
+        print('no Internet');
+        GlobalParameters.currentPage.value = 'NoInternetScreen';
+        break;
+      case AuthStatus.unknownError:
+        print('unknown error');
+        GlobalParameters.currentPage.value = 'ErrorScreen';
         break;
       default:
         print('AuthStatus = $status');
