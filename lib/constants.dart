@@ -1,5 +1,6 @@
 import 'package:codeine/screens/error_screen.dart';
 import 'package:codeine/screens/no_internet_screen.dart';
+import 'package:codeine/widgets/music_player.dart';
 import 'package:flutter/material.dart';
 
 import 'screens/login_screen.dart';
