@@ -24,18 +24,23 @@ class SongCard extends StatelessWidget {
           width: double.infinity,
           child: Row(
             children: [
-              Container(
-                height: 62,
-                width: 62,
-                decoration: BoxDecoration(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.circular(19.0),
-                  image: DecorationImage(
-                    image: NetworkImage(
-                      song.imageUrl,
+              Stack(
+                children: [
+                  Container(
+                    height: 62,
+                    width: 62,
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(19.0),
+                      image: DecorationImage(
+                        image: NetworkImage(
+                          song.imageUrl,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+
+                ],
               ),
               SizedBox(width: 20),
               Container(
@@ -69,8 +74,8 @@ class SongCard extends StatelessWidget {
               Text(
                 song.duration,
                 style: Theme.of(context).textTheme.bodyText2.copyWith(
-                  color: Theme.of(context).disabledColor,
-                ),
+                      color: Theme.of(context).disabledColor,
+                    ),
                 overflow: TextOverflow.ellipsis,
               ),
             ],

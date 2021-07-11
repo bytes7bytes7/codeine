@@ -1,6 +1,29 @@
 part of 'music_player.dart';
 
-class TopMusicPlayer extends StatelessWidget {
+class TopMusicPlayer extends StatefulWidget {
+  @override
+  State<TopMusicPlayer> createState() => _TopMusicPlayerState();
+}
+
+class _TopMusicPlayerState extends State<TopMusicPlayer>
+    with TickerProviderStateMixin {
+  AnimationController _controller;
+  Tween<double> _tween = Tween(begin: 0.75, end: 1);
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+        duration: const Duration(seconds: 1), vsync: this);
+    _controller.repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -43,13 +66,40 @@ class TopMusicPlayer extends StatelessWidget {
               ],
             ),
             Spacer(),
-            CircleAvatar(
-              radius: 125.5,
-              backgroundColor: Theme.of(context).focusColor.withOpacity(0.25),
-              child: CircleAvatar(
-                radius: 107.5,
-                backgroundImage:
-                    NetworkImage(GlobalParameters.currentSong.value.imageUrl),
+            Container(
+              alignment: Alignment.center,
+              height: 250,
+              width: 250,
+              child: Stack(
+                children: [
+                  // ScaleTransition(
+                  //   scale: _tween.animate(
+                  //     CurvedAnimation(
+                  //         parent: _controller, curve: Curves.elasticOut),
+                  //   ),
+                  //   child: Container(
+                  //     height: 250,
+                  //     width: 250,
+                  //     child: Container(
+                  //       height: 250,
+                  //       width: 250,
+                  //       decoration: BoxDecoration(
+                  //         color: Theme.of(context).focusColor.withOpacity(0.25),
+                  //         shape: BoxShape.circle,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  Container(
+                    alignment: Alignment.center,
+                    child: CircleAvatar(
+                      radius: 107.5,
+                      backgroundColor: Theme.of(context).focusColor,
+                      backgroundImage: NetworkImage(
+                          GlobalParameters.currentSong.value.imageUrl),
+                    ),
+                  ),
+                ],
               ),
             ),
             SizedBox(height: 30),
@@ -111,14 +161,14 @@ class TopMusicPlayer extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 10),
               child: FutureBuilder(
-                future: GlobalParameters.currentSong.value.generateColors(),
-                builder: (context, snapshot) {
-                  return SongSlider(
-                    firstColor: GlobalParameters.currentSong.value.firstColor,
-                    secondColor: GlobalParameters.currentSong.value.secondColor,
-                  );
-                }
-              ),
+                  future: GlobalParameters.currentSong.value.generateColors(),
+                  builder: (context, snapshot) {
+                    return SongSlider(
+                      firstColor: GlobalParameters.currentSong.value.firstColor,
+                      secondColor:
+                          GlobalParameters.currentSong.value.secondColor,
+                    );
+                  }),
             ),
             ValueListenableBuilder(
                 valueListenable: GlobalParameters.songSeconds,

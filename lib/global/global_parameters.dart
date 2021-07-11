@@ -101,6 +101,7 @@ abstract class GlobalParameters {
       SnappingSheetController();
   static AnimationController playAnimationController;
   static AnimationController waveController;
+  static AnimationController circleController;
   static final ValueNotifier<bool> playNotifier = ValueNotifier(false);
   static final ValueNotifier<Song> currentSong = ValueNotifier(songs[0]);
   static int songId = songs[0].id;

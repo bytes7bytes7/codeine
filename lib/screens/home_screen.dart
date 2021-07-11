@@ -1,3 +1,4 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:codeine/global/global_parameters.dart';
 import 'package:codeine/models/user.dart';
 import 'package:codeine/widgets/music_player.dart';
@@ -63,11 +64,76 @@ class _Header extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
         child: Row(
           children: [
-            Text(
-              'CODEINE',
-              style:
-                  Theme.of(context).textTheme.headline3.copyWith(fontSize: 25),
+            SizedBox(
+              width: 250.0,
+              child: DefaultTextStyle(
+                style: Theme.of(context).textTheme.headline3.copyWith(
+                  fontSize: 25,
+                  shadows: [
+                    Shadow(
+                      blurRadius: 7.0,
+                      color: Theme.of(context).focusColor,
+                      offset: Offset(0, 0),
+                    ),
+                  ],
+                ),
+                child: AnimatedTextKit(
+                  repeatForever: true,
+                  animatedTexts: [
+                    FlickerAnimatedText(
+                      'CODEINE',
+                      speed: Duration(seconds: 8),
+                    ),
+                  ],
+                  pause: Duration(milliseconds: 0),
+                  onTap: () {
+                    print("Tap Event");
+                  },
+                ),
+              ),
             ),
+            // SizedBox(
+            //   width: 250.0,
+            //   child: AnimatedTextKit(
+            //     animatedTexts: [
+            //       ColorizeAnimatedText(
+            //         'CODEINE',
+            //         textStyle: Theme.of(context)
+            //             .textTheme
+            //             .headline3
+            //             .copyWith(fontSize: 25),
+            //         colors: [
+            //           Theme.of(context).focusColor,
+            //           Theme.of(context).splashColor,
+            //         ],
+            //         speed: Duration(seconds: 2),
+            //       ),
+            //       ColorizeAnimatedText(
+            //         'CODEINE',
+            //         textStyle: Theme.of(context)
+            //             .textTheme
+            //             .headline3
+            //             .copyWith(fontSize: 25),
+            //         colors: [
+            //           Theme.of(context).focusColor,
+            //           Theme.of(context).splashColor,
+            //         ],
+            //         speed: Duration(seconds: 2),
+            //       ),
+            //     ],
+            //     isRepeatingAnimation: true,
+            //     repeatForever: true,
+            //     pause: Duration(milliseconds: 100),
+            //     onTap: () {
+            //       print("Tap Event");
+            //     },
+            //   ),
+            // ),
+            // Text(
+            //   'CODEINE',
+            //   style:
+            //       Theme.of(context).textTheme.headline3.copyWith(fontSize: 25),
+            // ),
             Spacer(),
             CircleAvatar(
               radius: 20,
