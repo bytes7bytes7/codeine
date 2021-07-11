@@ -1,15 +1,16 @@
 import 'dart:math';
+import 'package:flutter/material.dart';
+import 'package:palette_generator/palette_generator.dart';
 
 class Song {
-  Song({
-    this.id,
-    this.title = 'Betrayed',
-    this.artists = const ['Lil Xan'],
-    this.feat = const [],
-    this.duration = '3:07',
-    this.imageUrl =
-        'https://sun2-12.userapi.com/impf/c858328/v858328801/fa147/_QSE1Uz9MxA.jpg?size=592x592&quality=96&sign=b947a9c2f93af37a8b161071fe00109d&type=audio',
-  });
+  Song(
+      {this.id,
+      this.title,
+      this.artists,
+      this.feat,
+      this.duration,
+      this.imageUrl,
+      });
 
   int id;
   String title;
@@ -17,6 +18,32 @@ class Song {
   List<String> feat;
   String duration;
   String imageUrl;
+  Color primaryColor;
+  Color firstColor;
+  Color secondColor;
+
+  Future<void> generateColors() async {
+    PaletteGenerator pg = await _getPrimaryColor();
+    primaryColor = pg.paletteColors.first.color;
+    firstColor = Color.fromARGB(
+        255,
+        (primaryColor.red + primaryColor.green + primaryColor.blue).abs() % 256,
+        (primaryColor.green - primaryColor.blue + primaryColor.red) % 256,
+        (primaryColor.blue - primaryColor.red + primaryColor.green) % 256);
+    secondColor = Color.fromARGB(
+        255,
+        (primaryColor.red - primaryColor.green + primaryColor.blue) % 256,
+        (primaryColor.green - primaryColor.blue + primaryColor.red) % 256,
+        (primaryColor.blue - primaryColor.red + primaryColor.green) % 256);
+  }
+
+  Future<PaletteGenerator> _getPrimaryColor() async {
+    PaletteGenerator paletteGenerator =
+        await PaletteGenerator.fromImageProvider(
+      Image.network(imageUrl).image,
+    );
+    return paletteGenerator;
+  }
 
   double seconds() {
     List<int> lst = duration
@@ -39,7 +66,7 @@ class Song {
       seconds -= int.parse(lst.last) * 60;
     }
     lst.add(seconds.toString());
-    if(lst.length==1){
+    if (lst.length == 1) {
       lst.add('0');
       lst = lst.reversed.toList();
     }

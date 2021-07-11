@@ -1,3 +1,4 @@
+import 'package:codeine/global/global_parameters.dart';
 import 'package:codeine/models/song.dart';
 import 'package:flutter/material.dart';
 
@@ -15,7 +16,10 @@ class SongCard extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          GlobalParameters.currentSong.value = song;
+          GlobalParameters.songSeconds.value = 0;
+        },
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
           width: double.infinity,

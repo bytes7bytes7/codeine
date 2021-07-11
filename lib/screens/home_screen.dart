@@ -1,3 +1,4 @@
+import 'package:codeine/global/global_parameters.dart';
 import 'package:codeine/models/playlist.dart';
 import 'package:codeine/models/song.dart';
 import 'package:codeine/models/user.dart';
@@ -6,10 +7,7 @@ import 'package:codeine/widgets/music_sliver.dart';
 import 'package:codeine/widgets/search_bar.dart';
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
-  final List<Playlist> playlists = List.generate(5, (index) => Playlist());
-  final List<Song> songs = List.generate(10, (index) => Song());
-
+class HomeScreen extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -39,8 +37,8 @@ class HomeScreen extends StatelessWidget {
                 SearchBar(),
                 MusicSliver(
                   trackTitle: 'Мои треки',
-                  playlists: playlists,
-                  songs: songs,
+                  playlists: GlobalParameters.playlists,
+                  songs: GlobalParameters.songs,
                 ),
               ],
             ),

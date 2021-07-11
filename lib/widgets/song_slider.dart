@@ -19,14 +19,14 @@ class SongSlider extends StatelessWidget {
         return SliderTheme(
           data: SliderTheme.of(context).copyWith(
             trackShape: GradientRectSliderTrackShape(
-              firstColor: firstColor,
-              secondColor: secondColor,
+              firstColor: firstColor ?? Colors.white,
+              secondColor: secondColor ?? Colors.white,
             ),
             trackHeight: 2,
             thumbShape: RoundSliderThumbShape(enabledThumbRadius: 6.0),
             overlayShape: RoundSliderOverlayShape(overlayRadius: 14.0),
             // TODO: doesn't work
-            overlayColor: firstColor.withOpacity(0.25),
+            overlayColor: firstColor?.withOpacity(0.25) ??  Colors.white,
           ),
           child: Slider(
             value: value,

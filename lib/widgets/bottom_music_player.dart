@@ -3,14 +3,10 @@ part of 'music_player.dart';
 class BottomMusicPlayer extends StatefulWidget {
   const BottomMusicPlayer({
     Key key,
-    @required this.snappingSheetController,
-    @required this.playerHeight,
     @required this.opacityNotifier,
   }) : super(key: key);
 
-  final double playerHeight;
   final ValueNotifier<double> opacityNotifier;
-  final SnappingSheetController snappingSheetController;
 
   @override
   State<BottomMusicPlayer> createState() => _BottomMusicPlayerState();
@@ -18,12 +14,9 @@ class BottomMusicPlayer extends StatefulWidget {
 
 class _BottomMusicPlayerState extends State<BottomMusicPlayer>
     with TickerProviderStateMixin {
-  ValueNotifier<Song> songNotifier;
-  ValueNotifier<bool> playNotifier;
-
   AnimationController _playAnimationController;
   int _waveDuration;
-  AnimationController _waveController;
+  AnimationController waveController;
   CurvedAnimation _waveCurve;
   Animation<double> _waveHeightPercentage;
 
@@ -31,12 +24,12 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
   void initState() {
     super.initState();
     _waveDuration = 3000;
-    _waveController = AnimationController(
+    waveController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: _waveDuration),
     );
     _waveCurve = CurvedAnimation(
-      parent: _waveController,
+      parent: waveController,
       curve: Curves.easeInOut,
     );
     _waveHeightPercentage = Tween(
@@ -46,8 +39,6 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
       _waveCurve,
     );
 
-    songNotifier = ValueNotifier(Song());
-    playNotifier = ValueNotifier(false);
     _playAnimationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 500),
@@ -56,6 +47,10 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
 
   @override
   void dispose() {
+    // TODO: solve problem (when animation is not completed & dispose() is called
+    if (!_playAnimationController.isCompleted){
+      _playAnimationController.stop();
+    }
     _playAnimationController.dispose();
     super.dispose();
   }
@@ -71,7 +66,7 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
             color: Colors.transparent,
             child: InkWell(
               onTap: () {
-                widget.snappingSheetController.snapToPosition(ConstantData.snappingPositions[1]);
+                GlobalParameters.snappingSheetController.snapToPosition(ConstantData.snappingPositions[1]);
               },
               child: Container(
                 color: Theme.of(context).scaffoldBackgroundColor,
@@ -93,40 +88,45 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
                       ),
                       waveAmplitude: 0,
                       backgroundColor: Colors.transparent,
-                      size: Size(double.infinity, widget.playerHeight),
+                      size: Size(double.infinity, ConstantData.bottomPlayerHeight),
                     ),
                     Container(
                       width: double.infinity,
-                      height: widget.playerHeight,
+                      height: ConstantData.bottomPlayerHeight,
                       padding: const EdgeInsets.symmetric(horizontal: 30),
                       child: Row(
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                songNotifier.value?.title,
-                                style: Theme.of(context).textTheme.bodyText1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              Text(
-                                '${songNotifier.value.artists.sublist(1).fold<String>(songNotifier.value.artists.first, (prev, next) => prev += ', ' + next)}' +
-                                    ((songNotifier.value.feat.isNotEmpty)
-                                        ? ' feat ' +
-                                            songNotifier.value.feat
-                                                .sublist(1)
-                                                .fold<String>(
-                                                    songNotifier.value.feat.first,
-                                                    (prev, next) =>
-                                                        prev += ', ' + next)
-                                        : ''),
-                                style: Theme.of(context).textTheme.bodyText2.copyWith(
-                                      color: Theme.of(context).disabledColor,
-                                    ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
+                          ValueListenableBuilder(
+                            valueListenable: GlobalParameters.currentSong,
+                            builder: (context, value, child) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    GlobalParameters.currentSong.value?.title,
+                                    style: Theme.of(context).textTheme.bodyText1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    '${GlobalParameters.currentSong.value.artists.sublist(1).fold<String>(GlobalParameters.currentSong.value.artists.first, (prev, next) => prev += ', ' + next)}' +
+                                        ((GlobalParameters.currentSong.value.feat.isNotEmpty)
+                                            ? ' feat ' +
+                                                GlobalParameters.currentSong.value.feat
+                                                    .sublist(1)
+                                                    .fold<String>(
+                                                        GlobalParameters.currentSong.value.feat.first,
+                                                        (prev, next) =>
+                                                            prev += ', ' + next)
+                                            : ''),
+                                    style: Theme.of(context).textTheme.bodyText2.copyWith(
+                                          color: Theme.of(context).disabledColor,
+                                        ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              );
+                            }
                           ),
                           Spacer(),
                           // TODO: place button on the center of songs' duration
@@ -135,7 +135,7 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
                             padding: const EdgeInsets.symmetric(horizontal: 0),
                             splashRadius: 20,
                             icon: ValueListenableBuilder(
-                              valueListenable: playNotifier,
+                              valueListenable: GlobalParameters.playNotifier,
                               builder: (context, value, __) {
                                 return AnimatedIcon(
                                   icon: AnimatedIcons.play_pause,
@@ -146,12 +146,12 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
                               },
                             ),
                             onPressed: () {
-                              playNotifier.value = !playNotifier.value;
-                              if (playNotifier.value) {
-                                _waveController.forward();
+                              GlobalParameters.playNotifier.value = !GlobalParameters.playNotifier.value;
+                              if (GlobalParameters.playNotifier.value) {
+                                waveController.forward();
                                 _playAnimationController.forward();
                               } else {
-                                _waveController.reverse();
+                                waveController.reverse();
                                 _playAnimationController.reverse();
                               }
                             },

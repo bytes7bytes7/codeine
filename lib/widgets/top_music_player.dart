@@ -22,7 +22,10 @@ class TopMusicPlayer extends StatelessWidget {
                   icon: Icon(Icons.arrow_back_ios_outlined),
                   color: Theme.of(context).focusColor,
                   iconSize: 30.0,
-                  onPressed: () {},
+                  onPressed: () {
+                    GlobalParameters.snappingSheetController
+                        .snapToPosition(ConstantData.snappingPositions[0]);
+                  },
                 ),
                 Text(
                   'CODEINE',
@@ -70,26 +73,51 @@ class TopMusicPlayer extends StatelessWidget {
             SizedBox(height: 30),
             Row(
               children: [
-                IconButton(
-                  icon: Icon(Icons.shuffle_outlined),
-                  color: Theme.of(context).focusColor,
-                  iconSize: 30,
-                  onPressed: () {},
+                ValueListenableBuilder(
+                  valueListenable: GlobalParameters.shuffleMode,
+                  builder: (context, value, child) {
+                    return IconButton(
+                      icon: (value)
+                          ? Icon(Icons.shuffle_on_outlined)
+                          : Icon(Icons.shuffle_outlined),
+                      color: Theme.of(context).focusColor,
+                      iconSize: 30,
+                      onPressed: () {
+                        GlobalParameters.shuffleMode.value =
+                            !GlobalParameters.shuffleMode.value;
+                      },
+                    );
+                  },
                 ),
                 Spacer(),
-                IconButton(
-                  icon: Icon(Icons.repeat_one_outlined),
-                  color: Theme.of(context).focusColor,
-                  iconSize: 30,
-                  onPressed: () {},
+                ValueListenableBuilder(
+                  valueListenable: GlobalParameters.repeatOneMode,
+                  builder: (context, value, child) {
+                    return IconButton(
+                      icon: (value)
+                          ? Icon(Icons.repeat_one_on_outlined)
+                          : Icon(Icons.repeat_one_outlined),
+                      color: Theme.of(context).focusColor,
+                      iconSize: 30,
+                      onPressed: () {
+                        GlobalParameters.repeatOneMode.value =
+                            !GlobalParameters.repeatOneMode.value;
+                      },
+                    );
+                  },
                 ),
               ],
             ),
             Padding(
               padding: const EdgeInsets.only(top: 10),
-              child: SongSlider(
-                firstColor: Color(0xFF26FF56),
-                secondColor: Color(0xFF2CDEFF),
+              child: FutureBuilder(
+                future: GlobalParameters.currentSong.value.generateColors(),
+                builder: (context, snapshot) {
+                  return SongSlider(
+                    firstColor: GlobalParameters.currentSong.value.firstColor,
+                    secondColor: GlobalParameters.currentSong.value.secondColor,
+                  );
+                }
               ),
             ),
             ValueListenableBuilder(
@@ -113,29 +141,7 @@ class TopMusicPlayer extends StatelessWidget {
                   );
                 }),
             SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(Icons.fast_rewind_rounded),
-                  color: Theme.of(context).focusColor,
-                  iconSize: 60,
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(Icons.pause_circle_filled_rounded),
-                  color: Theme.of(context).focusColor,
-                  iconSize: 60,
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(Icons.fast_forward_rounded),
-                  color: Theme.of(context).focusColor,
-                  iconSize: 60,
-                ),
-              ],
-            ),
+            PlayerControls(),
             Spacer(),
           ],
         ),
