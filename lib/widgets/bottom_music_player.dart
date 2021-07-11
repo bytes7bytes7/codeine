@@ -14,9 +14,7 @@ class BottomMusicPlayer extends StatefulWidget {
 
 class _BottomMusicPlayerState extends State<BottomMusicPlayer>
     with TickerProviderStateMixin {
-  AnimationController _playAnimationController;
   int _waveDuration;
-  AnimationController waveController;
   CurvedAnimation _waveCurve;
   Animation<double> _waveHeightPercentage;
 
@@ -24,12 +22,12 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
   void initState() {
     super.initState();
     _waveDuration = 3000;
-    waveController = AnimationController(
+    GlobalParameters.waveController = GlobalParameters.waveController ?? AnimationController(
       vsync: this,
       duration: Duration(milliseconds: _waveDuration),
     );
     _waveCurve = CurvedAnimation(
-      parent: waveController,
+      parent: GlobalParameters.waveController,
       curve: Curves.easeInOut,
     );
     _waveHeightPercentage = Tween(
@@ -39,20 +37,10 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
       _waveCurve,
     );
 
-    _playAnimationController = AnimationController(
+    GlobalParameters.playAnimationController =  GlobalParameters.playAnimationController ?? AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 500),
     );
-  }
-
-  @override
-  void dispose() {
-    // TODO: solve problem (when animation is not completed & dispose() is called
-    if (!_playAnimationController.isCompleted){
-      _playAnimationController.stop();
-    }
-    _playAnimationController.dispose();
-    super.dispose();
   }
 
   @override
@@ -140,20 +128,13 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
                                 return AnimatedIcon(
                                   icon: AnimatedIcons.play_pause,
                                   size: 30,
-                                  progress: _playAnimationController,
+                                  progress: GlobalParameters.playAnimationController,
                                   color: Theme.of(context).focusColor,
                                 );
                               },
                             ),
                             onPressed: () {
-                              GlobalParameters.playNotifier.value = !GlobalParameters.playNotifier.value;
-                              if (GlobalParameters.playNotifier.value) {
-                                waveController.forward();
-                                _playAnimationController.forward();
-                              } else {
-                                waveController.reverse();
-                                _playAnimationController.reverse();
-                              }
+                              GlobalParameters.playPauseSong();
                             },
                           ),
                         ],

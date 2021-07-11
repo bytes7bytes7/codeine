@@ -174,14 +174,28 @@ class _LoginScreenState extends State<LoginScreen> {
                                 obscureText: true,
                                 errorNotifier: passwordNotifier,
                               ),
-                              IconButton(
-                                icon: Icon(
-                                  Icons.delete,
-                                  color: Theme.of(context).focusColor,
-                                ),
-                                onPressed: () async {
-                                  AuthService.logOut();
-                                },
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.delete,
+                                      color: Theme.of(context).focusColor,
+                                    ),
+                                    onPressed: () async {
+                                      AuthService.logOut();
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.home_filled,
+                                      color: Theme.of(context).focusColor,
+                                    ),
+                                    onPressed: () async {
+                                      GlobalParameters.currentPage.value='HomeScreen';
+                                    },
+                                  ),
+                                ],
                               ),
                               Spacer(flex: 1),
                               TextButton(

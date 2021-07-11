@@ -111,9 +111,12 @@ class _MusicPlayerState extends State<MusicPlayer> {
                         ValueListenableBuilder(
                           valueListenable: topPlayerOpacity,
                           builder: (context, percent, child) {
-                            return Opacity(
-                              opacity: percent,
-                              child: TopMusicPlayer(),
+                            return Visibility(
+                              visible: (percent == 0) ? false : true,
+                              child: Opacity(
+                                opacity: percent,
+                                child: TopMusicPlayer(),
+                              ),
                             );
                           },
                         ),

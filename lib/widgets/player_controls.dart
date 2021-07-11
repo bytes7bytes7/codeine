@@ -28,8 +28,7 @@ class PlayerControls extends StatelessWidget {
               color: Theme.of(context).focusColor,
               iconSize: 60,
               onPressed: () {
-                GlobalParameters.playNotifier.value =
-                !GlobalParameters.playNotifier.value;
+                GlobalParameters.playPauseSong();
               },
             );
           },

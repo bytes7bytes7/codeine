@@ -1,13 +1,13 @@
 import 'package:codeine/global/global_parameters.dart';
-import 'package:codeine/models/playlist.dart';
-import 'package:codeine/models/song.dart';
 import 'package:codeine/models/user.dart';
 import 'package:codeine/widgets/music_player.dart';
 import 'package:codeine/widgets/music_sliver.dart';
 import 'package:codeine/widgets/search_bar.dart';
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget{
+class HomeScreen extends StatelessWidget {
+  final TextEditingController textEditingController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -34,7 +34,9 @@ class HomeScreen extends StatelessWidget{
               physics: BouncingScrollPhysics(),
               slivers: [
                 _Header(),
-                SearchBar(),
+                SearchBar(
+                  controller: textEditingController,
+                ),
                 MusicSliver(
                   trackTitle: 'Мои треки',
                   playlists: GlobalParameters.playlists,

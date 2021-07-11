@@ -17,8 +17,7 @@ class SongCard extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          GlobalParameters.currentSong.value = song;
-          GlobalParameters.songSeconds.value = 0;
+          GlobalParameters.playSongByID(song.id);
         },
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),

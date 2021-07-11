@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 
 class SearchBar extends StatelessWidget {
-  const SearchBar({
+  SearchBar({
     Key key,
+    @required this.controller,
   }) : super(key: key);
+
+  final TextEditingController controller;
+  final ValueNotifier<bool> emptyFiled = ValueNotifier(true);
 
   @override
   Widget build(BuildContext context) {
@@ -40,12 +44,37 @@ class SearchBar extends StatelessWidget {
               ),
               Flexible(
                 child: TextField(
+                  controller: controller,
+                  onChanged: (value) {
+                    if (value.isNotEmpty) {
+                      emptyFiled.value = false;
+                    } else {
+                      emptyFiled.value = true;
+                    }
+                  },
                   decoration: InputDecoration(
                     hintText: 'Поиск',
                     hintStyle: Theme.of(context).textTheme.subtitle1,
                     border: InputBorder.none,
                   ),
                 ),
+              ),
+              ValueListenableBuilder(
+                valueListenable: emptyFiled,
+                builder: (context, value, child) {
+                  if (value) {
+                    return SizedBox.shrink();
+                  } else {
+                    return IconButton(
+                      icon: Icon(Icons.close),
+                      color: Theme.of(context).focusColor,
+                      onPressed: () {
+                        controller.text = '';
+                        emptyFiled.value = true;
+                      },
+                    );
+                  }
+                },
               ),
             ],
           ),

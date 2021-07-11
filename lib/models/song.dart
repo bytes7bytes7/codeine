@@ -23,18 +23,21 @@ class Song {
   Color secondColor;
 
   Future<void> generateColors() async {
-    PaletteGenerator pg = await _getPrimaryColor();
-    primaryColor = pg.paletteColors.first.color;
-    firstColor = Color.fromARGB(
-        255,
-        (primaryColor.red + primaryColor.green + primaryColor.blue).abs() % 256,
-        (primaryColor.green - primaryColor.blue + primaryColor.red) % 256,
-        (primaryColor.blue - primaryColor.red + primaryColor.green) % 256);
-    secondColor = Color.fromARGB(
-        255,
-        (primaryColor.red - primaryColor.green + primaryColor.blue) % 256,
-        (primaryColor.green - primaryColor.blue + primaryColor.red) % 256,
-        (primaryColor.blue - primaryColor.red + primaryColor.green) % 256);
+    if(firstColor == null || secondColor == null) {
+      PaletteGenerator pg = await _getPrimaryColor();
+      primaryColor = pg.paletteColors.first.color;
+      firstColor = Color.fromARGB(
+          255,
+          (primaryColor.red + primaryColor.green + primaryColor.blue).abs() %
+              256,
+          (primaryColor.green - primaryColor.blue + primaryColor.red) % 256,
+          (primaryColor.blue - primaryColor.red + primaryColor.green) % 256);
+      secondColor = Color.fromARGB(
+          255,
+          (primaryColor.red - primaryColor.green + primaryColor.blue) % 256,
+          (primaryColor.green - primaryColor.blue + primaryColor.red) % 256,
+          (primaryColor.blue - primaryColor.red + primaryColor.green) % 256);
+    }
   }
 
   Future<PaletteGenerator> _getPrimaryColor() async {

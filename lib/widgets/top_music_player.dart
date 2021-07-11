@@ -70,7 +70,7 @@ class TopMusicPlayer extends StatelessWidget {
                       : ''),
               style: Theme.of(context).textTheme.bodyText2,
             ),
-            SizedBox(height: 30),
+            Spacer(),
             Row(
               children: [
                 ValueListenableBuilder(

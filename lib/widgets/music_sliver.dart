@@ -1,3 +1,4 @@
+import 'package:codeine/constants.dart';
 import 'package:codeine/models/playlist.dart';
 import 'package:codeine/models/song.dart';
 import 'package:flutter/material.dart';
@@ -42,13 +43,17 @@ class MusicSliver extends StatelessWidget {
                 ],
               ),
             );
+          }else if(index == songs.length + 2){
+            return Container(
+              height: ConstantData.bottomPlayerHeight,
+            );
           } else {
             return SongCard(
               song: songs[index - 2],
             );
           }
         },
-        childCount: songs.length + 2,
+        childCount: songs.length + 3,
       ),
     );
   }
