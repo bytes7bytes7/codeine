@@ -61,17 +61,19 @@ abstract class MusicService {
         List<int> bytes = BytesService.getInts(dataAudio);
         // Convert windows1251 bytes to string
         dataAudio = Win1251Decoder.decode(bytes);
-        var unescape  = HtmlUnescape();
-         dataAudio =
-             dataAudio.replaceAll('&quot;', '\"').replaceAll('&amp;', '&');
+        var unescape = HtmlUnescape();
+        dataAudio =
+            dataAudio.replaceAll('&quot;', '\"').replaceAll('&amp;', '&');
         var jsonData = json.decode(dataAudio);
         Song newSong = Song();
         newSong.id = jsonData[0];
         newSong.title = unescape.convert(jsonData[3]);
-        newSong.artists =
-            jsonData[4].split(',').map<Artist>((n) => Artist(name: unescape.convert(n))).toList();
+        newSong.artists = jsonData[4]
+            .split(',')
+            .map<Artist>((n) => Artist(name: unescape.convert(n)))
+            .toList();
         newSong.seconds = jsonData[5];
-        newSong.imageUrl =
+        newSong.songImageUrl =
             jsonData[14].split(',').last.replaceAll('&amp;', '&');
         newSong.duration =
             Win1251Decoder.decode(BytesService.getInts(BytesService.subByte(
@@ -81,10 +83,17 @@ abstract class MusicService {
           endString: r'</div>',
           cutStart: true,
         )));
+        try {
+          newSong.albumUrl = jsonData[19].join('_');
+        }catch(e){
+          //
+        }
         GlobalParameters.songs.add(newSong);
       }
       return MusicStatus.ok;
     }
     return MusicStatus.error;
   }
+
+
 }

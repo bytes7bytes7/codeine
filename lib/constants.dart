@@ -74,6 +74,7 @@ abstract class ConstantHTTP {
   static const String vkLoginURL = 'https://login.vk.com/';
   // static const String vkMusicURL = 'https://vk.com/al_audio.php';
   static const String vkMusicURL = 'https://vk.com/audios';
+  static const String vkAlbumUrl = 'https://vk.com/music/album/';
 
   static const Map<String, String> headers = {
     'User-Agent':

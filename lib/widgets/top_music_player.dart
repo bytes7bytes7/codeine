@@ -13,8 +13,8 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-        duration: const Duration(seconds: 1), vsync: this);
+    _controller =
+        AnimationController(duration: const Duration(seconds: 1), vsync: this);
     _controller.repeat(reverse: true);
   }
 
@@ -90,27 +90,47 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
                   //     ),
                   //   ),
                   // ),
-                  Container(
-                    alignment: Alignment.center,
-                    child: CircleAvatar(
-                      radius: 107.5,
-                      backgroundColor: Theme.of(context).focusColor,
-                      backgroundImage: NetworkImage(
-                          GlobalParameters.currentSong.value.imageUrl),
-                    ),
+                  FutureBuilder(
+                    future: GlobalParameters.currentSong.value.generateColors(),
+                    builder: (context, snapshot) {
+                      return Container(
+                        alignment: Alignment.center,
+                        child: CircleAvatar(
+                          radius: 107.5,
+                          backgroundColor: Theme.of(context).focusColor,
+                          backgroundImage: (GlobalParameters
+                                  .currentSong.value.albumImageUrl.isNotEmpty)
+                              ? NetworkImage(GlobalParameters
+                                  .currentSong.value.albumImageUrl)
+                              : (GlobalParameters.currentSong.value.songImageUrl
+                                      .isNotEmpty)
+                                  ? NetworkImage(GlobalParameters
+                                      .currentSong.value.songImageUrl)
+                                  : AssetImage('assets/png/cup.png'),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
             ),
             SizedBox(height: 30),
-            Text(
-              GlobalParameters.currentSong.value.title,
-              style: Theme.of(context).textTheme.headline3,
+            Container(
+              width: size.width * 0.9,
+              child: Text(
+                GlobalParameters.currentSong.value.title,
+                style: Theme.of(context).textTheme.headline3,
+                textAlign: TextAlign.center,
+              ),
             ),
             SizedBox(height: 5),
-            Text(
-              '${GlobalParameters.currentSong.value.artists.sublist(1).fold<String>(GlobalParameters.currentSong.value.artists.first.name, (prev, next) => prev += ', ' + next.name)}',
-              style: Theme.of(context).textTheme.bodyText2,
+            Container(
+              width: size.width * 0.9,
+              child: Text(
+                '${GlobalParameters.currentSong.value.artists.sublist(1).fold<String>(GlobalParameters.currentSong.value.artists.first.name, (prev, next) => prev += ', ' + next.name)}',
+                style: Theme.of(context).textTheme.bodyText2,
+                textAlign: TextAlign.center,
+              ),
             ),
             Spacer(),
             Row(

@@ -33,9 +33,9 @@ class SongCard extends StatelessWidget {
                       color: Colors.transparent,
                       borderRadius: BorderRadius.circular(19.0),
                       image: DecorationImage(
-                        image: NetworkImage(
-                          song.imageUrl,
-                        ),
+                        image: (song.songImageUrl.isNotEmpty) ?NetworkImage(
+                          song.songImageUrl,
+                        ) : AssetImage('assets/png/cup.png'),
                       ),
                     ),
                   ),

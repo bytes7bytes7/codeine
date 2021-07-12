@@ -7,6 +7,7 @@ class MiddleMusicPlayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -22,14 +23,24 @@ class MiddleMusicPlayer extends StatelessWidget {
             },
           ),
           SizedBox(height: 5),
-          Text(
-            GlobalParameters.currentSong.value.title,
-            style: Theme.of(context).textTheme.headline3,
+          Container(
+            width: size.width*0.8,
+            child: Text(
+              GlobalParameters.currentSong.value.title,
+              style: Theme.of(context).textTheme.headline3,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+            ),
           ),
           SizedBox(height: 5),
-          Text(
-            '${GlobalParameters.currentSong.value.artists.sublist(1).fold<String>(GlobalParameters.currentSong.value.artists.first.name, (prev, next) => prev += ', ' + next.name)}',
-            style: Theme.of(context).textTheme.bodyText2,
+          Container(
+            width: size.width*0.8,
+            child: Text(
+              '${GlobalParameters.currentSong.value.artists.sublist(1).fold<String>(GlobalParameters.currentSong.value.artists.first.name, (prev, next) => prev += ', ' + next.name)}',
+              style: Theme.of(context).textTheme.bodyText2,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+            ),
           ),
           Row(
             children: [

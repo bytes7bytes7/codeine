@@ -1,28 +1,45 @@
+import 'dart:math';
+import 'package:codeine/global/global_parameters.dart';
 import 'package:codeine/models/artist.dart';
+import 'package:codeine/models/user.dart';
+import 'package:codeine/services/bytes_service.dart';
+import 'package:codeine/services/win1251_decoder.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:palette_generator/palette_generator.dart';
 
+import '../constants.dart';
+
 class Song {
-  Song(
-      {this.id,
-      this.title,
-      this.artists,
-      this.duration,
-      this.imageUrl,
-      });
+  Song({
+    this.id,
+    this.title,
+    this.artists,
+    this.duration,
+    this.songImageUrl='',
+    this.albumImageUrl='',
+    this.albumUrl='',
+    this.seconds,
+  });
 
   int id;
   String title;
   List<Artist> artists;
   int seconds;
   String duration;
-  String imageUrl;
+  String songImageUrl;
+  String albumImageUrl;
+  String albumUrl;
   Color primaryColor;
   Color firstColor;
   Color secondColor;
 
   Future<void> generateColors() async {
-    if(firstColor == null || secondColor == null) {
+    if(albumImageUrl.isEmpty) {
+      await getAlbumImageUrl();
+    }
+    if (firstColor == null || secondColor == null) {
       PaletteGenerator pg = await _getPrimaryColor();
       primaryColor = pg.paletteColors.first.color;
       firstColor = Color.fromARGB(
@@ -39,11 +56,57 @@ class Song {
     }
   }
 
+  Future<void> getAlbumImageUrl() async {
+    if (albumUrl != null) {
+      Response response;
+      try {
+        response = await User.dio.get(
+          '${ConstantHTTP.vkAlbumUrl}${GlobalParameters.currentSong.value.albumUrl}',
+          options:
+          Options(responseType: ResponseType.bytes, followRedirects: false),
+        );
+      } on DioError catch (e) {
+        if (GlobalParameters.connectionStatus.value ==
+            ConnectivityResult.none) {
+          return MusicStatus.noInternet;
+        } else {
+          print('logIn error: ${e.error}');
+          print('logIn error: ${e.message}');
+          print('logIn error: ${e.type}');
+          return MusicStatus.unknownError;
+        }
+      }
+
+      String data = response.data.toString();
+
+      data = BytesService.subByte(
+        data: data,
+        startString: 'background-image:url(\'',
+        endString: '\');',
+        cutStart: true,
+      );
+
+      GlobalParameters.currentSong.value.albumImageUrl = Win1251Decoder.decode(BytesService.getInts(data));
+    }
+  }
+
   Future<PaletteGenerator> _getPrimaryColor() async {
-    PaletteGenerator paletteGenerator =
-        await PaletteGenerator.fromImageProvider(
-      Image.network(imageUrl).image,
-    );
+    PaletteGenerator paletteGenerator;
+    if (songImageUrl.isNotEmpty) {
+      paletteGenerator = await PaletteGenerator.fromImageProvider(
+        Image.network(songImageUrl).image,
+      );
+    } else {
+      paletteGenerator = PaletteGenerator.fromColors(
+        List.generate(
+          3,
+          (index) => PaletteColor(
+            Color((Random().nextDouble() * 0xFFFFFF).toInt()),
+            Random().nextInt(10000),
+          ),
+        ),
+      );
+    }
     return paletteGenerator;
   }
 

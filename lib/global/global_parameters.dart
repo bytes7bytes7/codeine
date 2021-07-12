@@ -50,33 +50,40 @@ abstract class GlobalParameters {
 
   static void playSongByID(int id) async {
     songId = id;
-    await songs[songId].generateColors();
-    currentSong.value = songs[songId];
+    Song nextSong = songs.where((s) => s.id == songId).first;
+    await nextSong.generateColors();
+    currentSong.value = nextSong;
     songSeconds.value = 0;
   }
 
   static void previousSong() async {
     if (songs.length > 0) {
-      if (songId != 0) {
-        songId--;
+      int index = songs.indexOf(currentSong.value);
+      if (index != 0) {
+        index--;
       } else {
-        songId = songs.length - 1;
+        index = songs.length - 1;
       }
-      await songs[songId].generateColors();
-      currentSong.value = songs[songId];
+      Song song = songs[index];
+      songId = song.id;
+      await song.generateColors();
+      currentSong.value = song;
       songSeconds.value = 0;
     }
   }
 
   static void nextSong() async {
     if (songs.length > 0) {
-      if (songId != songs.length - 1) {
-        songId++;
+      int index = songs.indexOf(currentSong.value);
+      if (index != songs.length - 1) {
+        index++;
       } else {
-        songId = 0;
+        index = 0;
       }
-      await songs[songId].generateColors();
-      currentSong.value = songs[songId];
+      Song song = songs[index];
+      songId = song.id;
+      await song.generateColors();
+      currentSong.value = song;
       songSeconds.value = 0;
     }
   }

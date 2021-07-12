@@ -48,6 +48,7 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return ValueListenableBuilder(
         valueListenable: widget.opacityNotifier,
         builder: (context, percent, child) {
@@ -89,36 +90,39 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
                         padding: const EdgeInsets.symmetric(horizontal: 30),
                         child: Row(
                           children: [
-                            ValueListenableBuilder(
-                                valueListenable: GlobalParameters.currentSong,
-                                builder: (context, value, child) {
-                                  return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        GlobalParameters
-                                            .currentSong.value?.title,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyText1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      Text(
-                                        '${GlobalParameters.currentSong.value.artists.sublist(1).fold<String>(GlobalParameters.currentSong.value.artists.first.name, (prev, next) => prev += ', ' + next.name)}',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyText2
-                                            .copyWith(
-                                              color: Theme.of(context)
-                                                  .disabledColor,
-                                            ),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ],
-                                  );
-                                }),
+                            Container(
+                              width: size.width * 0.7,
+                              child: ValueListenableBuilder(
+                                  valueListenable: GlobalParameters.currentSong,
+                                  builder: (context, value, child) {
+                                    return Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          GlobalParameters
+                                              .currentSong.value?.title,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyText1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Text(
+                                          '${GlobalParameters.currentSong.value.artists.sublist(1).fold<String>(GlobalParameters.currentSong.value.artists.first.name, (prev, next) => prev += ', ' + next.name)}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyText2
+                                              .copyWith(
+                                                color: Theme.of(context)
+                                                    .disabledColor,
+                                              ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    );
+                                  }),
+                            ),
                             Spacer(),
                             // TODO: place button on the center of songs' duration
                             IconButton(
