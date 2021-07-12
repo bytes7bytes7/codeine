@@ -62,9 +62,18 @@ enum AuthStatus {
   unknownError,
 }
 
+enum MusicStatus{
+  ok,
+  error,
+  noInternet,
+  unknownError,
+}
+
 abstract class ConstantHTTP {
   static const String vkURL = 'https://vk.com/';
   static const String vkLoginURL = 'https://login.vk.com/';
+  // static const String vkMusicURL = 'https://vk.com/al_audio.php';
+  static const String vkMusicURL = 'https://vk.com/audios';
 
   static const Map<String, String> headers = {
     'User-Agent':

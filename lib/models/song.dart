@@ -1,4 +1,4 @@
-import 'dart:math';
+import 'package:codeine/models/artist.dart';
 import 'package:flutter/material.dart';
 import 'package:palette_generator/palette_generator.dart';
 
@@ -7,15 +7,14 @@ class Song {
       {this.id,
       this.title,
       this.artists,
-      this.feat,
       this.duration,
       this.imageUrl,
       });
 
   int id;
   String title;
-  List<String> artists;
-  List<String> feat;
+  List<Artist> artists;
+  int seconds;
   String duration;
   String imageUrl;
   Color primaryColor;
@@ -46,20 +45,6 @@ class Song {
       Image.network(imageUrl).image,
     );
     return paletteGenerator;
-  }
-
-  double seconds() {
-    List<int> lst = duration
-        .split(':')
-        .map<int>((e) => int.parse(e))
-        .toList()
-        .reversed
-        .toList();
-    double seconds = 0;
-    for (int i = 0; i < lst.length; i++) {
-      seconds += pow(60, i) * lst[i];
-    }
-    return seconds;
   }
 
   static String time(int seconds) {

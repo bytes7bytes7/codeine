@@ -22,10 +22,11 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
   void initState() {
     super.initState();
     _waveDuration = 3000;
-    GlobalParameters.waveController = GlobalParameters.waveController ?? AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: _waveDuration),
-    );
+    GlobalParameters.waveController = GlobalParameters.waveController ??
+        AnimationController(
+          vsync: this,
+          duration: Duration(milliseconds: _waveDuration),
+        );
     _waveCurve = CurvedAnimation(
       parent: GlobalParameters.waveController,
       curve: Curves.easeInOut,
@@ -37,116 +38,119 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
       _waveCurve,
     );
 
-    GlobalParameters.playAnimationController =  GlobalParameters.playAnimationController ?? AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 500),
-    );
+    GlobalParameters.playAnimationController =
+        GlobalParameters.playAnimationController ??
+            AnimationController(
+              vsync: this,
+              duration: Duration(milliseconds: 500),
+            );
   }
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: widget.opacityNotifier,
-      builder: (context, percent, child) {
-        return Opacity(
-          opacity: percent,
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () {
-                GlobalParameters.snappingSheetController.snapToPosition(ConstantData.snappingPositions[1]);
-              },
-              child: Container(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                child: Stack(
-                  children: [
-                    PlayerWave(
-                      config: CustomConfig(
-                        gradients: [
-                          [
-                            Theme.of(context).splashColor,
-                            Theme.of(context).splashColor.withOpacity(0.0),
+        valueListenable: widget.opacityNotifier,
+        builder: (context, percent, child) {
+          return Opacity(
+            opacity: percent,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  GlobalParameters.snappingSheetController
+                      .snapToPosition(ConstantData.snappingPositions[1]);
+                },
+                child: Container(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  child: Stack(
+                    children: [
+                      PlayerWave(
+                        config: CustomConfig(
+                          gradients: [
+                            [
+                              Theme.of(context).splashColor,
+                              Theme.of(context).splashColor.withOpacity(0.0),
+                            ],
                           ],
-                        ],
-                        durations: [10000],
-                        heightPercentages: [_waveHeightPercentage],
-                        blur: MaskFilter.blur(BlurStyle.solid, 5),
-                        gradientBegin: Alignment.bottomCenter,
-                        gradientEnd: Alignment.topCenter,
+                          durations: [10000],
+                          heightPercentages: [_waveHeightPercentage],
+                          blur: MaskFilter.blur(BlurStyle.solid, 5),
+                          gradientBegin: Alignment.bottomCenter,
+                          gradientEnd: Alignment.topCenter,
+                        ),
+                        waveAmplitude: 0,
+                        backgroundColor: Colors.transparent,
+                        size: Size(
+                            double.infinity, ConstantData.bottomPlayerHeight),
                       ),
-                      waveAmplitude: 0,
-                      backgroundColor: Colors.transparent,
-                      size: Size(double.infinity, ConstantData.bottomPlayerHeight),
-                    ),
-                    Container(
-                      width: double.infinity,
-                      height: ConstantData.bottomPlayerHeight,
-                      padding: const EdgeInsets.symmetric(horizontal: 30),
-                      child: Row(
-                        children: [
-                          ValueListenableBuilder(
-                            valueListenable: GlobalParameters.currentSong,
-                            builder: (context, value, child) {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    GlobalParameters.currentSong.value?.title,
-                                    style: Theme.of(context).textTheme.bodyText1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  Text(
-                                    '${GlobalParameters.currentSong.value.artists.sublist(1).fold<String>(GlobalParameters.currentSong.value.artists.first, (prev, next) => prev += ', ' + next)}' +
-                                        ((GlobalParameters.currentSong.value.feat.isNotEmpty)
-                                            ? ' feat ' +
-                                                GlobalParameters.currentSong.value.feat
-                                                    .sublist(1)
-                                                    .fold<String>(
-                                                        GlobalParameters.currentSong.value.feat.first,
-                                                        (prev, next) =>
-                                                            prev += ', ' + next)
-                                            : ''),
-                                    style: Theme.of(context).textTheme.bodyText2.copyWith(
-                                          color: Theme.of(context).disabledColor,
-                                        ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              );
-                            }
-                          ),
-                          Spacer(),
-                          // TODO: place button on the center of songs' duration
-                          IconButton(
-                            color: Theme.of(context).focusColor,
-                            padding: const EdgeInsets.symmetric(horizontal: 0),
-                            splashRadius: 20,
-                            icon: ValueListenableBuilder(
-                              valueListenable: GlobalParameters.playNotifier,
-                              builder: (context, value, __) {
-                                return AnimatedIcon(
-                                  icon: AnimatedIcons.play_pause,
-                                  size: 30,
-                                  progress: GlobalParameters.playAnimationController,
-                                  color: Theme.of(context).focusColor,
-                                );
+                      Container(
+                        width: double.infinity,
+                        height: ConstantData.bottomPlayerHeight,
+                        padding: const EdgeInsets.symmetric(horizontal: 30),
+                        child: Row(
+                          children: [
+                            ValueListenableBuilder(
+                                valueListenable: GlobalParameters.currentSong,
+                                builder: (context, value, child) {
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        GlobalParameters
+                                            .currentSong.value?.title,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyText1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      Text(
+                                        '${GlobalParameters.currentSong.value.artists.sublist(1).fold<String>(GlobalParameters.currentSong.value.artists.first.name, (prev, next) => prev += ', ' + next.name)}',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyText2
+                                            .copyWith(
+                                              color: Theme.of(context)
+                                                  .disabledColor,
+                                            ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  );
+                                }),
+                            Spacer(),
+                            // TODO: place button on the center of songs' duration
+                            IconButton(
+                              color: Theme.of(context).focusColor,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 0),
+                              splashRadius: 20,
+                              icon: ValueListenableBuilder(
+                                valueListenable: GlobalParameters.playNotifier,
+                                builder: (context, value, __) {
+                                  return AnimatedIcon(
+                                    icon: AnimatedIcons.play_pause,
+                                    size: 30,
+                                    progress: GlobalParameters
+                                        .playAnimationController,
+                                    color: Theme.of(context).focusColor,
+                                  );
+                                },
+                              ),
+                              onPressed: () {
+                                GlobalParameters.playPauseSong();
                               },
                             ),
-                            onPressed: () {
-                              GlobalParameters.playPauseSong();
-                            },
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      }
-    );
+          );
+        });
   }
 }

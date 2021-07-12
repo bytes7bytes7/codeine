@@ -31,7 +31,7 @@ class SongSlider extends StatelessWidget {
           child: Slider(
             value: value,
             min: 0.0,
-            max: GlobalParameters.currentSong.value.seconds(),
+            max: GlobalParameters.currentSong.value.seconds.toDouble(),
             onChanged: (newValue) {
               GlobalParameters.songSeconds.value = newValue;
             },

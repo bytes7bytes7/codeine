@@ -38,6 +38,7 @@ dependencies:
   snapping_sheet: ^3.1.0
   palette_generator: ^0.3.0
   animated_text_kit: ^4.2.1
+  html_unescape: ^2.0.0
 
 dev_dependencies:
   flutter_test:

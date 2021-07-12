@@ -39,7 +39,6 @@ class SongCard extends StatelessWidget {
                       ),
                     ),
                   ),
-
                 ],
               ),
               SizedBox(width: 20),
@@ -55,13 +54,7 @@ class SongCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      '${song.artists.sublist(1).fold<String>(song.artists.first, (prev, next) => prev += ', ' + next)}' +
-                          ((song.feat.isNotEmpty)
-                              ? ' feat ' +
-                                  song.feat.sublist(1).fold<String>(
-                                      song.feat.first,
-                                      (prev, next) => prev += ', ' + next)
-                              : ''),
+                      '${song.artists.sublist(1).fold<String>(song.artists.first.name, (prev, next) => prev += ', ' + next.name)}',
                       style: Theme.of(context).textTheme.bodyText2.copyWith(
                             color: Theme.of(context).disabledColor,
                           ),

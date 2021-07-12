@@ -109,15 +109,7 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
             ),
             SizedBox(height: 5),
             Text(
-              '${GlobalParameters.currentSong.value.artists.sublist(1).fold<String>(GlobalParameters.currentSong.value.artists.first, (prev, next) => prev += ', ' + next)}' +
-                  ((GlobalParameters.currentSong.value.feat.isNotEmpty)
-                      ? ' feat ' +
-                          GlobalParameters.currentSong.value.feat
-                              .sublist(1)
-                              .fold<String>(
-                                  GlobalParameters.currentSong.value.feat.first,
-                                  (prev, next) => prev += ', ' + next)
-                      : ''),
+              '${GlobalParameters.currentSong.value.artists.sublist(1).fold<String>(GlobalParameters.currentSong.value.artists.first.name, (prev, next) => prev += ', ' + next.name)}',
               style: Theme.of(context).textTheme.bodyText2,
             ),
             Spacer(),

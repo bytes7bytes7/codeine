@@ -17,11 +17,16 @@ abstract class AuthService {
 
   static Future<AuthStatus> fetchUserData() async {
     if (User.id != null) {
+      await DatabaseHelper.db.getUser(User.id);
+      if (User.phoneOrEmail != null) {
+        return AuthStatus.loggedIn;
+      }
       Response response;
       try {
         response = await User.dio.get(
           '${ConstantHTTP.vkURL}id${User.id}',
-          options: Options(responseType: ResponseType.bytes,followRedirects:false),
+          options:
+              Options(responseType: ResponseType.bytes, followRedirects: false),
         );
       } catch (e) {
         if (GlobalParameters.connectionStatus.value ==

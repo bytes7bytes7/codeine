@@ -1,3 +1,4 @@
+import 'package:codeine/services/music_service.dart';
 import 'package:flutter/material.dart';
 
 import '../models/user.dart';
@@ -18,6 +19,7 @@ class MainScreen extends StatelessWidget {
         switch(status){
           case AuthStatus.noInternet:
           case AuthStatus.loggedIn:
+            await MusicService.getAllMusic();
             GlobalParameters.currentPage.value = 'HomeScreen';
             break;
           case AuthStatus.loggedOut:
