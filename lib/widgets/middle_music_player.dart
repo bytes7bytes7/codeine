@@ -1,10 +1,15 @@
 part of 'music_player.dart';
 
-class MiddleMusicPlayer extends StatelessWidget {
+class MiddleMusicPlayer extends StatefulWidget {
   MiddleMusicPlayer({
     Key key,
   }) : super(key: key);
 
+  @override
+  State<MiddleMusicPlayer> createState() => _MiddleMusicPlayerState();
+}
+
+class _MiddleMusicPlayerState extends State<MiddleMusicPlayer> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;

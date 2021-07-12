@@ -34,6 +34,7 @@ class Song {
   Color primaryColor;
   Color firstColor;
   Color secondColor;
+  final randomInstance = Random();
 
   Future<void> generateColors() async {
     if(albumImageUrl.isEmpty) {
@@ -101,8 +102,8 @@ class Song {
         List.generate(
           3,
           (index) => PaletteColor(
-            Color((Random().nextDouble() * 0xFFFFFF).toInt()),
-            Random().nextInt(10000),
+            Color((randomInstance.nextDouble() * 0xFFFFFF).toInt()),
+            randomInstance.nextInt(10000),
           ),
         ),
       );

@@ -1,6 +1,21 @@
 part of 'music_player.dart';
 
 class TopMusicPlayer extends StatefulWidget {
+  const TopMusicPlayer({
+    Key key,
+    @required this.safeHeight,
+    @required this.firstSizedBox,
+    @required this.firstContainer,
+    @required this.secondSizedBox,
+    @required this.bigCircleRadius,
+  }) : super(key: key);
+
+  final double safeHeight;
+  final double firstSizedBox;
+  final double firstContainer;
+  final double secondSizedBox;
+  final double bigCircleRadius;
+
   @override
   State<TopMusicPlayer> createState() => _TopMusicPlayerState();
 }
@@ -9,10 +24,12 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
     with TickerProviderStateMixin {
   AnimationController _controller;
   Tween<double> _tween = Tween(begin: 0.75, end: 1);
+  PageController pageController;
 
   @override
   void initState() {
     super.initState();
+    pageController = PageController(initialPage: GlobalParameters.songNumber);
     _controller =
         AnimationController(duration: const Duration(seconds: 1), vsync: this);
     _controller.repeat(reverse: true);
@@ -30,15 +47,14 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
     return SafeArea(
       child: Container(
         width: double.infinity,
-        height: size.height -
-            MediaQuery.of(context).padding.bottom -
-            MediaQuery.of(context).padding.top,
+        height: widget.safeHeight,
         padding: const EdgeInsets.all(0.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            SizedBox(height: 10),
-            Padding(
+            SizedBox(height: widget.firstSizedBox),
+            Container(
+              height: widget.firstContainer,
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -68,11 +84,12 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
                 ],
               ),
             ),
-            Spacer(),
+            SizedBox(height: widget.secondSizedBox),
             Container(
               height: size.width * 0.9,
               child: PageView.builder(
-                controller: GlobalParameters.musicPageController,
+                // TODO: maybe something here causes error: The following _CastError was thrown during a service extension callback for "ext.flutter.inspector.getRootWidgetSummaryTree": Null check operator used on a null value
+                controller: pageController,
                 itemCount: GlobalParameters.songs.length,
                 scrollDirection: Axis.horizontal,
                 pageSnapping: true,
@@ -84,8 +101,8 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
                     children: [
                       Container(
                         alignment: Alignment.center,
-                        height: 250,
-                        width: 250,
+                        height: widget.bigCircleRadius*2,
+                        width: widget.bigCircleRadius*2,
                         child: Stack(
                           children: [
                             // ScaleTransition(
@@ -113,7 +130,7 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
                                 return Container(
                                   alignment: Alignment.center,
                                   child: CircleAvatar(
-                                    radius: 107.5,
+                                    radius: widget.bigCircleRadius,
                                     backgroundColor: Colors.transparent,
                                     backgroundImage: (GlobalParameters
                                             .songs[index]
@@ -236,7 +253,9 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
             SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: PlayerControls(),
+              child: PlayerControls(
+                pageController: pageController,
+              ),
             ),
             Spacer(),
           ],

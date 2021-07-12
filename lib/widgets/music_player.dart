@@ -29,15 +29,77 @@ class MusicPlayer extends StatefulWidget {
   _MusicPlayerState createState() => _MusicPlayerState();
 }
 
-class _MusicPlayerState extends State<MusicPlayer> {
-  final ValueNotifier<double> topPlayerOpacity = ValueNotifier(0.0);
-  final ValueNotifier<double> middlePlayerOpacity = ValueNotifier(0.0);
-  final ValueNotifier<double> bottomPlayerOpacity = ValueNotifier(1.0);
-  final ValueNotifier<int> progress = ValueNotifier(0);
+class _MusicPlayerState extends State<MusicPlayer>
+    with SingleTickerProviderStateMixin {
+  ValueNotifier<double> topPlayerOpacity;
+  ValueNotifier<double> middlePlayerOpacity;
+  ValueNotifier<double> bottomPlayerOpacity;
+  ValueNotifier<int> progress;
+  Animation<double> _xTween;
+  Animation<double> _yTween;
+  Animation<double> _radiusTween;
+
+  @override
+  void initState() {
+    topPlayerOpacity = ValueNotifier(0.0);
+    middlePlayerOpacity = ValueNotifier(0.0);
+    bottomPlayerOpacity = ValueNotifier(1.0);
+    progress = ValueNotifier(0);
+    GlobalParameters.radiusController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 800),
+    );
+    _xTween = Tween<double>(begin:0.0, end: 1.0)
+        .animate(GlobalParameters.radiusController);
+    _radiusTween = Tween<double>(begin: 0.35, end: 1.5)
+        .animate(GlobalParameters.radiusController);
+    super.initState();
+  }
+
+  void initTween(
+      {@required double halfOfHeight,
+      @required double paddingTop,
+      @required double firstSizedBox,
+      @required double firstContainer,
+      @required double secondSizedBox,
+      @required double bigCircleRadius}) {
+    if (_yTween == null) {
+      double begin = (-halfOfHeight +
+              paddingTop +
+              firstSizedBox +
+              firstContainer +
+              secondSizedBox +
+              bigCircleRadius) /
+          halfOfHeight;
+      _yTween = Tween<double>(begin: begin, end: -1.0)
+          .animate(GlobalParameters.radiusController);
+    }
+  }
+
+  @override
+  void dispose() {
+    GlobalParameters.radiusController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    final double safeHeight = size.height -
+        MediaQuery.of(context).padding.bottom -
+        MediaQuery.of(context).padding.top;
+    final double firstSizedBox = 10.0;
+    final double firstContainer = 45.0;
+    final double secondSizedBox = safeHeight * 0.05;
+    final double bigCircleRadius = 107.0;
+    initTween(
+      halfOfHeight: size.height / 2,
+      paddingTop: MediaQuery.of(context).padding.top,
+      firstSizedBox: firstSizedBox,
+      firstContainer: firstContainer,
+      secondSizedBox: secondSizedBox,
+      bigCircleRadius: bigCircleRadius,
+    );
     return SnappingSheet(
       controller: GlobalParameters.snappingSheetController,
       initialSnappingPosition: SnappingPosition.pixels(
@@ -88,32 +150,42 @@ class _MusicPlayerState extends State<MusicPlayer> {
                 return Stack(
                   children: [
                     FutureBuilder(
-                        future:
-                            GlobalParameters.currentSong.value.generateColors(),
-                        builder: (context, snapshot) {
-                          return Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              gradient: LinearGradient(
-                                colors: [
-                                  GlobalParameters
-                                          .currentSong.value.firstColor ??
+                      future:
+                          GlobalParameters.currentSong.value.generateColors(),
+                      builder: (context, snapshot) {
+                        return AnimatedBuilder(
+                            animation: _xTween,
+                            builder: (context, child) {
+                              return Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color:
                                       Theme.of(context).scaffoldBackgroundColor,
-                                  GlobalParameters.currentSong.value.secondColor
-                                          ?.withOpacity(0) ??
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                ],
-                                begin: Alignment.topRight,
-                                end: Alignment.centerLeft,
-                              ),
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(20),
-                                topRight: Radius.circular(20),
-                              ),
-                            ),
-                          );
-                        }),
+                                  gradient: RadialGradient(
+                                    colors: [
+                                      GlobalParameters
+                                              .currentSong.value.firstColor ??
+                                          Theme.of(context)
+                                              .scaffoldBackgroundColor,
+                                      GlobalParameters
+                                              .currentSong.value.secondColor
+                                              ?.withOpacity(0) ??
+                                          Theme.of(context)
+                                              .scaffoldBackgroundColor,
+                                    ],
+                                    center:
+                                        Alignment(_xTween.value, _yTween.value),
+                                    radius: _radiusTween.value,
+                                  ),
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(20),
+                                    topRight: Radius.circular(20),
+                                  ),
+                                ),
+                              );
+                            });
+                      },
+                    ),
                     SingleChildScrollView(
                       physics: NeverScrollableScrollPhysics(),
                       child: Column(
@@ -125,7 +197,13 @@ class _MusicPlayerState extends State<MusicPlayer> {
                                 visible: (percent == 0) ? false : true,
                                 child: Opacity(
                                   opacity: percent,
-                                  child: TopMusicPlayer(),
+                                  child: TopMusicPlayer(
+                                    safeHeight: safeHeight,
+                                    firstSizedBox: firstSizedBox,
+                                    firstContainer: firstContainer,
+                                    secondSizedBox: secondSizedBox,
+                                    bigCircleRadius: bigCircleRadius,
+                                  ),
                                 ),
                               );
                             },

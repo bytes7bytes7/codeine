@@ -29,7 +29,7 @@ abstract class GlobalParameters {
   static AnimationController playAnimationController;
   static AnimationController waveController;
   static AnimationController circleController;
-  static PageController musicPageController = PageController();
+  static AnimationController radiusController;
   static final ValueNotifier<bool> playNotifier = ValueNotifier(false);
   static final ValueNotifier<Song> currentSong = ValueNotifier(songs[0]);
   static int songNumber = 0;
@@ -42,10 +42,12 @@ abstract class GlobalParameters {
       playNotifier.value = false;
       playAnimationController.reverse();
       waveController.reverse();
+      radiusController.reverse();
     } else {
       playNotifier.value = true;
       playAnimationController.forward();
       waveController.forward();
+      radiusController.forward();
     }
   }
 
@@ -65,32 +67,36 @@ abstract class GlobalParameters {
     songSeconds.value = 0;
   }
 
+  static void moveToPreviousIndex() {
+    if (songNumber != 0) {
+      songNumber--;
+    } else {
+      songNumber = songs.length - 1;
+    }
+  }
+
   static void previousSong() async {
     if (songs.length > 0) {
-      int index = songs.indexOf(currentSong.value);
-      if (index != 0) {
-        index--;
-      } else {
-        index = songs.length - 1;
-      }
-      Song song = songs[index];
-      songNumber = index;
+      moveToPreviousIndex();
+      Song song = songs[songNumber];
       await song.generateColors();
       currentSong.value = song;
       songSeconds.value = 0;
     }
   }
 
+  static void moveToNextIndex() {
+    if (songNumber != songs.length - 1) {
+      songNumber++;
+    } else {
+      songNumber = 0;
+    }
+  }
+
   static void nextSong() async {
     if (songs.length > 0) {
-      int index = songs.indexOf(currentSong.value);
-      if (index != songs.length - 1) {
-        index++;
-      } else {
-        index = 0;
-      }
-      Song song = songs[index];
-      songNumber = index;
+      moveToNextIndex();
+      Song song = songs[songNumber];
       await song.generateColors();
       currentSong.value = song;
       songSeconds.value = 0;

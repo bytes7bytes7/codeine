@@ -1,9 +1,14 @@
 part of 'music_player.dart';
 
 class PlayerControls extends StatelessWidget {
-  const PlayerControls({
+  PlayerControls({
     Key key,
-  }) : super(key: key);
+    this.pageController,
+  });
+
+  final PageController pageController;
+  final Duration duration = Duration(milliseconds: 400);
+  final Curve curve = Curves.easeInOut;
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +20,12 @@ class PlayerControls extends StatelessWidget {
           color: Theme.of(context).focusColor,
           iconSize: 60,
           onPressed: () {
-            GlobalParameters.previousSong();
+            if(pageController!=null){
+              GlobalParameters.moveToPreviousIndex();
+              pageController.animateToPage(GlobalParameters.songNumber, duration: duration, curve: curve);
+            }else {
+              GlobalParameters.previousSong();
+            }
           },
         ),
         ValueListenableBuilder(
@@ -38,7 +48,12 @@ class PlayerControls extends StatelessWidget {
           color: Theme.of(context).focusColor,
           iconSize: 60,
           onPressed: () {
-            GlobalParameters.nextSong();
+            if(pageController!=null){
+              GlobalParameters.moveToNextIndex();
+              pageController.animateToPage(GlobalParameters.songNumber, duration: duration, curve: curve);
+            }else {
+              GlobalParameters.nextSong();
+            }
           },
         ),
       ],

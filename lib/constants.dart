@@ -13,6 +13,9 @@ abstract class ConstantColors {
   static const Color disabledColor = Color(0xFFC5C5C5);
   static const Color splashColor = Color(0xFF7F2BCF);
   static const Color highlightColor = Color(0xFFB538A7);
+  // TODO: try this colors
+  // Color(0xFFF13AD3),
+  // Color(0xFF63BAC4),
   static const Color errorColor = Color(0xFFB53850);
 }
 
