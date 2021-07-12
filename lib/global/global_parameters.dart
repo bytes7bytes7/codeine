@@ -29,9 +29,10 @@ abstract class GlobalParameters {
   static AnimationController playAnimationController;
   static AnimationController waveController;
   static AnimationController circleController;
+  static PageController musicPageController = PageController();
   static final ValueNotifier<bool> playNotifier = ValueNotifier(false);
   static final ValueNotifier<Song> currentSong = ValueNotifier(songs[0]);
-  static int songId = songs[0].id;
+  static int songNumber = 0;
   static final ValueNotifier<double> songSeconds = ValueNotifier(0.0);
   static final ValueNotifier<bool> shuffleMode = ValueNotifier(false);
   static final ValueNotifier<bool> repeatOneMode = ValueNotifier(false);
@@ -49,8 +50,16 @@ abstract class GlobalParameters {
   }
 
   static void playSongByID(int id) async {
-    songId = id;
-    Song nextSong = songs.where((s) => s.id == songId).first;
+    songNumber = songs.indexWhere((s) => s.id == id);
+    Song nextSong = songs[songNumber];
+    await nextSong.generateColors();
+    currentSong.value = nextSong;
+    songSeconds.value = 0;
+  }
+
+  static void playSongByIndex(int index) async {
+    songNumber = index;
+    Song nextSong = songs[songNumber];
     await nextSong.generateColors();
     currentSong.value = nextSong;
     songSeconds.value = 0;
@@ -65,7 +74,7 @@ abstract class GlobalParameters {
         index = songs.length - 1;
       }
       Song song = songs[index];
-      songId = song.id;
+      songNumber = index;
       await song.generateColors();
       currentSong.value = song;
       songSeconds.value = 0;
@@ -81,7 +90,7 @@ abstract class GlobalParameters {
         index = 0;
       }
       Song song = songs[index];
-      songId = song.id;
+      songNumber = index;
       await song.generateColors();
       currentSong.value = song;
       songSeconds.value = 0;

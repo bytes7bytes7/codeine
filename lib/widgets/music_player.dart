@@ -6,10 +6,15 @@ import 'package:codeine/constants.dart';
 import 'package:codeine/global/global_parameters.dart';
 
 part 'bottom_music_player.dart';
+
 part 'middle_music_player.dart';
+
 part 'top_music_player.dart';
+
 part 'song_slider.dart';
+
 part 'gradient_rect_slider_track_shape.dart';
+
 part 'player_controls.dart';
 
 class MusicPlayer extends StatefulWidget {
@@ -52,7 +57,8 @@ class _MusicPlayerState extends State<MusicPlayer> {
                   opacity: (1.0 - percent) / 4,
                   child: GestureDetector(
                     onTap: () {
-                      GlobalParameters.snappingSheetController.snapToPosition(ConstantData.snappingPositions[0]);
+                      GlobalParameters.snappingSheetController
+                          .snapToPosition(ConstantData.snappingPositions[0]);
                     },
                     child: Container(
                       color: Theme.of(context).scaffoldBackgroundColor,
@@ -77,89 +83,92 @@ class _MusicPlayerState extends State<MusicPlayer> {
             ),
           ),
           child: ValueListenableBuilder(
-            valueListenable: GlobalParameters.currentSong,
-            builder: (context, _, __) {
-              return Stack(
-                children: [
-                  FutureBuilder(
-                      future: GlobalParameters.currentSong.value.generateColors(),
-                      builder: (context, snapshot) {
-                        return Container(
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            gradient: LinearGradient(
-                              colors: [
-                                GlobalParameters.currentSong.value.firstColor ?? Theme.of(context).scaffoldBackgroundColor,
-                                GlobalParameters.currentSong.value.secondColor?.withOpacity(0) ?? Theme.of(context).scaffoldBackgroundColor,
-                              ],
-                              begin: Alignment.topRight,
-                              end: Alignment.centerLeft,
+              valueListenable: GlobalParameters.currentSong,
+              builder: (context, _, __) {
+                return Stack(
+                  children: [
+                    FutureBuilder(
+                        future:
+                            GlobalParameters.currentSong.value.generateColors(),
+                        builder: (context, snapshot) {
+                          return Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                              gradient: LinearGradient(
+                                colors: [
+                                  GlobalParameters
+                                          .currentSong.value.firstColor ??
+                                      Theme.of(context).scaffoldBackgroundColor,
+                                  GlobalParameters.currentSong.value.secondColor
+                                          ?.withOpacity(0) ??
+                                      Theme.of(context).scaffoldBackgroundColor,
+                                ],
+                                begin: Alignment.topRight,
+                                end: Alignment.centerLeft,
+                              ),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                                topRight: Radius.circular(20),
+                              ),
                             ),
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(20),
-                              topRight: Radius.circular(20),
+                          );
+                        }),
+                    SingleChildScrollView(
+                      physics: NeverScrollableScrollPhysics(),
+                      child: Column(
+                        children: [
+                          ValueListenableBuilder(
+                            valueListenable: topPlayerOpacity,
+                            builder: (context, percent, child) {
+                              return Visibility(
+                                visible: (percent == 0) ? false : true,
+                                child: Opacity(
+                                  opacity: percent,
+                                  child: TopMusicPlayer(),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    SingleChildScrollView(
+                      physics: NeverScrollableScrollPhysics(),
+                      child: Column(
+                        children: [
+                          ValueListenableBuilder(
+                            valueListenable: middlePlayerOpacity,
+                            builder: (context, percent, child) {
+                              return Visibility(
+                                visible: (percent == 0) ? false : true,
+                                child: Opacity(
+                                  opacity: percent,
+                                  child: MiddleMusicPlayer(),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    ValueListenableBuilder(
+                      valueListenable: bottomPlayerOpacity,
+                      builder: (context, percent, child) {
+                        return Visibility(
+                          visible: (percent == 0) ? false : true,
+                          child: Opacity(
+                            opacity: percent,
+                            child: BottomMusicPlayer(
+                              opacityNotifier: bottomPlayerOpacity,
                             ),
                           ),
                         );
-                      }
-                  ),
-                  SingleChildScrollView(
-                    physics: NeverScrollableScrollPhysics(),
-                    child: Column(
-                      children: [
-                        ValueListenableBuilder(
-                          valueListenable: topPlayerOpacity,
-                          builder: (context, percent, child) {
-                            return Visibility(
-                              visible: (percent == 0) ? false : true,
-                              child: Opacity(
-                                opacity: percent,
-                                child: TopMusicPlayer(),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
+                      },
                     ),
-                  ),
-                  SingleChildScrollView(
-                    physics: NeverScrollableScrollPhysics(),
-                    child: Column(
-                      children: [
-                        ValueListenableBuilder(
-                          valueListenable: middlePlayerOpacity,
-                          builder: (context, percent, child) {
-                            return Visibility(
-                              visible: (percent == 0) ? false : true,
-                              child: Opacity(
-                                opacity: percent,
-                                child: MiddleMusicPlayer(),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  ValueListenableBuilder(
-                    valueListenable: bottomPlayerOpacity,
-                    builder: (context, percent, child) {
-                      return Visibility(
-                        visible: (percent == 0) ? false : true,
-                        child: Opacity(
-                          opacity: percent,
-                          child: BottomMusicPlayer(
-                            opacityNotifier: bottomPlayerOpacity,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              );
-            }
-          ),
+                  ],
+                );
+              }),
         ),
       ),
       onSnapCompleted: (sheetPosition, snappingPosition) {

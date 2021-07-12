@@ -33,145 +33,176 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
         height: size.height -
             MediaQuery.of(context).padding.bottom -
             MediaQuery.of(context).padding.top,
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.all(0.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.arrow_back_ios_outlined),
-                  color: Theme.of(context).focusColor,
-                  iconSize: 30.0,
-                  onPressed: () {
-                    GlobalParameters.snappingSheetController
-                        .snapToPosition(ConstantData.snappingPositions[0]);
-                  },
-                ),
-                Text(
-                  'CODEINE',
-                  style: Theme.of(context)
-                      .textTheme
-                      .headline3
-                      .copyWith(fontSize: 25),
-                ),
-                IconButton(
-                  icon: Icon(Icons.scatter_plot),
-                  color: Theme.of(context).focusColor,
-                  iconSize: 30.0,
-                  onPressed: () {},
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.arrow_back_ios_outlined),
+                    color: Theme.of(context).focusColor,
+                    iconSize: 30.0,
+                    onPressed: () {
+                      GlobalParameters.snappingSheetController
+                          .snapToPosition(ConstantData.snappingPositions[0]);
+                    },
+                  ),
+                  Text(
+                    'CODEINE',
+                    style: Theme.of(context)
+                        .textTheme
+                        .headline3
+                        .copyWith(fontSize: 25),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.scatter_plot),
+                    color: Theme.of(context).focusColor,
+                    iconSize: 30.0,
+                    onPressed: () {},
+                  ),
+                ],
+              ),
             ),
             Spacer(),
             Container(
-              alignment: Alignment.center,
-              height: 250,
-              width: 250,
-              child: Stack(
-                children: [
-                  // ScaleTransition(
-                  //   scale: _tween.animate(
-                  //     CurvedAnimation(
-                  //         parent: _controller, curve: Curves.elasticOut),
-                  //   ),
-                  //   child: Container(
-                  //     height: 250,
-                  //     width: 250,
-                  //     child: Container(
-                  //       height: 250,
-                  //       width: 250,
-                  //       decoration: BoxDecoration(
-                  //         color: Theme.of(context).focusColor.withOpacity(0.25),
-                  //         shape: BoxShape.circle,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                  FutureBuilder(
-                    future: GlobalParameters.currentSong.value.generateColors(),
-                    builder: (context, snapshot) {
-                      return Container(
+              height: size.width * 0.9,
+              child: PageView.builder(
+                controller: GlobalParameters.musicPageController,
+                itemCount: GlobalParameters.songs.length,
+                scrollDirection: Axis.horizontal,
+                pageSnapping: true,
+                onPageChanged: (index) {
+                  GlobalParameters.playSongByIndex(index);
+                },
+                itemBuilder: (context, index) {
+                  return Column(
+                    children: [
+                      Container(
                         alignment: Alignment.center,
-                        child: CircleAvatar(
-                          radius: 107.5,
-                          backgroundColor: Theme.of(context).focusColor,
-                          backgroundImage: (GlobalParameters
-                                  .currentSong.value.albumImageUrl.isNotEmpty)
-                              ? NetworkImage(GlobalParameters
-                                  .currentSong.value.albumImageUrl)
-                              : (GlobalParameters.currentSong.value.songImageUrl
-                                      .isNotEmpty)
-                                  ? NetworkImage(GlobalParameters
-                                      .currentSong.value.songImageUrl)
-                                  : AssetImage('assets/png/cup.png'),
+                        height: 250,
+                        width: 250,
+                        child: Stack(
+                          children: [
+                            // ScaleTransition(
+                            //   scale: _tween.animate(
+                            //     CurvedAnimation(
+                            //         parent: _controller, curve: Curves.elasticOut),
+                            //   ),
+                            //   child: Container(
+                            //     height: 250,
+                            //     width: 250,
+                            //     child: Container(
+                            //       height: 250,
+                            //       width: 250,
+                            //       decoration: BoxDecoration(
+                            //         color: Theme.of(context).focusColor.withOpacity(0.25),
+                            //         shape: BoxShape.circle,
+                            //       ),
+                            //     ),
+                            //   ),
+                            // ),
+                            FutureBuilder(
+                              future: GlobalParameters.songs[index]
+                                  .generateColors(),
+                              builder: (context, snapshot) {
+                                return Container(
+                                  alignment: Alignment.center,
+                                  child: CircleAvatar(
+                                    radius: 107.5,
+                                    backgroundColor: Colors.transparent,
+                                    backgroundImage: (GlobalParameters
+                                            .songs[index]
+                                            .albumImageUrl
+                                            .isNotEmpty)
+                                        ? NetworkImage(GlobalParameters
+                                            .songs[index].albumImageUrl)
+                                        : (GlobalParameters.songs[index]
+                                                .songImageUrl.isNotEmpty)
+                                            ? NetworkImage(GlobalParameters
+                                                .songs[index].songImageUrl)
+                                            : AssetImage('assets/png/cup.png'),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
                         ),
+                      ),
+                      SizedBox(height: 30),
+                      Container(
+                        width: size.width * 0.9,
+                        child: Text(
+                          GlobalParameters.songs[index].title,
+                          style: Theme.of(context).textTheme.headline3,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      Container(
+                        width: size.width * 0.9,
+                        child: Text(
+                          '${GlobalParameters.songs[index].artists.sublist(1).fold<String>(GlobalParameters.songs[index].artists.first.name, (prev, next) => prev += ', ' + next.name)}',
+                          style: Theme.of(context).textTheme.bodyText2,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+            Spacer(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Row(
+                children: [
+                  ValueListenableBuilder(
+                    valueListenable: GlobalParameters.shuffleMode,
+                    builder: (context, value, child) {
+                      return IconButton(
+                        icon: (value)
+                            ? Icon(Icons.shuffle_on_outlined)
+                            : Icon(Icons.shuffle_outlined),
+                        color: Theme.of(context).focusColor,
+                        iconSize: 30,
+                        onPressed: () {
+                          GlobalParameters.shuffleMode.value =
+                              !GlobalParameters.shuffleMode.value;
+                        },
+                      );
+                    },
+                  ),
+                  Spacer(),
+                  ValueListenableBuilder(
+                    valueListenable: GlobalParameters.repeatOneMode,
+                    builder: (context, value, child) {
+                      return IconButton(
+                        icon: (value)
+                            ? Icon(Icons.repeat_one_on_outlined)
+                            : Icon(Icons.repeat_one_outlined),
+                        color: Theme.of(context).focusColor,
+                        iconSize: 30,
+                        onPressed: () {
+                          GlobalParameters.repeatOneMode.value =
+                              !GlobalParameters.repeatOneMode.value;
+                        },
                       );
                     },
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 30),
-            Container(
-              width: size.width * 0.9,
-              child: Text(
-                GlobalParameters.currentSong.value.title,
-                style: Theme.of(context).textTheme.headline3,
-                textAlign: TextAlign.center,
-              ),
-            ),
-            SizedBox(height: 5),
-            Container(
-              width: size.width * 0.9,
-              child: Text(
-                '${GlobalParameters.currentSong.value.artists.sublist(1).fold<String>(GlobalParameters.currentSong.value.artists.first.name, (prev, next) => prev += ', ' + next.name)}',
-                style: Theme.of(context).textTheme.bodyText2,
-                textAlign: TextAlign.center,
-              ),
-            ),
-            Spacer(),
-            Row(
-              children: [
-                ValueListenableBuilder(
-                  valueListenable: GlobalParameters.shuffleMode,
-                  builder: (context, value, child) {
-                    return IconButton(
-                      icon: (value)
-                          ? Icon(Icons.shuffle_on_outlined)
-                          : Icon(Icons.shuffle_outlined),
-                      color: Theme.of(context).focusColor,
-                      iconSize: 30,
-                      onPressed: () {
-                        GlobalParameters.shuffleMode.value =
-                            !GlobalParameters.shuffleMode.value;
-                      },
-                    );
-                  },
-                ),
-                Spacer(),
-                ValueListenableBuilder(
-                  valueListenable: GlobalParameters.repeatOneMode,
-                  builder: (context, value, child) {
-                    return IconButton(
-                      icon: (value)
-                          ? Icon(Icons.repeat_one_on_outlined)
-                          : Icon(Icons.repeat_one_outlined),
-                      color: Theme.of(context).focusColor,
-                      iconSize: 30,
-                      onPressed: () {
-                        GlobalParameters.repeatOneMode.value =
-                            !GlobalParameters.repeatOneMode.value;
-                      },
-                    );
-                  },
-                ),
-              ],
-            ),
             Padding(
-              padding: const EdgeInsets.only(top: 10),
+              padding: const EdgeInsets.only(
+                top: 10,
+                left: 20.0,
+                right: 20.0,
+              ),
               child: FutureBuilder(
                   future: GlobalParameters.currentSong.value.generateColors(),
                   builder: (context, snapshot) {
@@ -186,7 +217,7 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
                 valueListenable: GlobalParameters.songSeconds,
                 builder: (context, percent, child) {
                   return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    padding: const EdgeInsets.symmetric(horizontal: 35),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -203,7 +234,10 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
                   );
                 }),
             SizedBox(height: 10),
-            PlayerControls(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: PlayerControls(),
+            ),
             Spacer(),
           ],
         ),
