@@ -98,18 +98,24 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
                                     return Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Text(
                                           GlobalParameters
-                                              .currentSong.value?.title,
+                                                  .currentSong.value?.title ??
+                                              '',
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyText1,
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
-                                          '${GlobalParameters.currentSong.value.artists.sublist(1).fold<String>(GlobalParameters.currentSong.value.artists.first.name, (prev, next) => prev += ', ' + next.name)}',
+                                          GlobalParameters.currentSong.value
+                                                      .title !=
+                                                  null
+                                              ? '${GlobalParameters.currentSong.value.artists.sublist(1).fold<String>(GlobalParameters.currentSong.value.artists.first.name, (prev, next) => prev += ', ' + next.name)}'
+                                              : '',
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyText2

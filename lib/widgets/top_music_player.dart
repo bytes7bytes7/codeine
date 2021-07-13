@@ -90,7 +90,7 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
               child: PageView.builder(
                 // TODO: maybe something here causes error: The following _CastError was thrown during a service extension callback for "ext.flutter.inspector.getRootWidgetSummaryTree": Null check operator used on a null value
                 controller: pageController,
-                itemCount: GlobalParameters.songs.length,
+                itemCount: GlobalParameters.songs.value.length,
                 scrollDirection: Axis.horizontal,
                 pageSnapping: true,
                 onPageChanged: (index) {
@@ -101,8 +101,8 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
                     children: [
                       Container(
                         alignment: Alignment.center,
-                        height: widget.bigCircleRadius*2,
-                        width: widget.bigCircleRadius*2,
+                        height: widget.bigCircleRadius * 2,
+                        width: widget.bigCircleRadius * 2,
                         child: Stack(
                           children: [
                             // ScaleTransition(
@@ -124,7 +124,7 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
                             //   ),
                             // ),
                             FutureBuilder(
-                              future: GlobalParameters.songs[index]
+                              future: GlobalParameters.songs.value[index]
                                   .generateColors(),
                               builder: (context, snapshot) {
                                 return Container(
@@ -133,15 +133,18 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
                                     radius: widget.bigCircleRadius,
                                     backgroundColor: Colors.transparent,
                                     backgroundImage: (GlobalParameters
-                                            .songs[index]
+                                            .songs
+                                            .value[index]
                                             .albumImageUrl
                                             .isNotEmpty)
                                         ? NetworkImage(GlobalParameters
-                                            .songs[index].albumImageUrl)
-                                        : (GlobalParameters.songs[index]
+                                            .songs.value[index].albumImageUrl)
+                                        : (GlobalParameters.songs.value[index]
                                                 .songImageUrl.isNotEmpty)
                                             ? NetworkImage(GlobalParameters
-                                                .songs[index].songImageUrl)
+                                                .songs
+                                                .value[index]
+                                                .songImageUrl)
                                             : AssetImage('assets/png/cup.png'),
                                   ),
                                 );
@@ -154,7 +157,7 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
                       Container(
                         width: size.width * 0.9,
                         child: Text(
-                          GlobalParameters.songs[index].title,
+                          GlobalParameters.songs.value[index].title,
                           style: Theme.of(context).textTheme.headline3,
                           textAlign: TextAlign.center,
                         ),
@@ -163,7 +166,7 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
                       Container(
                         width: size.width * 0.9,
                         child: Text(
-                          '${GlobalParameters.songs[index].artists.sublist(1).fold<String>(GlobalParameters.songs[index].artists.first.name, (prev, next) => prev += ', ' + next.name)}',
+                          '${GlobalParameters.songs.value[index].artists.sublist(1).fold<String>(GlobalParameters.songs.value[index].artists.first.name, (prev, next) => prev += ', ' + next.name)}',
                           style: Theme.of(context).textTheme.bodyText2,
                           textAlign: TextAlign.center,
                         ),
@@ -221,12 +224,17 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
                 right: 20.0,
               ),
               child: FutureBuilder(
-                  future: GlobalParameters.currentSong.value.generateColors(),
+                  future: GlobalParameters.currentSong.value.title != null
+                      ? GlobalParameters.currentSong.value.generateColors()
+                      : Future.delayed(const Duration(milliseconds: 10)),
                   builder: (context, snapshot) {
                     return SongSlider(
-                      firstColor: GlobalParameters.currentSong.value.firstColor,
+                      firstColor:
+                          GlobalParameters.currentSong.value.firstColor ??
+                              Theme.of(context).scaffoldBackgroundColor,
                       secondColor:
-                          GlobalParameters.currentSong.value.secondColor,
+                          GlobalParameters.currentSong.value.secondColor ??
+                              Theme.of(context).focusColor,
                     );
                   }),
             ),
@@ -239,11 +247,16 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          Song.time(GlobalParameters.songSeconds.value.toInt()),
+                          GlobalParameters.currentSong.value.title != null
+                              ? Song.time(
+                                  GlobalParameters.songSeconds.value.toInt())
+                              : '',
                           style: Theme.of(context).textTheme.subtitle1,
                         ),
                         Text(
-                          GlobalParameters.currentSong.value.duration,
+                          GlobalParameters.currentSong.value.title != null
+                              ? GlobalParameters.currentSong.value.duration
+                              : '',
                           style: Theme.of(context).textTheme.subtitle1,
                         ),
                       ],

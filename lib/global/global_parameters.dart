@@ -22,7 +22,7 @@ abstract class GlobalParameters {
       ValueNotifier('SplashScreen');
 
   static List<Playlist> playlists = List.generate(5, (index) => Playlist());
-  static List<Song> songs = <Song>[];
+  static ValueNotifier<List<Song>> songs = ValueNotifier(<Song>[]);
 
   static final SnappingSheetController snappingSheetController =
       SnappingSheetController();
@@ -31,7 +31,7 @@ abstract class GlobalParameters {
   static AnimationController circleController;
   static AnimationController radiusController;
   static final ValueNotifier<bool> playNotifier = ValueNotifier(false);
-  static final ValueNotifier<Song> currentSong = ValueNotifier(songs[0]);
+  static final ValueNotifier<Song> currentSong = ValueNotifier(songs.value.isNotEmpty ? songs.value[0] : Song());
   static int songNumber = 0;
   static final ValueNotifier<double> songSeconds = ValueNotifier(0.0);
   static final ValueNotifier<bool> shuffleMode = ValueNotifier(false);
@@ -52,8 +52,8 @@ abstract class GlobalParameters {
   }
 
   static void playSongByID(int id) async {
-    songNumber = songs.indexWhere((s) => s.id == id);
-    Song nextSong = songs[songNumber];
+    songNumber = songs.value.indexWhere((s) => s.id == id);
+    Song nextSong = songs.value[songNumber];
     await nextSong.generateColors();
     currentSong.value = nextSong;
     songSeconds.value = 0;
@@ -61,7 +61,7 @@ abstract class GlobalParameters {
 
   static void playSongByIndex(int index) async {
     songNumber = index;
-    Song nextSong = songs[songNumber];
+    Song nextSong = songs.value[songNumber];
     await nextSong.generateColors();
     currentSong.value = nextSong;
     songSeconds.value = 0;
@@ -71,14 +71,14 @@ abstract class GlobalParameters {
     if (songNumber != 0) {
       songNumber--;
     } else {
-      songNumber = songs.length - 1;
+      songNumber = songs.value.length - 1;
     }
   }
 
   static void previousSong() async {
-    if (songs.length > 0) {
+    if (songs.value.length > 0) {
       moveToPreviousIndex();
-      Song song = songs[songNumber];
+      Song song = songs.value[songNumber];
       await song.generateColors();
       currentSong.value = song;
       songSeconds.value = 0;
@@ -86,7 +86,7 @@ abstract class GlobalParameters {
   }
 
   static void moveToNextIndex() {
-    if (songNumber != songs.length - 1) {
+    if (songNumber != songs.value.length - 1) {
       songNumber++;
     } else {
       songNumber = 0;
@@ -94,9 +94,9 @@ abstract class GlobalParameters {
   }
 
   static void nextSong() async {
-    if (songs.length > 0) {
+    if (songs.value.length > 0) {
       moveToNextIndex();
-      Song song = songs[songNumber];
+      Song song = songs.value[songNumber];
       await song.generateColors();
       currentSong.value = song;
       songSeconds.value = 0;

@@ -29,9 +29,9 @@ class _MiddleMusicPlayerState extends State<MiddleMusicPlayer> {
           ),
           SizedBox(height: 5),
           Container(
-            width: size.width*0.8,
+            width: size.width * 0.8,
             child: Text(
-              GlobalParameters.currentSong.value.title,
+              GlobalParameters.currentSong.value?.title ?? '',
               style: Theme.of(context).textTheme.headline3,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
@@ -39,9 +39,11 @@ class _MiddleMusicPlayerState extends State<MiddleMusicPlayer> {
           ),
           SizedBox(height: 5),
           Container(
-            width: size.width*0.8,
+            width: size.width * 0.8,
             child: Text(
-              '${GlobalParameters.currentSong.value.artists.sublist(1).fold<String>(GlobalParameters.currentSong.value.artists.first.name, (prev, next) => prev += ', ' + next.name)}',
+              GlobalParameters.currentSong.value.title != null
+                  ? '${GlobalParameters.currentSong.value.artists.sublist(1).fold<String>(GlobalParameters.currentSong.value.artists.first.name, (prev, next) => prev += ', ' + next.name)}'
+                  : '',
               style: Theme.of(context).textTheme.bodyText2,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
@@ -94,7 +96,7 @@ class _MiddleMusicPlayerState extends State<MiddleMusicPlayer> {
                         Theme.of(context).scaffoldBackgroundColor,
                     secondColor:
                         GlobalParameters.currentSong.value.secondColor ??
-                            Theme.of(context).scaffoldBackgroundColor,
+                            Theme.of(context).focusColor,
                   );
                 }),
           ),
@@ -107,11 +109,11 @@ class _MiddleMusicPlayerState extends State<MiddleMusicPlayer> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        Song.time(GlobalParameters.songSeconds.value.toInt()),
+                        GlobalParameters.currentSong.value.title != null ? Song.time(GlobalParameters.songSeconds.value.toInt()) : '',
                         style: Theme.of(context).textTheme.subtitle1,
                       ),
                       Text(
-                        GlobalParameters.currentSong.value.duration,
+                        GlobalParameters.currentSong.value.title != null ? GlobalParameters.currentSong.value.duration : '',
                         style: Theme.of(context).textTheme.subtitle1,
                       ),
                     ],

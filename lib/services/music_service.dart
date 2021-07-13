@@ -20,7 +20,7 @@ abstract class MusicService {
           '${ConstantHTTP.vkMusicURL}${User.id}',
           queryParameters: {'section': 'all'},
           options:
-              Options(responseType: ResponseType.bytes, followRedirects: false),
+              Options(responseType: ResponseType.bytes, followRedirects: true),
         );
       } on DioError catch (e) {
         if (GlobalParameters.connectionStatus.value ==
@@ -49,7 +49,7 @@ abstract class MusicService {
       );
       songDivs.removeAt(0);
 
-      GlobalParameters.songs.clear();
+      List<Song> songs = <Song>[];
       for (var div in songDivs) {
         String dataAudio = BytesService.subByte(
           data: div,
@@ -88,7 +88,11 @@ abstract class MusicService {
         }catch(e){
           //
         }
-        GlobalParameters.songs.add(newSong);
+        songs.add(newSong);
+      }
+      GlobalParameters.songs.value = songs;
+      if (GlobalParameters.currentSong.value.title==null){
+        GlobalParameters.currentSong.value = GlobalParameters.songs.value[0];
       }
       return MusicStatus.ok;
     }

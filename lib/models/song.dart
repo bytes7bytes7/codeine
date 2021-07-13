@@ -37,8 +37,8 @@ class Song {
   final randomInstance = Random();
 
   Future<void> generateColors() async {
-    if(albumImageUrl.isEmpty) {
-      await getAlbumImageUrl();
+    if(albumImageUrl.isEmpty && title!= null) {
+      getAlbumImageUrl();
     }
     if (firstColor == null || secondColor == null) {
       PaletteGenerator pg = await _getPrimaryColor();
@@ -62,7 +62,7 @@ class Song {
       Response response;
       try {
         response = await User.dio.get(
-          '${ConstantHTTP.vkAlbumUrl}${GlobalParameters.currentSong.value.albumUrl}',
+          '${ConstantHTTP.vkAlbumUrl}$albumUrl',
           options:
           Options(responseType: ResponseType.bytes, followRedirects: false),
         );
@@ -87,7 +87,7 @@ class Song {
         cutStart: true,
       );
 
-      GlobalParameters.currentSong.value.albumImageUrl = Win1251Decoder.decode(BytesService.getInts(data));
+      albumImageUrl = Win1251Decoder.decode(BytesService.getInts(data));
     }
   }
 

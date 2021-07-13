@@ -86,13 +86,15 @@ abstract class AuthService {
           String value = domains[key].toString();
           value = value.substring(value.indexOf(key));
           value = value.substring(0, value.indexOf(';'));
-          if (key == 'remixuas' || key == 'remixtmr_login')
-            continue;
-          else if (key == 'remixsid') value = key + '==DELETED';
+          // if (key == 'remixuas' || key == 'remixtmr_login')
+          //   continue;
+          // else if (key == 'remixsid') value = key + '=DELETED';
           cookies += value + '; ';
         }
         cookies = cookies.substring(0, cookies.length - 2);
+        //cookies += '; '+ 'remixbdr=0';
         User.dio.options.headers['cookie'] = cookies;
+        print(User.dio.options.headers['cookie']);
       }
       return AuthStatus.cookies;
     }

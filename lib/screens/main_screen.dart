@@ -12,6 +12,8 @@ class MainScreen extends StatelessWidget {
     User u = User();
     await u.init();
 
+    //AuthService.logOut();
+
     AuthStatus status = await AuthService.checkCookie();
     switch(status){
       case AuthStatus.cookies:
@@ -19,7 +21,6 @@ class MainScreen extends StatelessWidget {
         switch(status){
           case AuthStatus.noInternet:
           case AuthStatus.loggedIn:
-            await MusicService.getAllMusic();
             GlobalParameters.currentPage.value = 'HomeScreen';
             break;
           case AuthStatus.loggedOut:

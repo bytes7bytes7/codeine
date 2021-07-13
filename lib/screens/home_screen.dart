@@ -1,6 +1,7 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:codeine/global/global_parameters.dart';
 import 'package:codeine/models/user.dart';
+import 'package:codeine/services/music_service.dart';
 import 'package:codeine/widgets/music_player.dart';
 import 'package:codeine/widgets/music_sliver.dart';
 import 'package:codeine/widgets/search_bar.dart';
@@ -11,6 +12,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    MusicService.getAllMusic();
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
@@ -40,8 +42,6 @@ class HomeScreen extends StatelessWidget {
                 ),
                 MusicSliver(
                   trackTitle: 'Мои треки',
-                  playlists: GlobalParameters.playlists,
-                  songs: GlobalParameters.songs,
                 ),
               ],
             ),

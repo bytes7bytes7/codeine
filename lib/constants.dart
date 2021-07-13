@@ -85,7 +85,7 @@ abstract class ConstantHTTP {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
     'DNT': '1',
     'cookie':
-        'remixusid=DELETED; remixflash=0.0.0; remixscreen_width=1920; remixscreen_height=1080; remixscreen_dpr=1; remixscreen_depth=24; remixscreen_orient=1; remixscreen_winzoom=1; remixseenads=0; remixlhk==DELETED; ',
+        'remixflash=0.0.0; remixscreen_width=1920; remixscreen_height=1080; remixscreen_dpr=1; remixscreen_depth=24; remixscreen_orient=1; remixscreen_winzoom=1; remixseenads=0;',
     'Connection': 'keep-alive',
     'Accept-Encoding': 'gzip, deflate',
     'Accept-Language': 'ru-ru,ru;q=0.8,en-us;q=0.5,en;q=0.3',

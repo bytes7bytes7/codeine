@@ -90,7 +90,7 @@ class _MusicPlayerState extends State<MusicPlayer>
         MediaQuery.of(context).padding.top;
     final double firstSizedBox = 10.0;
     final double firstContainer = 45.0;
-    final double secondSizedBox = safeHeight * 0.05;
+    final double secondSizedBox = safeHeight * 0.1;
     final double bigCircleRadius = 107.0;
     initTween(
       halfOfHeight: size.height / 2,
