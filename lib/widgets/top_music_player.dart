@@ -2,12 +2,12 @@ part of 'music_player.dart';
 
 class TopMusicPlayer extends StatefulWidget {
   const TopMusicPlayer({
-    Key key,
-    @required this.safeHeight,
-    @required this.firstSizedBox,
-    @required this.firstContainer,
-    @required this.secondSizedBox,
-    @required this.bigCircleRadius,
+    Key? key,
+    required this.safeHeight,
+    required this.firstSizedBox,
+    required this.firstContainer,
+    required this.secondSizedBox,
+    required this.bigCircleRadius,
   }) : super(key: key);
 
   final double safeHeight;
@@ -22,9 +22,10 @@ class TopMusicPlayer extends StatefulWidget {
 
 class _TopMusicPlayerState extends State<TopMusicPlayer>
     with TickerProviderStateMixin {
-  AnimationController _controller;
-  Tween<double> _tween = Tween(begin: 0.75, end: 1);
-  PageController pageController;
+  late AnimationController _controller;
+
+  // Tween<double> _tween = Tween(begin: 0.75, end: 1);
+  late PageController pageController;
 
   @override
   void initState() {
@@ -60,7 +61,7 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.arrow_back_ios_outlined),
+                    icon: const Icon(Icons.arrow_back_ios_outlined),
                     color: Theme.of(context).focusColor,
                     iconSize: 30.0,
                     onPressed: () {
@@ -72,20 +73,33 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
                     'CODEINE',
                     style: Theme.of(context)
                         .textTheme
-                        .headline3
+                        .headline3!
                         .copyWith(fontSize: 25),
                   ),
                   IconButton(
-                    icon: Icon(Icons.scatter_plot),
+                    icon: const Icon(Icons.scatter_plot),
                     color: Theme.of(context).focusColor,
                     iconSize: 30.0,
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(builder: (context) {
+                        return GestureDetector(
+                          onTap: () {
+                            // TODO: finish
+                          },
+                          child: Container(
+                            color: Colors.transparent,
+                          ),
+                        );
+                      }));
+                      showMoreBottomSheet(context: context);
+                    },
                   ),
                 ],
               ),
             ),
             SizedBox(height: widget.secondSizedBox),
-            Container(
+            SizedBox(
               height: size.width * 0.9,
               child: PageView.builder(
                 // TODO: maybe something here causes error: The following _CastError was thrown during a service extension callback for "ext.flutter.inspector.getRootWidgetSummaryTree": Null check operator used on a null value
@@ -93,6 +107,7 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
                 itemCount: GlobalParameters.songs.value.length,
                 scrollDirection: Axis.horizontal,
                 pageSnapping: true,
+                physics: const BouncingScrollPhysics(),
                 onPageChanged: (index) {
                   GlobalParameters.playSongByIndex(index);
                 },
@@ -127,46 +142,67 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
                               future: GlobalParameters.songs.value[index]
                                   .generateColors(),
                               builder: (context, snapshot) {
-                                return Container(
-                                  alignment: Alignment.center,
-                                  child: CircleAvatar(
-                                    radius: widget.bigCircleRadius,
-                                    backgroundColor: Colors.transparent,
-                                    backgroundImage: (GlobalParameters
-                                            .songs
-                                            .value[index]
-                                            .albumImageUrl
-                                            .isNotEmpty)
-                                        ? NetworkImage(GlobalParameters
-                                            .songs.value[index].albumImageUrl)
-                                        : (GlobalParameters.songs.value[index]
-                                                .songImageUrl.isNotEmpty)
-                                            ? NetworkImage(GlobalParameters
-                                                .songs
-                                                .value[index]
-                                                .songImageUrl)
-                                            : AssetImage('assets/png/cup.png'),
-                                  ),
+                                return Stack(
+                                  children: [
+                                    Container(
+                                      alignment: Alignment.center,
+                                      child: CircleAvatar(
+                                        radius: widget.bigCircleRadius,
+                                        backgroundColor: Colors.transparent,
+                                        backgroundImage: const AssetImage(
+                                            'assets/png/cup.png'),
+                                      ),
+                                    ),
+                                    if (GlobalParameters.songs.value[index]
+                                        .songImageUrl.isNotEmpty)
+                                      Container(
+                                        alignment: Alignment.center,
+                                        child: CircleAvatar(
+                                          radius: widget.bigCircleRadius,
+                                          backgroundColor: Colors.transparent,
+                                          backgroundImage: NetworkImage(
+                                              GlobalParameters.songs
+                                                  .value[index].songImageUrl),
+                                        ),
+                                      ),
+                                    if (GlobalParameters.songs.value[index]
+                                        .albumImageUrl.isNotEmpty)
+                                      Container(
+                                        alignment: Alignment.center,
+                                        child: CircleAvatar(
+                                          radius: widget.bigCircleRadius,
+                                          backgroundColor: Colors.transparent,
+                                          backgroundImage: NetworkImage(
+                                              GlobalParameters.songs
+                                                  .value[index].albumImageUrl),
+                                        ),
+                                      ),
+                                  ],
                                 );
                               },
                             ),
                           ],
                         ),
                       ),
-                      SizedBox(height: 30),
-                      Container(
+                      const SizedBox(height: 30),
+                      SizedBox(
                         width: size.width * 0.9,
                         child: Text(
-                          GlobalParameters.songs.value[index].title,
+                          GlobalParameters.songs.value[index].title ?? '',
                           style: Theme.of(context).textTheme.headline3,
                           textAlign: TextAlign.center,
                         ),
                       ),
-                      SizedBox(height: 5),
-                      Container(
+                      const SizedBox(height: 5),
+                      SizedBox(
                         width: size.width * 0.9,
                         child: Text(
-                          '${GlobalParameters.songs.value[index].artists.sublist(1).fold<String>(GlobalParameters.songs.value[index].artists.first.name, (prev, next) => prev += ', ' + next.name)}',
+                          GlobalParameters.songs.value[index].artists
+                              .sublist(1)
+                              .fold<String>(
+                                  GlobalParameters
+                                      .songs.value[index].artists.first.name!,
+                                  (prev, next) => prev += ', ' + next.name!),
                           style: Theme.of(context).textTheme.bodyText2,
                           textAlign: TextAlign.center,
                         ),
@@ -176,18 +212,18 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
                 },
               ),
             ),
-            Spacer(),
+            const Spacer(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Row(
                 children: [
                   ValueListenableBuilder(
                     valueListenable: GlobalParameters.shuffleMode,
-                    builder: (context, value, child) {
+                    builder: (context, bool value, child) {
                       return IconButton(
                         icon: (value)
-                            ? Icon(Icons.shuffle_on_outlined)
-                            : Icon(Icons.shuffle_outlined),
+                            ? const Icon(Icons.shuffle_on_outlined)
+                            : const Icon(Icons.shuffle_outlined),
                         color: Theme.of(context).focusColor,
                         iconSize: 30,
                         onPressed: () {
@@ -197,14 +233,14 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
                       );
                     },
                   ),
-                  Spacer(),
+                  const Spacer(),
                   ValueListenableBuilder(
                     valueListenable: GlobalParameters.repeatOneMode,
-                    builder: (context, value, child) {
+                    builder: (context, bool value, child) {
                       return IconButton(
                         icon: (value)
-                            ? Icon(Icons.repeat_one_on_outlined)
-                            : Icon(Icons.repeat_one_outlined),
+                            ? const Icon(Icons.repeat_one_on_outlined)
+                            : const Icon(Icons.repeat_one_outlined),
                         color: Theme.of(context).focusColor,
                         iconSize: 30,
                         onPressed: () {
@@ -263,14 +299,14 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
                     ),
                   );
                 }),
-            SizedBox(height: 10),
+            const       SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: PlayerControls(
                 pageController: pageController,
               ),
             ),
-            Spacer(),
+            const Spacer(),
           ],
         ),
       ),

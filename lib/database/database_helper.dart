@@ -11,11 +11,10 @@ class DatabaseHelper {
 
   static final DatabaseHelper db = DatabaseHelper._privateConstructor();
 
-  static Database _database;
+  static Database? _database;
 
-  Future<Database> get database async {
-    if (_database != null) return _database;
-    _database = await _initDB();
+  Future<Database?> get database async {
+    _database ??= await _initDB();
     return _database;
   }
 
@@ -48,11 +47,11 @@ class DatabaseHelper {
     final db = await database;
     switch (dbName) {
       case ConstantDBData.userTableName:
-        await db
+        await db!
             .execute('DROP TABLE IF EXISTS ${ConstantDBData.userTableName};');
         break;
       default:
-        await db
+        await db!
             .execute('DROP TABLE IF EXISTS ${ConstantDBData.userTableName};');
         await _createDB(db, ConstantDBData.databaseVersion);
     }
@@ -61,7 +60,7 @@ class DatabaseHelper {
   // User methods
   Future _addUser() async {
     final db = await database;
-    await db.rawInsert(
+    await db!.rawInsert(
       "INSERT INTO ${ConstantDBData.userTableName} (${ConstantDBData.id}, ${ConstantDBData.link}, ${ConstantDBData.name}, ${ConstantDBData.firstName}, ${ConstantDBData.lastName}, ${ConstantDBData.shortName}, ${ConstantDBData.sex}, ${ConstantDBData.photo}, ${ConstantDBData.photo_100}, ${ConstantDBData.phoneOrEmail}) VALUES (?,?,?,?,?,?,?,?,?,?)",
       [
         User.id,
@@ -80,27 +79,26 @@ class DatabaseHelper {
 
   Future updateUser() async {
     final db = await database;
-    List<Map<String, dynamic>> data = await db.query(
-        "${ConstantDBData.userTableName}",
+    List<Map<String, dynamic>> data = await db!.query(
+        ConstantDBData.userTableName,
         where: "${ConstantDBData.id} = ?",
         whereArgs: [User.id]);
     if (data.isNotEmpty) {
       Map<String, dynamic> map = User.toMap();
-      if(map['phoneOrEmail']==null){
-        map['phoneOrEmail']=data.first['phoneOrEmail'];
+      if (map['phoneOrEmail'] == null) {
+        map['phoneOrEmail'] = data.first['phoneOrEmail'];
       }
-      await db.update("${ConstantDBData.userTableName}", map,
+      await db.update(ConstantDBData.userTableName, map,
           where: "${ConstantDBData.id} = ?", whereArgs: [User.id]);
-    }else{
+    } else {
       await _addUser();
     }
-
   }
 
   Future getUser(int id) async {
     final db = await database;
-    List<Map<String, dynamic>> data = await db.query(
-        "${ConstantDBData.userTableName}",
+    List<Map<String, dynamic>> data = await db!.query(
+        ConstantDBData.userTableName,
         where: "${ConstantDBData.id} = ?",
         whereArgs: [id]);
     if (data.isNotEmpty) {
@@ -110,7 +108,7 @@ class DatabaseHelper {
 
   Future deleteUser(int id) async {
     final db = await database;
-    db.delete("${ConstantDBData.userTableName}",
+    db!.delete(ConstantDBData.userTableName,
         where: "${ConstantDBData.id} = ?", whereArgs: [id]);
   }
 }

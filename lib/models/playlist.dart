@@ -1,15 +1,29 @@
+import 'package:codeine/models/song.dart';
+
 class Playlist {
   Playlist({
-    this.albumId,
+    required this.albumId,
     this.ownerId,
-    this.albumName = 'Life Sucks asd sad  as',
-    this.ownerName = 'Lil Xan',
-    this.imageUrl = 'https://sun2-3.userapi.com/impf/7hFBQU8uAs3CuvqCfNl9eeDqTmFfDvGg-HoVsw/3O5gbuRquFU.jpg?size=300x300&quality=96&sign=7f98fc2169d23eb95e94020d2c17968e&type=audio',
+    required this.albumName,
+    required this.ownerName,
+    required this.imageUrl,
+    this.genre,
+    this.year,
+    this.auditions,
+    this.numberOfSongs,
+    this.albumSeconds,
+    this.songs,
   });
 
-  int albumId;
-  int ownerId;
+  String albumId;
+  int? ownerId;
   String albumName;
   String ownerName;
   String imageUrl;
+  String? genre;
+  int? year;
+  String? auditions;
+  int? numberOfSongs;
+  int? albumSeconds;
+  List<Song>? songs;
 }

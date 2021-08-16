@@ -3,9 +3,9 @@ import 'package:codeine/services/auth_service.dart';
 import 'package:codeine/widgets/input_field.dart';
 import 'package:flutter/material.dart';
 
-Future<void> showCaptchaDialog({BuildContext context}) async {
+Future<void> showCaptchaDialog({required BuildContext context}) async {
   final TextEditingController captchaController = TextEditingController();
-  final ValueNotifier<String> errorNotifier = ValueNotifier(null);
+  final ValueNotifier<String> errorNotifier = ValueNotifier('');
 
   return showDialog<void>(
     context: context,
@@ -50,7 +50,7 @@ Future<void> showCaptchaDialog({BuildContext context}) async {
                             textAlign: TextAlign.center,
                           ),
                         ),
-                        SizedBox(height: 25),
+                        const SizedBox(height: 25),
                         ClipRRect(
                           borderRadius: BorderRadius.circular(10),
                           child: Image.network(
@@ -61,13 +61,13 @@ Future<void> showCaptchaDialog({BuildContext context}) async {
                             alignment: Alignment.center,
                           ),
                         ),
-                        SizedBox(height: 30),
+                        const SizedBox(height: 30),
                         InputField(
                           controller: captchaController,
                           errorNotifier: errorNotifier,
                           hint: 'Код',
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [

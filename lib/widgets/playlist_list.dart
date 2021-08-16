@@ -4,8 +4,8 @@ import 'thin_text_button.dart';
 
 class PlaylistList extends StatelessWidget {
   const PlaylistList({
-    Key key,
-    @required this.playlists,
+    Key? key,
+    required this.playlists,
   }) : super(key: key);
 
   final List<Playlist> playlists;
@@ -33,12 +33,12 @@ class PlaylistList extends StatelessWidget {
         SizedBox(
           height: 190,
           child: ListView.builder(
-            physics: BouncingScrollPhysics(),
+            physics: const BouncingScrollPhysics(),
             scrollDirection: Axis.horizontal,
             itemCount: playlists.length + 2,
             itemBuilder: (context, index) {
               if (index == 0 || index == playlists.length + 1) {
-                return SizedBox(width: 22.0);
+                return const SizedBox(width: 22.0);
               } else {
                 return PlaylistCard(playlist: playlists[index - 1]);
               }
@@ -52,8 +52,8 @@ class PlaylistList extends StatelessWidget {
 
 class PlaylistCard extends StatelessWidget {
   const PlaylistCard({
-    Key key,
-    @required this.playlist,
+    Key? key,
+    required this.playlist,
   }) : super(key: key);
 
   final Playlist playlist;
@@ -90,7 +90,7 @@ class PlaylistCard extends StatelessWidget {
               ),
               Text(
                 playlist.ownerName,
-                style: Theme.of(context).textTheme.bodyText2.copyWith(
+                style: Theme.of(context).textTheme.bodyText2!.copyWith(
                       color: Theme.of(context).disabledColor,
                     ),
                 overflow: TextOverflow.ellipsis,

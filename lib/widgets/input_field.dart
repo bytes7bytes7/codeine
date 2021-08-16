@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class InputField extends StatelessWidget {
   const InputField({
-    Key key,
-    @required this.controller,
-    @required this.errorNotifier,
-    @required this.hint,
+    Key? key,
+    required this.controller,
+    required this.errorNotifier,
+    required this.hint,
     this.obscureText = false,
   }) : super(key: key);
 
@@ -22,7 +22,7 @@ class InputField extends StatelessWidget {
           BoxDecoration(borderRadius: BorderRadius.circular(15), boxShadow: [
         BoxShadow(
           color: Theme.of(context).focusColor.withOpacity(0.4),
-          offset: Offset(0, 0),
+          offset: const Offset(0, 0),
           spreadRadius: 0,
           blurRadius: 6,
         ),
@@ -34,7 +34,7 @@ class InputField extends StatelessWidget {
             controller: controller,
             obscureText: obscureText,
             onChanged: (value) {
-              errorNotifier.value = null;
+              errorNotifier.value = '';
             },
             cursorColor: Theme.of(context).splashColor,
             cursorWidth: 2,
@@ -46,7 +46,7 @@ class InputField extends StatelessWidget {
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(15),
                 borderSide: BorderSide(
-                  color: (errorNotifier.value != null)
+                  color: (errorNotifier.value.isNotEmpty)
                       ? Theme.of(context).errorColor
                       : Colors.transparent,
                 ),
@@ -54,7 +54,7 @@ class InputField extends StatelessWidget {
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(15),
                 borderSide: BorderSide(
-                  color: (errorNotifier.value != null)
+                  color: (errorNotifier.value.isNotEmpty)
                       ? Theme.of(context).errorColor
                       : Theme.of(context).splashColor,
                 ),

@@ -13,32 +13,32 @@ import '../constants.dart';
 
 class Song {
   Song({
-    this.id,
+    required this.id,
     this.title,
-    this.artists,
-    this.duration,
+    required this.artists,
+    required this.duration,
     this.songImageUrl='',
     this.albumImageUrl='',
     this.albumUrl='',
-    this.seconds,
+    required this.seconds,
   });
 
-  int id;
-  String title;
+  String id;
+  String? title;
   List<Artist> artists;
   int seconds;
   String duration;
   String songImageUrl;
   String albumImageUrl;
   String albumUrl;
-  Color primaryColor;
-  Color firstColor;
-  Color secondColor;
+  late Color primaryColor;
+  Color? firstColor;
+  Color? secondColor;
   final randomInstance = Random();
 
   Future<void> generateColors() async {
-    if(albumImageUrl.isEmpty && title!= null) {
-      getAlbumImageUrl();
+    if(albumImageUrl.isEmpty && title!= null && songImageUrl.isNotEmpty) {
+      await getAlbumImageUrl();
     }
     if (firstColor == null || secondColor == null) {
       PaletteGenerator pg = await _getPrimaryColor();
@@ -57,11 +57,11 @@ class Song {
     }
   }
 
-  Future<void> getAlbumImageUrl() async {
-    if (albumUrl != null) {
+  Future getAlbumImageUrl() async {
+    if (albumUrl.isNotEmpty) {
       Response response;
       try {
-        response = await User.dio.get(
+        response = await User.dio!.get(
           '${ConstantHTTP.vkAlbumUrl}$albumUrl',
           options:
           Options(responseType: ResponseType.bytes, followRedirects: false),
@@ -71,8 +71,11 @@ class Song {
             ConnectivityResult.none) {
           return MusicStatus.noInternet;
         } else {
+          // ignore: avoid_print
           print('logIn error: ${e.error}');
+          // ignore: avoid_print
           print('logIn error: ${e.message}');
+          // ignore: avoid_print
           print('logIn error: ${e.type}');
           return MusicStatus.unknownError;
         }

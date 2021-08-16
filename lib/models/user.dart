@@ -6,8 +6,8 @@ import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:path_provider/path_provider.dart';
 
 class User {
-  static Dio dio;
-  static PersistCookieJar cookieJar;
+  static Dio? dio;
+  static PersistCookieJar? cookieJar;
 
   init() async {
     if (dio == null || cookieJar == null) {
@@ -17,22 +17,22 @@ class User {
 
   _init() async {
     dio = Dio();
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    cookieJar = PersistCookieJar(dir: appDocDir.path + "./cookies/");
-    dio.interceptors.add(CookieManager(cookieJar));
-    dio.options.followRedirects = true;
+    Directory tempDir  = await getTemporaryDirectory();
+    cookieJar = PersistCookieJar(storage: FileStorage(tempDir.path));
+    dio!.interceptors.add(CookieManager(cookieJar!));
+    dio!.options.followRedirects = true;
   }
 
-  static int id;
-  static String link;
-  static String name;
-  static String firstName;
-  static String lastName;
-  static String shortName;
-  static int sex;
-  static String photo;
-  static String photo_100;
-  static String phoneOrEmail;
+  static int? id;
+  static String? link;
+  static String? name;
+  static String? firstName;
+  static String? lastName;
+  static String? shortName;
+  static int? sex;
+  static String? photo;
+  static String? photo_100;
+  static String? phoneOrEmail;
 
   static Map<String, dynamic> toMap() {
     return {

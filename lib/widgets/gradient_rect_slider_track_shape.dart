@@ -3,8 +3,8 @@ part of 'music_player.dart';
 class GradientRectSliderTrackShape extends SliderTrackShape
     with BaseSliderTrackShape {
   const GradientRectSliderTrackShape({
-    @required this.firstColor,
-    @required this.secondColor,
+    required this.firstColor,
+    required this.secondColor,
   });
 
   final Color firstColor;
@@ -14,28 +14,21 @@ class GradientRectSliderTrackShape extends SliderTrackShape
   void paint(
     PaintingContext context,
     Offset offset, {
-    @required RenderBox parentBox,
-    @required SliderThemeData sliderTheme,
-    @required Animation<double> enableAnimation,
-    @required TextDirection textDirection,
-    @required Offset thumbCenter,
+    required RenderBox parentBox,
+    required SliderThemeData sliderTheme,
+    required Animation<double> enableAnimation,
+    required TextDirection textDirection,
+    required Offset thumbCenter,
     bool isDiscrete = false,
     bool isEnabled = false,
     double additionalActiveTrackHeight = 2,
   }) {
-    assert(context != null);
-    assert(offset != null);
-    assert(parentBox != null);
-    assert(sliderTheme != null);
     assert(sliderTheme.disabledActiveTrackColor != null);
     assert(sliderTheme.disabledInactiveTrackColor != null);
     assert(sliderTheme.activeTrackColor != null);
     assert(sliderTheme.inactiveTrackColor != null);
     assert(sliderTheme.thumbShape != null);
-    assert(enableAnimation != null);
-    assert(textDirection != null);
-    assert(thumbCenter != null);
-    if (sliderTheme.trackHeight == null || sliderTheme.trackHeight <= 0) {
+    if (sliderTheme.trackHeight == null) {
       return;
     }
 
@@ -72,9 +65,9 @@ class GradientRectSliderTrackShape extends SliderTrackShape
         end: sliderTheme.inactiveTrackColor);
     final Paint activePaint = Paint()
       ..shader = gradient.createShader(activeGradientRect)
-      ..color = activeTrackColorTween.evaluate(enableAnimation);
+      ..color = activeTrackColorTween.evaluate(enableAnimation)!;
     final Paint inactivePaint = Paint()
-      ..color = inactiveTrackColorTween.evaluate(enableAnimation);
+      ..color = inactiveTrackColorTween.evaluate(enableAnimation)!;
     Paint leftTrackPaint;
     Paint rightTrackPaint;
     switch (textDirection) {

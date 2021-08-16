@@ -1,9 +1,11 @@
-import 'package:snapping_sheet/snapping_sheet.dart';
-import 'package:codeine/models/song.dart';
-import 'package:codeine/widgets/player_wave.dart';
 import 'package:flutter/material.dart';
-import 'package:codeine/constants.dart';
-import 'package:codeine/global/global_parameters.dart';
+import 'package:snapping_sheet/snapping_sheet.dart';
+
+import '../global/global_parameters.dart';
+import '../models/song.dart';
+import '../constants.dart';
+import 'more_bottom_sheet.dart';
+// import 'player_wave.dart';
 
 part 'bottom_music_player.dart';
 
@@ -19,8 +21,8 @@ part 'player_controls.dart';
 
 class MusicPlayer extends StatefulWidget {
   const MusicPlayer({
-    Key key,
-    @required this.backgroundBody,
+    Key? key,
+    required this.backgroundBody,
   }) : super(key: key);
 
   final Widget backgroundBody;
@@ -31,13 +33,13 @@ class MusicPlayer extends StatefulWidget {
 
 class _MusicPlayerState extends State<MusicPlayer>
     with SingleTickerProviderStateMixin {
-  ValueNotifier<double> topPlayerOpacity;
-  ValueNotifier<double> middlePlayerOpacity;
-  ValueNotifier<double> bottomPlayerOpacity;
-  ValueNotifier<int> progress;
-  Animation<double> _xTween;
-  Animation<double> _yTween;
-  Animation<double> _radiusTween;
+  late ValueNotifier<double> topPlayerOpacity;
+  late ValueNotifier<double> middlePlayerOpacity;
+  late ValueNotifier<double> bottomPlayerOpacity;
+  late ValueNotifier<int> progress;
+  late Animation<double> _xTween;
+  late Animation<double> _yTween;
+  late Animation<double> _radiusTween;
 
   @override
   void initState() {
@@ -47,9 +49,9 @@ class _MusicPlayerState extends State<MusicPlayer>
     progress = ValueNotifier(0);
     GlobalParameters.radiusController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 800),
     );
-    _xTween = Tween<double>(begin:0.0, end: 1.0)
+    _xTween = Tween<double>(begin: 0.0, end: 1.0)
         .animate(GlobalParameters.radiusController);
     _radiusTween = Tween<double>(begin: 0.35, end: 1.5)
         .animate(GlobalParameters.radiusController);
@@ -57,23 +59,21 @@ class _MusicPlayerState extends State<MusicPlayer>
   }
 
   void initTween(
-      {@required double halfOfHeight,
-      @required double paddingTop,
-      @required double firstSizedBox,
-      @required double firstContainer,
-      @required double secondSizedBox,
-      @required double bigCircleRadius}) {
-    if (_yTween == null) {
-      double begin = (-halfOfHeight +
-              paddingTop +
-              firstSizedBox +
-              firstContainer +
-              secondSizedBox +
-              bigCircleRadius) /
-          halfOfHeight;
-      _yTween = Tween<double>(begin: begin, end: -1.0)
-          .animate(GlobalParameters.radiusController);
-    }
+      {required double halfOfHeight,
+      required double paddingTop,
+      required double firstSizedBox,
+      required double firstContainer,
+      required double secondSizedBox,
+      required double bigCircleRadius}) {
+    double begin = (-halfOfHeight +
+            paddingTop +
+            firstSizedBox +
+            firstContainer +
+            secondSizedBox +
+            bigCircleRadius) /
+        halfOfHeight;
+    _yTween = Tween<double>(begin: begin, end: -1.0)
+        .animate(GlobalParameters.radiusController);
   }
 
   @override
@@ -88,10 +88,10 @@ class _MusicPlayerState extends State<MusicPlayer>
     final double safeHeight = size.height -
         MediaQuery.of(context).padding.bottom -
         MediaQuery.of(context).padding.top;
-    final double firstSizedBox = 10.0;
-    final double firstContainer = 45.0;
-    final double secondSizedBox = safeHeight * 0.1;
-    final double bigCircleRadius = 107.0;
+    const  double firstSizedBox = 10.0;
+    const  double firstContainer = 45.0;
+    final  double secondSizedBox = safeHeight * 0.1;
+    const  double bigCircleRadius = 107.0;
     initTween(
       halfOfHeight: size.height / 2,
       paddingTop: MediaQuery.of(context).padding.top,
@@ -102,7 +102,7 @@ class _MusicPlayerState extends State<MusicPlayer>
     );
     return SnappingSheet(
       controller: GlobalParameters.snappingSheetController,
-      initialSnappingPosition: SnappingPosition.pixels(
+      initialSnappingPosition: const SnappingPosition.pixels(
           positionPixels: ConstantData.bottomPlayerHeight),
       lockOverflowDrag: true,
       child: Stack(
@@ -112,7 +112,7 @@ class _MusicPlayerState extends State<MusicPlayer>
           ),
           ValueListenableBuilder(
             valueListenable: bottomPlayerOpacity,
-            builder: (context, percent, child) {
+            builder: (context, double percent, child) {
               return Visibility(
                 visible: (percent == 1) ? false : true,
                 child: Opacity(
@@ -139,7 +139,7 @@ class _MusicPlayerState extends State<MusicPlayer>
           width: double.infinity,
           decoration: BoxDecoration(
             color: Theme.of(context).scaffoldBackgroundColor,
-            borderRadius: BorderRadius.only(
+            borderRadius:const BorderRadius.only(
               topLeft: Radius.circular(20),
               topRight: Radius.circular(20),
             ),
@@ -177,7 +177,7 @@ class _MusicPlayerState extends State<MusicPlayer>
                                         Alignment(_xTween.value, _yTween.value),
                                     radius: _radiusTween.value,
                                   ),
-                                  borderRadius: BorderRadius.only(
+                                  borderRadius: const BorderRadius.only(
                                     topLeft: Radius.circular(20),
                                     topRight: Radius.circular(20),
                                   ),
@@ -187,12 +187,12 @@ class _MusicPlayerState extends State<MusicPlayer>
                       },
                     ),
                     SingleChildScrollView(
-                      physics: NeverScrollableScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       child: Column(
                         children: [
                           ValueListenableBuilder(
                             valueListenable: topPlayerOpacity,
-                            builder: (context, percent, child) {
+                            builder: (context,double percent, child) {
                               return Visibility(
                                 visible: (percent == 0) ? false : true,
                                 child: Opacity(
@@ -212,17 +212,17 @@ class _MusicPlayerState extends State<MusicPlayer>
                       ),
                     ),
                     SingleChildScrollView(
-                      physics: NeverScrollableScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       child: Column(
                         children: [
                           ValueListenableBuilder(
                             valueListenable: middlePlayerOpacity,
-                            builder: (context, percent, child) {
+                            builder: (context,double percent, child) {
                               return Visibility(
                                 visible: (percent == 0) ? false : true,
                                 child: Opacity(
                                   opacity: percent,
-                                  child: MiddleMusicPlayer(),
+                                  child: const MiddleMusicPlayer(),
                                 ),
                               );
                             },
@@ -232,7 +232,7 @@ class _MusicPlayerState extends State<MusicPlayer>
                     ),
                     ValueListenableBuilder(
                       valueListenable: bottomPlayerOpacity,
-                      builder: (context, percent, child) {
+                      builder: (context,double percent, child) {
                         return Visibility(
                           visible: (percent == 0) ? false : true,
                           child: Opacity(
@@ -281,6 +281,7 @@ class _MusicPlayerState extends State<MusicPlayer>
           middlePlayerOpacity.value = percent / hundredPercent;
           topPlayerOpacity.value = 1.0 - middlePlayerOpacity.value;
         } else {
+          // ignore: avoid_print
           print(sheetPosition.pixels);
         }
       },

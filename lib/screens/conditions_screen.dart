@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ConditionsScreen extends StatelessWidget {
+  const ConditionsScreen({Key? key}) : super(key: key);
+
 
   // TODO: finish this screen
 
@@ -10,13 +12,13 @@ class ConditionsScreen extends StatelessWidget {
       body: Center(
         child: Column(
           children: [
-            Spacer(flex: 3),
+            const Spacer(flex: 3),
             Text(
               'Условия\nпользования',
               style: Theme.of(context).textTheme.headline1,
               textAlign: TextAlign.center,
             ),
-            Spacer(flex: 1),
+            const Spacer(flex: 1),
             TextButton(
               child: Text(
                 'Назад',
@@ -26,7 +28,7 @@ class ConditionsScreen extends StatelessWidget {
                 Navigator.pop(context);
               },
             ),
-            Spacer(flex: 2),
+            const Spacer(flex: 2),
           ],
         ),
       ),

@@ -1,4 +1,5 @@
-import 'package:codeine/services/music_service.dart';
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 
 import '../models/user.dart';
@@ -7,6 +8,8 @@ import '../constants.dart';
 import '../global/global_parameters.dart';
 
 class MainScreen extends StatelessWidget {
+  const MainScreen({Key? key}) : super(key: key);
+
   initSession() async {
     // init singleton of user
     User u = User();
@@ -62,7 +65,7 @@ class MainScreen extends StatelessWidget {
     return ValueListenableBuilder(
       valueListenable: GlobalParameters.currentPage,
       builder: (context, _, __) {
-        return ConstantData.appDestinations[GlobalParameters.currentPage.value];
+        return ConstantData.appDestinations[GlobalParameters.currentPage.value]!;
       },
     );
   }

@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/widgets.dart';
 
 class CustomConfig {
-  final List<Color> colors;
+  final List<Color>? colors;
   final List<List<Color>> gradients;
   final Alignment gradientBegin;
   final Alignment gradientEnd;
@@ -13,50 +13,20 @@ class CustomConfig {
 
   CustomConfig({
     this.colors,
-    this.gradients,
-    this.gradientBegin,
-    this.gradientEnd,
-    @required this.durations,
-    @required this.heightPercentages,
-    this.blur,
+    required this.gradients,
+    required this.gradientBegin,
+    required this.gradientEnd,
+    required this.durations,
+    required this.heightPercentages,
+    required this.blur,
   })  : assert(() {
-          if (colors == null && gradients == null) {
-            throw 'colors` or `gradients';
-          }
-          return true;
-        }()),
-        assert(() {
-          if (gradients == null &&
-              (gradientBegin != null || gradientEnd != null)) {
+          if (colors?.length != durations.length ||
+              colors?.length != heightPercentages.length) {
             throw FlutterError(
-                'You set a gradient direction but forgot setting `gradients`.');
+                'Length of `colors`, `durations` and `heightPercentages` must be equal.');
           }
           return true;
-        }()),
-        assert(() {
-          if (durations == null) {
-            throw 'durations';
-          }
-          return true;
-        }()),
-        assert(() {
-          if (heightPercentages == null) {
-            throw 'heightPercentages';
-          }
-          return true;
-        }()),
-        assert(() {
-          if (colors != null) {
-            if (colors.length != durations.length ||
-                colors.length != heightPercentages.length) {
-              throw FlutterError(
-                  'Length of `colors`, `durations` and `heightPercentages` must be equal.');
-            }
-          }
-          return true;
-        }()),
-        assert(colors == null || gradients == null,
-            'Cannot provide both colors and gradients.');
+        }());
 }
 
 class PlayerWave extends StatefulWidget {
@@ -65,35 +35,31 @@ class PlayerWave extends StatefulWidget {
   final double waveAmplitude;
   final double wavePhase;
   final double waveFrequency;
-  final Animation<double> heightPercentage;
   final int duration;
   final Color backgroundColor;
 
-  PlayerWave({
-    @required this.config,
+  const PlayerWave({Key? key,
+    required this.config,
     this.duration = 6000,
-    @required this.size,
+    required this.size,
     this.waveAmplitude = 20.0,
     this.waveFrequency = 1.6,
     this.wavePhase = 10.0,
-    this.backgroundColor,
-    this.heightPercentage,
-  });
+    required this.backgroundColor,
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _PlayerWaveState();
 }
 
 class _PlayerWaveState extends State<PlayerWave> with TickerProviderStateMixin {
-  List<AnimationController> _waveControllers;
-  List<Animation<double>> _wavePhaseValues;
+  late List<AnimationController> _waveControllers;
+  late List<Animation<double>> _wavePhaseValues;
 
-  List<double> _waveAmplitudes = [];
-  Map<Animation<double>, AnimationController> valueList;
+  final List<double> _waveAmplitudes = [];
 
   _initAnimations() {
-    _waveControllers =
-        widget.config.durations.map((duration) {
+    _waveControllers = widget.config.durations.map((duration) {
       _waveAmplitudes.add(widget.waveAmplitude + 10);
       return AnimationController(
           vsync: this, duration: Duration(milliseconds: duration));
@@ -128,29 +94,26 @@ class _PlayerWaveState extends State<PlayerWave> with TickerProviderStateMixin {
   _buildPaints() {
     List<Widget> paints = [];
 
-    List<Color> _colors = widget.config.colors;
+    List<Color>? _colors = widget.config.colors;
     List<List<Color>> _gradients = widget.config.gradients;
     Alignment begin = widget.config.gradientBegin;
     Alignment end = widget.config.gradientEnd;
     for (int i = 0; i < _wavePhaseValues.length; i++) {
       paints.add(
-        Container(
-          child: CustomPaint(
-            painter: _CustomWavePainter(
-              color: _colors == null ? null : _colors[i],
-              gradient: _gradients == null ? null : _gradients[i],
-              gradientBegin: begin,
-              gradientEnd: end,
-              heightPercentage:
-                  widget.config.heightPercentages[i],
-              repaint: _waveControllers[i],
-              waveFrequency: widget.waveFrequency,
-              wavePhaseValue: _wavePhaseValues[i],
-              waveAmplitude: _waveAmplitudes[i],
-              blur: widget.config.blur,
-            ),
-            size: widget.size,
+        CustomPaint(
+          painter: _CustomWavePainter(
+            color: _colors == null ? null : _colors[i],
+            gradient: _gradients[i],
+            gradientBegin: begin,
+            gradientEnd: end,
+            heightPercentage: widget.config.heightPercentages[i],
+            repaint: _waveControllers[i],
+            waveFrequency: widget.waveFrequency,
+            wavePhaseValue: _wavePhaseValues[i],
+            waveAmplitude: _waveAmplitudes[i],
+            blur: widget.config.blur,
           ),
+          size: widget.size,
         ),
       );
     }
@@ -159,9 +122,9 @@ class _PlayerWaveState extends State<PlayerWave> with TickerProviderStateMixin {
   }
 
   _disposeAnimations() {
-    _waveControllers.forEach((controller) {
+    for (var controller in _waveControllers) {
       controller.dispose();
-    });
+    }
   }
 
   @override
@@ -189,12 +152,12 @@ class _PlayerWaveState extends State<PlayerWave> with TickerProviderStateMixin {
 
 /// Meta data of layer
 class Layer {
-  final Color color;
-  final List<Color> gradient;
-  final MaskFilter blur;
-  final Path path;
-  final double amplitude;
-  final double phase;
+  final Color? color;
+  final List<Color>? gradient;
+  final MaskFilter? blur;
+  final Path? path;
+  final double? amplitude;
+  final double? phase;
 
   Layer({
     this.color,
@@ -207,7 +170,7 @@ class Layer {
 }
 
 class _CustomWavePainter extends CustomPainter {
-  final Color color;
+  final Color? color;
   final List<Color> gradient;
   final Alignment gradientBegin;
   final Alignment gradientEnd;
@@ -224,19 +187,19 @@ class _CustomWavePainter extends CustomPainter {
   double _tempA = 0.0;
   double _tempB = 0.0;
   double viewWidth = 0.0;
-  Paint _paint = Paint();
+  final Paint _paint = Paint();
 
   _CustomWavePainter({
     this.color,
-    this.gradient,
-    this.gradientBegin,
-    this.gradientEnd,
-    this.blur,
-    this.heightPercentage,
-    this.waveFrequency,
-    this.wavePhaseValue,
-    this.waveAmplitude,
-    Listenable repaint,
+    required this.gradient,
+    required this.gradientBegin,
+    required this.gradientEnd,
+    required this.blur,
+    required this.heightPercentage,
+    required this.waveFrequency,
+    required this.wavePhaseValue,
+    required this.waveAmplitude,
+    Listenable? repaint,
   }) : super(repaint: repaint);
 
   _setPaths(double viewCenterY, Size size, Canvas canvas) {
@@ -249,33 +212,31 @@ class _CustomWavePainter extends CustomPainter {
       phase: wavePhaseValue.value * 2 + 30,
     );
 
-    _layer.path.reset();
-    _layer.path.moveTo(
+    _layer.path!.reset();
+    _layer.path!.moveTo(
         0.0,
         viewCenterY +
-            _layer.amplitude * _getSinY(_layer.phase, waveFrequency, -1));
+            _layer.amplitude! * _getSinY(_layer.phase!, waveFrequency, -1));
     for (int i = 1; i < size.width + 1; i++) {
-      _layer.path.lineTo(
+      _layer.path!.lineTo(
           i.toDouble(),
           viewCenterY +
-              _layer.amplitude * _getSinY(_layer.phase, waveFrequency, i));
+              _layer.amplitude! * _getSinY(_layer.phase!, waveFrequency, i));
     }
 
-    _layer.path.lineTo(size.width, size.height);
-    _layer.path.lineTo(0.0, size.height);
-    _layer.path.close();
+    _layer.path!.lineTo(size.width, size.height);
+    _layer.path!.lineTo(0.0, size.height);
+    _layer.path!.close();
     if (_layer.color != null) {
-      _paint.color = _layer.color;
+      _paint.color = _layer.color!;
     }
     if (_layer.gradient != null) {
       var rect = Offset.zero &
           Size(size.width, size.height - viewCenterY * heightPercentage.value);
       _paint.shader = LinearGradient(
-              begin: gradientBegin == null
-                  ? Alignment.bottomCenter
-                  : gradientBegin,
-              end: gradientEnd == null ? Alignment.topCenter : gradientEnd,
-              colors: _layer.gradient)
+              begin:  gradientBegin,
+              end: gradientEnd,
+              colors: _layer.gradient!)
           .createShader(rect);
     }
     if (_layer.blur != null) {
@@ -283,7 +244,7 @@ class _CustomWavePainter extends CustomPainter {
     }
 
     _paint.style = PaintingStyle.fill;
-    canvas.drawPath(_layer.path, _paint);
+    canvas.drawPath(_layer.path!, _paint);
   }
 
   @override

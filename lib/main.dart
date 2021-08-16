@@ -6,15 +6,17 @@ import 'screens/main_screen.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(
-    SystemUiOverlayStyle(
+    const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
     ),
   );
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
@@ -24,7 +26,7 @@ class MyApp extends StatelessWidget {
       title: 'CODEINE',
       debugShowCheckedModeBanner: false,
       theme: darkTheme,
-      home: MainScreen(),
+      home: const MainScreen(),
     );
   }
 }

@@ -1,18 +1,53 @@
-import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:codeine/global/global_parameters.dart';
-import 'package:codeine/models/user.dart';
-import 'package:codeine/services/music_service.dart';
-import 'package:codeine/widgets/music_player.dart';
-import 'package:codeine/widgets/music_sliver.dart';
-import 'package:codeine/widgets/search_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
 
-class HomeScreen extends StatelessWidget {
+import '../models/user.dart';
+import '../services/music_service.dart';
+import '../widgets/music_player.dart';
+import '../widgets/music_sliver.dart';
+import '../widgets/search_bar.dart';
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   final TextEditingController textEditingController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  late AnimationController _animationController;
+  late Animation<double> _yTween;
+
+  @override
+  void initState() {
+    MusicService.getAllMusic();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _yTween = Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    MusicService.getAllMusic();
+    Size size = MediaQuery.of(context).size;
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels > size.height && _animationController.status == AnimationStatus.reverse) {
+        _animationController.forward();
+      }else if(_scrollController.position.pixels <= size.height && _animationController.status == AnimationStatus.forward){
+        _animationController.reverse();
+      }
+    });
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
@@ -34,13 +69,15 @@ class HomeScreen extends StatelessWidget {
           backgroundColor: Colors.transparent,
           body: MusicPlayer(
             backgroundBody: CustomScrollView(
-              physics: BouncingScrollPhysics(),
+              controller: _scrollController,
+              physics: const BouncingScrollPhysics(),
               slivers: [
-                _Header(),
+                const _Header(),
                 SearchBar(
                   controller: textEditingController,
                 ),
                 MusicSliver(
+                  goUpAnimation: _yTween,
                   trackTitle: 'Мои треки',
                 ),
               ],
@@ -54,7 +91,7 @@ class HomeScreen extends StatelessWidget {
 
 class _Header extends StatelessWidget {
   const _Header({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -67,13 +104,13 @@ class _Header extends StatelessWidget {
             SizedBox(
               width: 250.0,
               child: DefaultTextStyle(
-                style: Theme.of(context).textTheme.headline3.copyWith(
+                style: Theme.of(context).textTheme.headline3!.copyWith(
                   fontSize: 25,
                   shadows: [
                     Shadow(
                       blurRadius: 7.0,
                       color: Theme.of(context).focusColor,
-                      offset: Offset(0, 0),
+                      offset: const Offset(0, 0),
                     ),
                   ],
                 ),
@@ -82,11 +119,12 @@ class _Header extends StatelessWidget {
                   animatedTexts: [
                     FlickerAnimatedText(
                       'CODEINE',
-                      speed: Duration(seconds: 8),
+                      speed: const Duration(seconds: 8),
                     ),
                   ],
-                  pause: Duration(milliseconds: 0),
+                  pause: const Duration(milliseconds: 0),
                   onTap: () {
+                    // ignore: avoid_print
                     print("Tap Event");
                   },
                 ),
@@ -134,15 +172,16 @@ class _Header extends StatelessWidget {
             //   style:
             //       Theme.of(context).textTheme.headline3.copyWith(fontSize: 25),
             // ),
-            Spacer(),
+            const Spacer(),
             CircleAvatar(
               radius: 20,
               backgroundColor: Theme.of(context).splashColor,
               child: ClipOval(
                 child: Image.network(
-                  User.photo,
+                  // TODO: case when user has no photo
+                  User.photo!,
                   errorBuilder: (context, object, stackTrace) {
-                    return Icon(Icons.person);
+                    return const Icon(Icons.person);
                   },
                 ),
               ),

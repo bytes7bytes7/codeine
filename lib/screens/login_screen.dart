@@ -17,31 +17,31 @@ import '../models/user.dart';
 import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key? key}) : super(key: key);
+
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  TextEditingController loginController;
-  TextEditingController passwordController;
-  TextEditingController codeController;
-  ValueNotifier<String> loginNotifier;
-  ValueNotifier<String> passwordNotifier;
-  ValueNotifier<String> codeNotifier;
-  ValueNotifier<bool> rememberNotifier;
-  PageController pageController;
-  ValueNotifier<bool> loading;
-  StreamSubscription<AuthState> subscription;
+  late TextEditingController loginController;
+  late TextEditingController passwordController;
+  late TextEditingController codeController;
+  late ValueNotifier<String> loginNotifier;
+  late ValueNotifier<String> passwordNotifier;
+  late ValueNotifier<String> codeNotifier;
+  late PageController pageController;
+  late ValueNotifier<bool> loading;
+  late StreamSubscription<AuthState> subscription;
 
   @override
   void initState() {
     loginController = TextEditingController();
     passwordController = TextEditingController();
     codeController = TextEditingController();
-    loginNotifier = ValueNotifier(null);
-    passwordNotifier = ValueNotifier(null);
-    codeNotifier = ValueNotifier(null);
-    rememberNotifier = ValueNotifier(true);
+    loginNotifier = ValueNotifier('');
+    passwordNotifier = ValueNotifier('');
+    codeNotifier = ValueNotifier('');
     pageController = PageController();
     loading = ValueNotifier(false);
     subscription = Bloc.authBloc.auth.listen((event) {
@@ -51,9 +51,9 @@ class _LoginScreenState extends State<LoginScreen> {
         loading.value = false;
         AuthDataState state = event;
         if (state.status == AuthStatus.needCode) {
-          loginNotifier.value = null;
-          passwordNotifier.value = null;
-          codeNotifier.value = null;
+          loginNotifier.value = '';
+          passwordNotifier.value = '';
+          codeNotifier.value = '';
           Bloc.authBloc.getCode();
           pageController.animateToPage(
             1,
@@ -103,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
         gradient: RadialGradient(
-          center: Alignment(-0.8, -1),
+          center: const Alignment(-0.8, -1),
           radius: 1,
           colors: [
             Theme.of(context).splashColor,
@@ -114,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Container(
         decoration: BoxDecoration(
           gradient: RadialGradient(
-            center: Alignment(-0.5, 1),
+            center: const Alignment(-0.5, 1),
             radius: 0.7,
             colors: [
               Theme.of(context).highlightColor,
@@ -137,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Spacer(flex: 4),
+                    const Spacer(flex: 4),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -147,27 +147,27 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ],
                     ),
-                    Spacer(flex: 3),
+                    const Spacer(flex: 3),
                     Text(
                       'Вход',
                       style: Theme.of(context).textTheme.headline2,
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Expanded(
                       flex: 7,
                       child: PageView(
                         controller: pageController,
-                        physics: NeverScrollableScrollPhysics(),
+                        physics: const NeverScrollableScrollPhysics(),
                         children: [
                           Column(
                             children: [
-                              SizedBox(height: 20),
+                              const SizedBox(height: 20),
                               InputField(
                                 controller: loginController,
                                 hint: 'Телефон',
                                 errorNotifier: loginNotifier,
                               ),
-                              SizedBox(height: 20),
+                              const SizedBox(height: 20),
                               InputField(
                                 controller: passwordController,
                                 hint: 'Пароль',
@@ -192,18 +192,19 @@ class _LoginScreenState extends State<LoginScreen> {
                                       color: Theme.of(context).focusColor,
                                     ),
                                     onPressed: () async {
-                                      GlobalParameters.currentPage.value='HomeScreen';
+                                      GlobalParameters.currentPage.value =
+                                          'HomeScreen';
                                     },
                                   ),
                                 ],
                               ),
-                              Spacer(flex: 1),
+                              const Spacer(flex: 1),
                               TextButton(
                                 child: Text(
                                   'Условия пользования',
                                   style: Theme.of(context)
                                       .textTheme
-                                      .subtitle1
+                                      .subtitle1!
                                       .copyWith(
                                         decoration: TextDecoration.underline,
                                       ),
@@ -212,7 +213,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   Navigator.push(
                                     context,
                                     NextPageRoute(
-                                      nextPage: ConditionsScreen(),
+                                      nextPage: const ConditionsScreen(),
                                     ),
                                   );
                                 },
@@ -221,7 +222,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           Column(
                             children: [
-                              SizedBox(height: 20),
+                              const SizedBox(height: 20),
                               InputField(
                                 controller: codeController,
                                 hint: 'Код подтверждения',
@@ -235,29 +236,30 @@ class _LoginScreenState extends State<LoginScreen> {
                                 onPressed: () async {
                                   await AuthService.fetchUserData();
                                   var u = User();
+                                  // ignore: avoid_print
                                   print(u);
                                 },
                               ),
-                              SizedBox(height: 20),
+                              const SizedBox(height: 20),
                               TextButton(
                                 child: Text(
                                   'Выслать СМС',
                                   style: Theme.of(context)
                                       .textTheme
-                                      .subtitle1
+                                      .subtitle1!
                                       .copyWith(
                                         decoration: TextDecoration.underline,
                                       ),
                                 ),
                                 onPressed: () {},
                               ),
-                              Spacer(flex: 1),
+                              const Spacer(flex: 1),
                               TextButton(
                                 child: Text(
                                   'Отмена',
                                   style: Theme.of(context)
                                       .textTheme
-                                      .subtitle1
+                                      .subtitle1!
                                       .copyWith(
                                         decoration: TextDecoration.underline,
                                       ),
@@ -309,25 +311,29 @@ class _LoginScreenState extends State<LoginScreen> {
                             width: double.infinity,
                             // TODO: make something more flexible
 
-                            height:
-                                Theme.of(context).textTheme.headline3.fontSize +
-                                    40,
+                            height: Theme.of(context)
+                                    .textTheme
+                                    .headline3!
+                                    .fontSize! +
+                                40,
                             padding: const EdgeInsets.symmetric(vertical: 20),
                             child: Center(
                               child: ValueListenableBuilder(
-                                  valueListenable: loading,
-                                  builder: (context, _, __) {
-                                    if (loading.value) {
-                                      return LoadingCircle();
-                                    }
-                                    return Text(
-                                      'Войти',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headline3
-                                          .copyWith(fontWeight: FontWeight.normal),
-                                    );
-                                  }),
+                                valueListenable: loading,
+                                builder: (context, _, __) {
+                                  if (loading.value) {
+                                    return const LoadingCircle();
+                                  }
+                                  return Text(
+                                    'Войти',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headline3!
+                                        .copyWith(
+                                            fontWeight: FontWeight.normal),
+                                  );
+                                },
+                              ),
                             ),
                             decoration: BoxDecoration(
                               color: Theme.of(context).scaffoldBackgroundColor,
@@ -345,7 +351,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 30),
+                    const       SizedBox(height: 30),
                   ],
                 ),
               ),

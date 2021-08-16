@@ -1,8 +1,8 @@
 part of 'music_player.dart';
 
 class MiddleMusicPlayer extends StatefulWidget {
-  MiddleMusicPlayer({
-    Key key,
+  const MiddleMusicPlayer({
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -19,7 +19,7 @@ class _MiddleMusicPlayerState extends State<MiddleMusicPlayer> {
       child: Column(
         children: [
           IconButton(
-            icon: Icon(Icons.arrow_drop_up_outlined),
+            icon: const Icon(Icons.arrow_drop_up_outlined),
             color: Theme.of(context).focusColor,
             iconSize: 30.0,
             onPressed: () {
@@ -27,22 +27,22 @@ class _MiddleMusicPlayerState extends State<MiddleMusicPlayer> {
                   .snapToPosition(ConstantData.snappingPositions[2]);
             },
           ),
-          SizedBox(height: 5),
-          Container(
+          const SizedBox(height: 5),
+          SizedBox(
             width: size.width * 0.8,
             child: Text(
-              GlobalParameters.currentSong.value?.title ?? '',
+              GlobalParameters.currentSong.value.title ?? '',
               style: Theme.of(context).textTheme.headline3,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
             ),
           ),
-          SizedBox(height: 5),
-          Container(
+          const SizedBox(height: 5),
+          SizedBox(
             width: size.width * 0.8,
             child: Text(
               GlobalParameters.currentSong.value.title != null
-                  ? '${GlobalParameters.currentSong.value.artists.sublist(1).fold<String>(GlobalParameters.currentSong.value.artists.first.name, (prev, next) => prev += ', ' + next.name)}'
+                  ? GlobalParameters.currentSong.value.artists.sublist(1).fold<String>(GlobalParameters.currentSong.value.artists.first.name!, (prev, next) => prev += ', ' + next.name!)
                   : '',
               style: Theme.of(context).textTheme.bodyText2,
               overflow: TextOverflow.ellipsis,
@@ -53,11 +53,11 @@ class _MiddleMusicPlayerState extends State<MiddleMusicPlayer> {
             children: [
               ValueListenableBuilder(
                 valueListenable: GlobalParameters.shuffleMode,
-                builder: (context, value, child) {
+                builder: (context,bool value, child) {
                   return IconButton(
                     icon: (value)
-                        ? Icon(Icons.shuffle_on_outlined)
-                        : Icon(Icons.shuffle_outlined),
+                        ? const Icon(Icons.shuffle_on_outlined)
+                        : const Icon(Icons.shuffle_outlined),
                     color: Theme.of(context).focusColor,
                     iconSize: 30,
                     onPressed: () {
@@ -67,14 +67,14 @@ class _MiddleMusicPlayerState extends State<MiddleMusicPlayer> {
                   );
                 },
               ),
-              Spacer(),
+              const Spacer(),
               ValueListenableBuilder(
                 valueListenable: GlobalParameters.repeatOneMode,
-                builder: (context, value, child) {
+                builder: (context,bool value, child) {
                   return IconButton(
                     icon: (value)
-                        ? Icon(Icons.repeat_one_on_outlined)
-                        : Icon(Icons.repeat_one_outlined),
+                        ? const Icon(Icons.repeat_one_on_outlined)
+                        : const Icon(Icons.repeat_one_outlined),
                     color: Theme.of(context).focusColor,
                     iconSize: 30,
                     onPressed: () {
@@ -120,7 +120,7 @@ class _MiddleMusicPlayerState extends State<MiddleMusicPlayer> {
                   ),
                 );
               }),
-          SizedBox(height: 5),
+          const SizedBox(height: 5),
           PlayerControls(),
         ],
       ),

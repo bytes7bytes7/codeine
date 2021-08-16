@@ -11,11 +11,14 @@ abstract class ConstantColors {
   static const Color scaffoldBackgroundColor = Color(0xFF121421);
   static const Color focusColor = Color(0xFFEDEDED);
   static const Color disabledColor = Color(0xFFC5C5C5);
-  static const Color splashColor = Color(0xFF7F2BCF);
-  static const Color highlightColor = Color(0xFFB538A7);
+  static const Color splashColor = Color(0xff9808a6); // 0xFF7F2BCF
+  static const Color highlightColor = Color(0xff4608a6); //0xFFB538A7
   // TODO: try this colors
   // Color(0xFFF13AD3),
   // Color(0xFF63BAC4),
+
+  // Color(0xff4608a6)
+  //Color(0xff9808a6)
   static const Color errorColor = Color(0xFFB53850);
 }
 
@@ -23,18 +26,18 @@ abstract class ConstantData {
   static const double bottomPlayerHeight = 60.0;
   static const double middlePlayerHeight = 300.0;
   static final List<SnappingPosition> snappingPositions = [
-    SnappingPosition.pixels(
+    const SnappingPosition.pixels(
       positionPixels: bottomPlayerHeight,
       snappingCurve: Curves.easeOutQuart,
       snappingDuration: Duration(milliseconds: 500),
       grabbingContentOffset: GrabbingContentOffset.top,
     ),
-    SnappingPosition.pixels(
+    const SnappingPosition.pixels(
       positionPixels: middlePlayerHeight,
       snappingCurve: Curves.easeOutQuart,
       snappingDuration: Duration(milliseconds: 500),
     ),
-    SnappingPosition.factor(
+    const SnappingPosition.factor(
       positionFactor: 1.0,
       snappingCurve: Curves.easeOutQuart,
       snappingDuration: Duration(milliseconds: 500),
@@ -43,11 +46,11 @@ abstract class ConstantData {
   ];
   // Do not add: MainScreen, ConditionsScreen
   static final Map<String, Widget> appDestinations = {
-    'SplashScreen': SplashScreen(),
-    'LoginScreen': LoginScreen(),
-    'HomeScreen': HomeScreen(),
-    'NoInternetScreen': NoInternetScreen(),
-    'ErrorScreen' : ErrorScreen(),
+    'SplashScreen': const SplashScreen(),
+    'LoginScreen': const LoginScreen(),
+    'HomeScreen': const HomeScreen(),
+    'NoInternetScreen': const NoInternetScreen(),
+    'ErrorScreen' : const ErrorScreen(),
   };
 }
 

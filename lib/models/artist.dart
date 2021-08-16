@@ -4,6 +4,6 @@ class Artist {
     this.url,
   });
 
-  String name;
-  String url;
+  String? name;
+  String? url;
 }

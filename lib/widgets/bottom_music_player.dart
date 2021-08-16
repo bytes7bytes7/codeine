@@ -2,8 +2,8 @@ part of 'music_player.dart';
 
 class BottomMusicPlayer extends StatefulWidget {
   const BottomMusicPlayer({
-    Key key,
-    @required this.opacityNotifier,
+    Key? key,
+    required this.opacityNotifier,
   }) : super(key: key);
 
   final ValueNotifier<double> opacityNotifier;
@@ -14,36 +14,36 @@ class BottomMusicPlayer extends StatefulWidget {
 
 class _BottomMusicPlayerState extends State<BottomMusicPlayer>
     with TickerProviderStateMixin {
-  int _waveDuration;
-  CurvedAnimation _waveCurve;
-  Animation<double> _waveHeightPercentage;
+  // late int _waveDuration;
+  // late CurvedAnimation _waveCurve;
+  // late Animation<double> _waveHeightPercentage;
 
   @override
   void initState() {
     super.initState();
-    _waveDuration = 3000;
-    GlobalParameters.waveController = GlobalParameters.waveController ??
-        AnimationController(
-          vsync: this,
-          duration: Duration(milliseconds: _waveDuration),
-        );
-    _waveCurve = CurvedAnimation(
-      parent: GlobalParameters.waveController,
-      curve: Curves.easeInOut,
-    );
-    _waveHeightPercentage = Tween(
-      begin: 0.75,
-      end: 0.45,
-    ).animate(
-      _waveCurve,
-    );
+    // _waveDuration = 3000;
+    // GlobalParameters.waveController = GlobalParameters.waveController ??
+    //     AnimationController(
+    //       vsync: this,
+    //       duration: Duration(milliseconds: _waveDuration),
+    //     );
+    // _waveCurve = CurvedAnimation(
+    //   parent: GlobalParameters.waveController!,
+    //   curve: Curves.easeInOut,
+    // );
+    // _waveHeightPercentage = Tween(
+    //   begin: 0.75,
+    //   end: 0.45,
+    // ).animate(
+    //   _waveCurve,
+    // );
 
-    GlobalParameters.playAnimationController =
-        GlobalParameters.playAnimationController ??
-            AnimationController(
-              vsync: this,
-              duration: Duration(milliseconds: 500),
-            );
+    // GlobalParameters.playAnimationController =
+    //     GlobalParameters.playAnimationController ??
+    //         AnimationController(
+    //           vsync: this,
+    //           duration: Duration(milliseconds: 500),
+    //         );
   }
 
   @override
@@ -51,7 +51,7 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
     Size size = MediaQuery.of(context).size;
     return ValueListenableBuilder(
         valueListenable: widget.opacityNotifier,
-        builder: (context, percent, child) {
+        builder: (context, double percent, child) {
           return Opacity(
             opacity: percent,
             child: Material(
@@ -65,32 +65,33 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
                   color: Theme.of(context).scaffoldBackgroundColor,
                   child: Stack(
                     children: [
-                      PlayerWave(
-                        config: CustomConfig(
-                          gradients: [
-                            [
-                              Theme.of(context).splashColor,
-                              Theme.of(context).splashColor.withOpacity(0.0),
-                            ],
-                          ],
-                          durations: [10000],
-                          heightPercentages: [_waveHeightPercentage],
-                          blur: MaskFilter.blur(BlurStyle.solid, 5),
-                          gradientBegin: Alignment.bottomCenter,
-                          gradientEnd: Alignment.topCenter,
-                        ),
-                        waveAmplitude: 0,
-                        backgroundColor: Colors.transparent,
-                        size: Size(
-                            double.infinity, ConstantData.bottomPlayerHeight),
-                      ),
+                      // PlayerWave(
+                      //   config: CustomConfig(
+                      //     // There is an error
+                      //     gradients: [
+                      //       [
+                      //         Theme.of(context).splashColor,
+                      //         Theme.of(context).splashColor.withOpacity(0.0),
+                      //       ],
+                      //     ],
+                      //     durations: [10000],
+                      //     heightPercentages: [_waveHeightPercentage],
+                      //     blur: MaskFilter.blur(BlurStyle.solid, 5),
+                      //     gradientBegin: Alignment.bottomCenter,
+                      //     gradientEnd: Alignment.topCenter,
+                      //   ),
+                      //   waveAmplitude: 0,
+                      //   backgroundColor: Colors.transparent,
+                      //   size: Size(
+                      //       double.infinity, ConstantData.bottomPlayerHeight),
+                      // ),
                       Container(
                         width: double.infinity,
                         height: ConstantData.bottomPlayerHeight,
                         padding: const EdgeInsets.symmetric(horizontal: 30),
                         child: Row(
                           children: [
-                            Container(
+                            SizedBox(
                               width: size.width * 0.7,
                               child: ValueListenableBuilder(
                                   valueListenable: GlobalParameters.currentSong,
@@ -103,7 +104,7 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
                                       children: [
                                         Text(
                                           GlobalParameters
-                                                  .currentSong.value?.title ??
+                                                  .currentSong.value.title ??
                                               '',
                                           style: Theme.of(context)
                                               .textTheme
@@ -114,11 +115,11 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
                                           GlobalParameters.currentSong.value
                                                       .title !=
                                                   null
-                                              ? '${GlobalParameters.currentSong.value.artists.sublist(1).fold<String>(GlobalParameters.currentSong.value.artists.first.name, (prev, next) => prev += ', ' + next.name)}'
+                                              ? GlobalParameters.currentSong.value.artists.sublist(1).fold<String>(GlobalParameters.currentSong.value.artists.first.name!, (prev, next) => prev += ', ' + next.name!)
                                               : '',
                                           style: Theme.of(context)
                                               .textTheme
-                                              .bodyText2
+                                              .bodyText2!
                                               .copyWith(
                                                 color: Theme.of(context)
                                                     .disabledColor,
@@ -129,7 +130,7 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
                                     );
                                   }),
                             ),
-                            Spacer(),
+                            const Spacer(),
                             // TODO: place button on the center of songs' duration
                             IconButton(
                               color: Theme.of(context).focusColor,
@@ -143,7 +144,7 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
                                     icon: AnimatedIcons.play_pause,
                                     size: 30,
                                     progress: GlobalParameters
-                                        .playAnimationController,
+                                        .playAnimationController!,
                                     color: Theme.of(context).focusColor,
                                   );
                                 },

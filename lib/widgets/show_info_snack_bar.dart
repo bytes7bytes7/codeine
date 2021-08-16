@@ -14,14 +14,14 @@ void showInfoSnackBar(BuildContext context, String info, IconData icon) {
           Theme.of(context).scaffoldBackgroundColor.withOpacity(0.9),
       content: Row(
         children: [
-          Container(
+          SizedBox(
             width: size.width * 0.65,
             child: Text(
               info,
               style: Theme.of(context).textTheme.subtitle1,
             ),
           ),
-          Spacer(),
+          const Spacer(),
           Icon(
             icon,
             color: Theme.of(context).focusColor,

@@ -10,7 +10,7 @@ final ThemeData darkTheme = ThemeData(
   splashColor: ConstantColors.splashColor,
   highlightColor: ConstantColors.highlightColor,
   errorColor: ConstantColors.errorColor,
-  textTheme: TextTheme(
+  textTheme: const TextTheme(
     headline1: TextStyle(
       fontSize: 46,
       color: ConstantColors.focusColor,

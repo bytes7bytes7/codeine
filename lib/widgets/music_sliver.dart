@@ -8,11 +8,13 @@ import 'thin_text_button.dart';
 
 class MusicSliver extends StatelessWidget {
   const MusicSliver({
-    Key key,
+    Key? key,
+    required this.goUpAnimation,
     this.trackTitle = 'Треки',
   }) : super(key: key);
 
   final String trackTitle;
+  final Animation goUpAnimation;
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +43,7 @@ class MusicSliver extends StatelessWidget {
                     ],
                   ),
                 );
-              }else if(index == GlobalParameters.songs.value.length + 2){
+              } else if (index == GlobalParameters.songs.value.length + 2) {
                 return Container(
                   height: ConstantData.bottomPlayerHeight,
                 );
@@ -54,7 +56,17 @@ class MusicSliver extends StatelessWidget {
             childCount: GlobalParameters.songs.value.length + 3,
           ),
         );
-      }
+        // AnimatedBuilder(
+        //   animation: goUpAnimation,
+        //   builder: (context, child){
+        //     return Container(
+        //       height: 50,
+        //       width: 50,
+        //       color: Colors.red,
+        //     );
+        //   },
+        // ),
+      },
     );
   }
 }

@@ -1,12 +1,10 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
-
 abstract class BytesService {
   static String subByte({
-    String data,
-    String startString,
-    String endString,
+    required String data,
+    String? startString,
+    String? endString,
     bool cutStart = false,
     bool cutEnd = true,
   }) {
@@ -35,15 +33,12 @@ abstract class BytesService {
     return data;
   }
 
-  static List<String> splitByte({String data, @required String splitString}) {
+  static List<String> splitByte({required String data, required String splitString}) {
     String cut = '';
-    if (splitString != null) {
-      utf8.encode(splitString).forEach((byte) {
-        cut += byte.toString() + ', ';
-      });
-      return data.split(cut);
-    }
-    return [];
+    utf8.encode(splitString).forEach((byte) {
+      cut += byte.toString() + ', ';
+    });
+    return data.split(cut);
   }
 
   static List<int> getInts(String data) {

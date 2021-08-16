@@ -1,9 +1,12 @@
+// ignore_for_file: avoid_print
+
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:http/http.dart' as http;
 
 import '../services/win1251_decoder.dart';
 import '../database/database_helper.dart';
@@ -11,24 +14,49 @@ import '../models/user.dart';
 import '../constants.dart';
 import '../global/global_parameters.dart';
 
+class Session {
+  Map<String, String> headers = Map.from(ConstantHTTP.headers);
+
+  Future<Map> get(String url) async {
+    http.Response response = await http.get(Uri.parse(url), headers: headers);
+    updateCookie(response);
+    return json.decode(response.body);
+  }
+
+  Future<Map> post(String url, dynamic data) async {
+    http.Response response = await http.post(Uri.parse(url), body: data, headers: headers);
+    updateCookie(response);
+    return json.decode(response.body);
+  }
+
+  void updateCookie(http.Response response) {
+    String rawCookie = response.headers['set-cookie'] ?? '';
+    if (rawCookie.isNotEmpty) {
+      int index = rawCookie.indexOf(';');
+      headers['cookie'] =
+      (index == -1) ? rawCookie : rawCookie.substring(0, index);
+    }
+  }
+}
+
 abstract class AuthService {
   static String _hash = '';
   static String captchaSID = '';
 
   static Future<AuthStatus> fetchUserData() async {
     if (User.id != null) {
-      await DatabaseHelper.db.getUser(User.id);
+      await DatabaseHelper.db.getUser(User.id!);
       if (User.phoneOrEmail != null) {
         return AuthStatus.loggedIn;
       }
       Response response;
       try {
-        response = await User.dio.get(
+        response = await User.dio!.get(
           '${ConstantHTTP.vkURL}id${User.id}',
           options:
               Options(responseType: ResponseType.bytes, followRedirects: false),
         );
-      } catch (e) {
+      } on DioError catch (e) {
         if (GlobalParameters.connectionStatus.value ==
             ConnectivityResult.none) {
           return AuthStatus.noInternet;
@@ -60,11 +88,16 @@ abstract class AuthService {
   }
 
   static Future<AuthStatus> checkCookie() async {
-    if (User.cookieJar.domains.isNotEmpty) {
+    if (User.cookieJar!.hostCookies.isNotEmpty) {
+      var trash = User.cookieJar!.hostCookies;
+      print(trash.toString());
       print('User.cookieJar domains is NOT empty');
       String uid;
       try {
-        uid = User.cookieJar.domains[0]['login.vk.com']['/']['l'].toString();
+        // TODO: replace it
+        uid = '';
+        //uid = User.cookieJar!.hostCookies[0]['login.vk.com']['/']['l'].toString();
+
         User.id =
             int.parse(uid.substring(uid.indexOf('l=') + 2, uid.indexOf(';')));
         print(User.id);
@@ -76,11 +109,16 @@ abstract class AuthService {
       //Load header to User.dio client
       Map<String, String> headers = HashMap();
       headers.addAll(ConstantHTTP.headers);
-      User.dio.options.headers = headers;
-      if (User.cookieJar.domains != null) {
-        String cookies = headers['cookie'];
+      User.dio!.options.headers = headers;
+      if (User.cookieJar!.hostCookies.isNotEmpty) {
+        String cookies = headers['cookie']!;
         Map<dynamic, dynamic> domains;
-        domains = HashMap.from(User.cookieJar.domains[0]['vk.com']['/']);
+
+        // TODO: replace it
+        domains = HashMap();
+        //domains = HashMap.from(User.cookieJar.hostCookies![0]['vk.com']['/']);
+
+
         for (int i = 0; i < domains.keys.length; i++) {
           String key = domains.keys.toList()[i].toString();
           String value = domains[key].toString();
@@ -93,8 +131,8 @@ abstract class AuthService {
         }
         cookies = cookies.substring(0, cookies.length - 2);
         //cookies += '; '+ 'remixbdr=0';
-        User.dio.options.headers['cookie'] = cookies;
-        print(User.dio.options.headers['cookie']);
+        User.dio!.options.headers['cookie'] = cookies;
+        print(User.dio!.options.headers['cookie']);
       }
       return AuthStatus.cookies;
     }
@@ -103,7 +141,7 @@ abstract class AuthService {
   }
 
   static void _updateCookie(Response response) {
-    List<String> setCookie = response.headers['set-cookie'];
+    List<String> setCookie = response.headers['set-cookie']!;
     Map<String, String> cookie = {};
     String key, value;
     for (String line in setCookie) {
@@ -113,7 +151,7 @@ abstract class AuthService {
       // cookie[key] = value;
     }
     Map<String, String> oldCookie = {};
-    User.dio.options.headers['cookie'].trim().split(';').forEach((pair) {
+    User.dio!.options.headers['cookie'].trim().split(';').forEach((pair) {
       if (pair.isNotEmpty) {
         pair = pair.trim();
         String key = pair.substring(0, pair.indexOf('=')),
@@ -134,10 +172,10 @@ abstract class AuthService {
     });
 
     Map<String, dynamic> headers =
-        Map<String, dynamic>.from(User.dio.options.headers);
+        Map<String, dynamic>.from(User.dio!.options.headers);
     headers['cookie'] = newCookie.join('; ');
 
-    User.dio.options.headers = Map<String, dynamic>.from(headers);
+    User.dio!.options.headers = Map<String, dynamic>.from(headers);
   }
 
   static Future<void> _setUserData(String data) async {
@@ -191,14 +229,18 @@ abstract class AuthService {
       FormData formData, Map<String, String> queryParameters) async {
     Response response;
     try {
-      response = await User.dio.post(
+      response = await User.dio!.post(
         ConstantHTTP.vkLoginURL,
         queryParameters: queryParameters,
         data: formData,
         options: Options(
           followRedirects: true,
           validateStatus: (status) {
-            return status < 500;
+            if (status != null) {
+              return status < 500;
+            } else {
+              return true;
+            }
           },
         ),
       );
@@ -218,16 +260,36 @@ abstract class AuthService {
     return response;
   }
 
+  // TODO: try to implement all request with http package
+  // static Future<AuthStatus> logInHttp(String phone, String password)async{
+  //   User.phoneOrEmail = phone;
+  //   Session session = Session();
+  //
+  //   try {
+  //     Map body = await session.get(ConstantHTTP.vkURL);
+  //   } on DioError catch (e) {
+  //     if (GlobalParameters.connectionStatus.value == ConnectivityResult.none) {
+  //       return AuthStatus.noInternet;
+  //     } else {
+  //       print('logIn error: ${e.error}');
+  //       print('logIn error: ${e.message}');
+  //       print('logIn error: ${e.type}');
+  //       return AuthStatus.unknownError;
+  //     }
+  //   }
+  //   return AuthStatus.unknownError;
+  // }
+
   static Future<AuthStatus> logIn(String phone, String password) async {
-    User.cookieJar.deleteAll();
+    User.cookieJar!.deleteAll();
 
     User.phoneOrEmail = phone;
-    User.dio.options.headers = ConstantHTTP.headers;
-    User.cookieJar.loadForRequest(Uri.parse(ConstantHTTP.vkLoginURL));
+    User.dio!.options.headers = ConstantHTTP.headers;
+    User.cookieJar!.loadForRequest(Uri.parse(ConstantHTTP.vkLoginURL));
     Response response;
 
     try {
-      response = await User.dio.get(ConstantHTTP.vkURL);
+      response = await User.dio!.get(ConstantHTTP.vkURL);
     } on DioError catch (e) {
       if (GlobalParameters.connectionStatus.value == ConnectivityResult.none) {
         return AuthStatus.noInternet;
@@ -245,12 +307,12 @@ abstract class AuthService {
     // Get form data
     var document = parse(response.data);
     var parameters = document
-        .getElementById("quick_login_form")
+        .getElementById("quick_login_form")!
         .getElementsByTagName('input');
     Map<String, String> forms = HashMap();
     for (var p in parameters) {
-      if (p.attributes['name'] != null) {
-        forms[p.attributes['name']] = p.attributes['value'];
+      if (p.attributes['value'] != null) {
+        forms[p.attributes['name']!] = p.attributes['value']!;
       }
     }
     forms['to'] = 'bG9naW4/bT0xJmVtYWlsPWFzJnRvPWFXNWtaWGd1Y0dodw--';
@@ -272,7 +334,7 @@ abstract class AuthService {
       'remixlang': '0',
     };
 
-    User.dio.options.headers['cookie'].split(';').forEach((line) {
+    User.dio!.options.headers['cookie'].split(';').forEach((line) {
       if (line.isNotEmpty) {
         line = line.trim();
         String key = line.substring(0, line.indexOf('='));
@@ -287,29 +349,29 @@ abstract class AuthService {
     });
 
     Map<String, dynamic> headers =
-        Map<String, dynamic>.from(User.dio.options.headers);
+        Map<String, dynamic>.from(User.dio!.options.headers);
     headers['cookie'] = cookieList.join('; ');
 
-    User.dio.options.headers = Map<String, dynamic>.from(headers);
+    User.dio!.options.headers = Map<String, dynamic>.from(headers);
 
     // Separate uri from parameters
-    String location = response.headers['location'].first;
+    String location = response.headers['location']!.first;
     Map<String, String> queryParams = {};
 
     List<String> params =
         location.substring(location.indexOf('?') + 1).split('&');
     location = location.substring(0, location.indexOf('?'));
 
-    params.forEach((element) {
+    for (var element in params) {
       List<String> keyValue = element.split('=');
       queryParams.putIfAbsent(keyValue[0], () => keyValue[1]);
-    });
+    }
 
     queryParams['to'] = 'aW5kZXgucGhw';
 
     // 2nd request
     try {
-      response = await User.dio.get(
+      response = await User.dio!.get(
         location,
         queryParameters: queryParams,
         options: Options(responseType: ResponseType.bytes),
@@ -350,6 +412,8 @@ abstract class AuthService {
       print('Login done');
       status = AuthStatus.loggedIn;
       await _setUserData(data);
+      print(await User.cookieJar?.loadForRequest(Uri.parse('login.vk.com')));
+      print(await User.cookieJar?.loadForRequest(Uri.parse('vk.com')));
     }
 
     return status;
@@ -362,7 +426,7 @@ abstract class AuthService {
 
     Response response;
     try {
-      response = await User.dio.get(
+      response = await User.dio!.get(
         '${ConstantHTTP.vkURL}login',
         queryParameters: queryParams,
         options: Options(responseType: ResponseType.bytes),
@@ -381,14 +445,14 @@ abstract class AuthService {
     String data = response.data.toString();
 
     String start = '', end = '';
-    utf8.encode("window.Authcheck.init(\'").forEach((byte) {
+    utf8.encode("window.Authcheck.init('").forEach((byte) {
       start += byte.toString() + ', ';
     });
 
     data = data.substring(data.indexOf(start) + start.length);
 
     end = '';
-    utf8.encode("\'").forEach((byte) {
+    utf8.encode("'").forEach((byte) {
       end += byte.toString() + ', ';
     });
     data = data.substring(0, data.lastIndexOf(end));
@@ -417,7 +481,7 @@ abstract class AuthService {
     var formData = FormData.fromMap(forms);
     Response response;
     try {
-      response = await User.dio.post(
+      response = await User.dio!.post(
         '${ConstantHTTP.vkURL}al_login.php',
         queryParameters: {'act': 'a_authcheck_code'},
         data: formData,
@@ -425,7 +489,11 @@ abstract class AuthService {
           responseType: ResponseType.bytes,
           followRedirects: true,
           validateStatus: (status) {
-            return status < 500;
+            if (status != null) {
+              return status < 500;
+            } else {
+              return true;
+            }
           },
         ),
       );
@@ -461,7 +529,7 @@ abstract class AuthService {
     // TODO: here jsonData can be smth like: {"payload":["2",["\"889784531685\"","0"]],"statsMeta":{"platform":"web2","st":false,"time":1624864729,"hash":"rr9Nqtl8ZlJzUPalJsFqVeZ5Us2xdmDdXuvstUe3QQg"},"loaderVersion":"13187849","langVersion":"7137"}
     // TODO: 889784531685 maybe captcha sid
 
-    location = location.replaceAll('\"', '');
+    location = location.replaceAll('"', '');
 
     try {
       int.parse(location);
@@ -479,7 +547,7 @@ abstract class AuthService {
 
     location = location.substring(0, location.indexOf('?'));
     try {
-      response = await User.dio.get(
+      response = await User.dio!.get(
         '${ConstantHTTP.vkURL}$location',
         queryParameters: queryParams,
         options: Options(responseType: ResponseType.bytes),
@@ -497,10 +565,10 @@ abstract class AuthService {
 
     _updateCookie(response);
 
-    location = response.headers['location'].first;
+    location = response.headers['location']!.first;
 
     try {
-      response = await User.dio.get(
+      response = await User.dio!.get(
         '${ConstantHTTP.vkURL}$location',
         queryParameters: queryParams,
         options: Options(responseType: ResponseType.bytes),
@@ -517,11 +585,12 @@ abstract class AuthService {
     }
 
     _updateCookie(response);
+    return AuthStatus.loggedIn;
   }
 
   static AuthStatus logOut() {
-    User.cookieJar.deleteAll();
-    User.dio.options.headers.clear();
+    User.cookieJar!.deleteAll();
+    User.dio!.options.headers.clear();
     return AuthStatus.loggedOut;
   }
 }

@@ -4,7 +4,7 @@ import '../constants.dart';
 import '../repositories/auth_repository.dart';
 
 class AuthBloc {
-  static final StreamController _authStreamController =
+  static final StreamController<AuthState> _authStreamController =
       StreamController<AuthState>.broadcast();
   static final AuthRepository _repository = AuthRepository();
 
@@ -13,46 +13,52 @@ class AuthBloc {
   }
 
   static void dispose() {
-    print('dispose AuthBloc');
     _authStreamController.close();
   }
 
   Future logIn(String login, String password) async {
     _authStreamController.sink.add(AuthState._authLoading());
     _repository.logIn(login, password).then((status) {
-      if (!_authStreamController.isClosed)
+      if (!_authStreamController.isClosed) {
         _authStreamController.sink.add(AuthState._authData(status));
-    }).onError((error, stackTrace) {
-      if (!_authStreamController.isClosed)
+      }
+    }).onError((Error error, stackTrace) {
+      if (!_authStreamController.isClosed) {
         _authStreamController.sink.add(AuthState._authError(error, stackTrace));
+      }
     });
   }
 
   Future getCode() async {
     _repository.getCode().then((status) {
-      if (!_authStreamController.isClosed)
+      if (!_authStreamController.isClosed) {
         _authStreamController.sink.add(AuthState._authData(status));
-    }).onError((error, stackTrace) {
-      if (!_authStreamController.isClosed)
+      }
+    }).onError((Error error, stackTrace) {
+      if (!_authStreamController.isClosed) {
         _authStreamController.sink.add(AuthState._authError(error, stackTrace));
+      }
     });
   }
 
   Future confirmCode(String code) async {
     _repository.confirmCode(code).then((status) {
-      if (!_authStreamController.isClosed)
+      if (!_authStreamController.isClosed) {
         _authStreamController.sink.add(AuthState._authData(status));
-    }).onError((error, stackTrace) {
-      if (!_authStreamController.isClosed)
+      }
+    }).onError((Error error, stackTrace) {
+      if (!_authStreamController.isClosed) {
         _authStreamController.sink.add(AuthState._authError(error, stackTrace));
+      }
     });
   }
 
   Future logOut() async {
     _authStreamController.sink.add(AuthState._authLoading());
     AuthStatus status = _repository.logOut();
-    if (!_authStreamController.isClosed)
+    if (!_authStreamController.isClosed) {
       _authStreamController.sink.add(AuthState._authData(status));
+    }
   }
 }
 

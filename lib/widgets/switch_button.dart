@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class SwitchButton extends StatefulWidget {
-  SwitchButton({
-    Key key,
-    @required this.notifier,
+  const SwitchButton({
+    Key? key,
+    required this.notifier,
   }) : super(key: key);
 
   final ValueNotifier<bool> notifier;
@@ -14,8 +14,8 @@ class SwitchButton extends StatefulWidget {
 
 class _SwitchButtonState extends State<SwitchButton>
     with SingleTickerProviderStateMixin {
-  Animation _animation;
-  AnimationController _controller;
+  late Animation _animation;
+  late AnimationController _controller;
   final double width = 32;
   final double radius = 19;
 
@@ -23,7 +23,7 @@ class _SwitchButtonState extends State<SwitchButton>
   void initState() {
     super.initState();
     _controller =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 200));
+        AnimationController(vsync: this, duration: const Duration(milliseconds: 200));
     _animation = Tween(begin: 0.0, end: width - radius)
         .animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
   }
@@ -31,7 +31,7 @@ class _SwitchButtonState extends State<SwitchButton>
   @override
   void dispose() {
     super.dispose();
-    _controller?.dispose();
+    _controller.dispose();
   }
 
   @override
@@ -53,7 +53,7 @@ class _SwitchButtonState extends State<SwitchButton>
             },
             child: Stack(
               children: [
-                Container(
+                SizedBox(
                   width: width,
                   height: 38,
                 ),
@@ -82,7 +82,7 @@ class _SwitchButtonState extends State<SwitchButton>
                   right: _animation.value,
                   child: Align(
                     alignment: Alignment.center,
-                    child: Container(
+                    child: SizedBox(
                       height: radius,
                       width: radius,
                       child: Align(

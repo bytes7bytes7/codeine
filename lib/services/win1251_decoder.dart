@@ -3,16 +3,16 @@ import 'dart:convert';
 abstract class Win1251Decoder {
   static String decode(Iterable<int> bytes) {
     String result = '';
-    bytes.forEach((byte) {
+    for (var byte in bytes) {
       if (byte >= 0 && byte <= 255) {
-        String decoded = win1251Map[byte];
-        if(decoded!=null){
+        String? decoded = win1251Map[byte];
+        if (decoded != null) {
           result += decoded;
         }
-      }else{
+      } else {
         result += utf8.decode(List<int>.from([byte]));
       }
-    });
+    }
     return result;
   }
 

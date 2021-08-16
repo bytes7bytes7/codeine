@@ -2,12 +2,12 @@ part of 'music_player.dart';
 
 class PlayerControls extends StatelessWidget {
   PlayerControls({
-    Key key,
+    Key? key,
     this.pageController,
-  });
+  }): super(key:key);
 
-  final PageController pageController;
-  final Duration duration = Duration(milliseconds: 400);
+  final PageController? pageController;
+  final Duration duration = const Duration(milliseconds: 400);
   final Curve curve = Curves.easeInOut;
 
   @override
@@ -16,14 +16,21 @@ class PlayerControls extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         IconButton(
-          icon: Icon(Icons.fast_rewind_rounded),
+          icon: const Icon(Icons.fast_rewind_rounded),
           color: Theme.of(context).focusColor,
           iconSize: 60,
           onPressed: () {
-            if(pageController!=null){
+            if (pageController != null) {
+              int prevIndex = GlobalParameters.songNumber;
               GlobalParameters.moveToPreviousIndex();
-              pageController.animateToPage(GlobalParameters.songNumber, duration: duration, curve: curve);
-            }else {
+              int nextIndex = GlobalParameters.songNumber;
+              if (( nextIndex-prevIndex).abs()==1) {
+                pageController!.animateToPage(GlobalParameters.songNumber,
+                    duration: duration, curve: curve);
+              }else{
+                pageController!.jumpToPage(GlobalParameters.songNumber);
+              }
+            } else {
               GlobalParameters.previousSong();
             }
           },
@@ -33,8 +40,8 @@ class PlayerControls extends StatelessWidget {
           builder: (context, value, child) {
             return IconButton(
               icon: (GlobalParameters.playNotifier.value)
-                  ? Icon(Icons.pause_circle_filled_rounded)
-                  : Icon(Icons.play_circle_fill_rounded),
+                  ? const Icon(Icons.pause_circle_filled_rounded)
+                  : const Icon(Icons.play_circle_fill_rounded),
               color: Theme.of(context).focusColor,
               iconSize: 60,
               onPressed: () {
@@ -44,14 +51,21 @@ class PlayerControls extends StatelessWidget {
           },
         ),
         IconButton(
-          icon: Icon(Icons.fast_forward_rounded),
+          icon: const Icon(Icons.fast_forward_rounded),
           color: Theme.of(context).focusColor,
           iconSize: 60,
           onPressed: () {
-            if(pageController!=null){
+            if (pageController != null) {
+              int prevIndex = GlobalParameters.songNumber;
               GlobalParameters.moveToNextIndex();
-              pageController.animateToPage(GlobalParameters.songNumber, duration: duration, curve: curve);
-            }else {
+              int nextIndex = GlobalParameters.songNumber;
+              if((nextIndex-prevIndex).abs()==1) {
+                pageController!.animateToPage(GlobalParameters.songNumber,
+                    duration: duration, curve: curve);
+              }else{
+                pageController!.jumpToPage(GlobalParameters.songNumber);
+              }
+            } else {
               GlobalParameters.nextSong();
             }
           },

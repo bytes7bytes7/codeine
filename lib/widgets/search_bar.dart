@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 class SearchBar extends StatelessWidget {
   SearchBar({
-    Key key,
-    @required this.controller,
+    Key? key,
+    required this.controller,
   }) : super(key: key);
 
   final TextEditingController controller;
@@ -61,12 +61,12 @@ class SearchBar extends StatelessWidget {
               ),
               ValueListenableBuilder(
                 valueListenable: emptyFiled,
-                builder: (context, value, child) {
+                builder: (context,bool value, child) {
                   if (value) {
-                    return SizedBox.shrink();
+                    return const SizedBox.shrink();
                   } else {
                     return IconButton(
-                      icon: Icon(Icons.close),
+                      icon: const Icon(Icons.close),
                       color: Theme.of(context).focusColor,
                       onPressed: () {
                         controller.text = '';
