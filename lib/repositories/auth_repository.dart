@@ -11,7 +11,7 @@ class AuthRepository {
   }
 
   Future<AuthStatus> logIn(String login, String password) async {
-    return await AuthService.logIn(login, password);
+    return await AuthService.logInHttp(login, password);
   }
 
   Future<AuthStatus> getCode() async {

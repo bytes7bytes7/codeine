@@ -17,10 +17,10 @@ import '../global/global_parameters.dart';
 class Session {
   Map<String, String> headers = Map.from(ConstantHTTP.headers);
 
-  Future<Map> get(String url) async {
+  Future<String> get(String url) async {
     http.Response response = await http.get(Uri.parse(url), headers: headers);
     updateCookie(response);
-    return json.decode(response.body);
+    return response.body;
   }
 
   Future<Map> post(String url, dynamic data) async {
@@ -261,24 +261,24 @@ abstract class AuthService {
   }
 
   // TODO: try to implement all request with http package
-  // static Future<AuthStatus> logInHttp(String phone, String password)async{
-  //   User.phoneOrEmail = phone;
-  //   Session session = Session();
-  //
-  //   try {
-  //     Map body = await session.get(ConstantHTTP.vkURL);
-  //   } on DioError catch (e) {
-  //     if (GlobalParameters.connectionStatus.value == ConnectivityResult.none) {
-  //       return AuthStatus.noInternet;
-  //     } else {
-  //       print('logIn error: ${e.error}');
-  //       print('logIn error: ${e.message}');
-  //       print('logIn error: ${e.type}');
-  //       return AuthStatus.unknownError;
-  //     }
-  //   }
-  //   return AuthStatus.unknownError;
-  // }
+  static Future<AuthStatus> logInHttp(String phone, String password)async{
+    User.phoneOrEmail = phone;
+    Session session = Session();
+
+    try {
+      await session.get(ConstantHTTP.vkURL);
+    } on DioError catch (e) {
+      if (GlobalParameters.connectionStatus.value == ConnectivityResult.none) {
+        return AuthStatus.noInternet;
+      } else {
+        print('logIn error: ${e.error}');
+        print('logIn error: ${e.message}');
+        print('logIn error: ${e.type}');
+        return AuthStatus.unknownError;
+      }
+    }
+    return AuthStatus.unknownError;
+  }
 
   static Future<AuthStatus> logIn(String phone, String password) async {
     User.cookieJar!.deleteAll();

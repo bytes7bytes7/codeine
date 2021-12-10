@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
 
 import '../models/user.dart';
 import '../services/music_service.dart';
@@ -101,34 +100,34 @@ class _Header extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
         child: Row(
           children: [
-            SizedBox(
+            const SizedBox(
               width: 250.0,
-              child: DefaultTextStyle(
-                style: Theme.of(context).textTheme.headline3!.copyWith(
-                  fontSize: 25,
-                  shadows: [
-                    Shadow(
-                      blurRadius: 7.0,
-                      color: Theme.of(context).focusColor,
-                      offset: const Offset(0, 0),
-                    ),
-                  ],
-                ),
-                child: AnimatedTextKit(
-                  repeatForever: true,
-                  animatedTexts: [
-                    FlickerAnimatedText(
-                      'CODEINE',
-                      speed: const Duration(seconds: 8),
-                    ),
-                  ],
-                  pause: const Duration(milliseconds: 0),
-                  onTap: () {
-                    // ignore: avoid_print
-                    print("Tap Event");
-                  },
-                ),
-              ),
+              // child: DefaultTextStyle(
+              //   style: Theme.of(context).textTheme.headline3!.copyWith(
+              //     fontSize: 25,
+              //     shadows: [
+              //       Shadow(
+              //         blurRadius: 7.0,
+              //         color: Theme.of(context).focusColor,
+              //         offset: const Offset(0, 0),
+              //       ),
+              //     ],
+              //   ),
+              //   child: AnimatedTextKit(
+              //     repeatForever: true,
+              //     animatedTexts: [
+              //       FlickerAnimatedText(
+              //         'CODEINE',
+              //         speed: const Duration(seconds: 8),
+              //       ),
+              //     ],
+              //     pause: const Duration(milliseconds: 0),
+              //     onTap: () {
+              //       // ignore: avoid_print
+              //       print("Tap Event");
+              //     },
+              //   ),
+              // ),
             ),
             // SizedBox(
             //   width: 250.0,

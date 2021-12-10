@@ -22,7 +22,7 @@ class TopMusicPlayer extends StatefulWidget {
 
 class _TopMusicPlayerState extends State<TopMusicPlayer>
     with TickerProviderStateMixin {
-  late AnimationController _controller;
+  // late AnimationController _controller;
 
   // Tween<double> _tween = Tween(begin: 0.75, end: 1);
   late PageController pageController;
@@ -31,14 +31,14 @@ class _TopMusicPlayerState extends State<TopMusicPlayer>
   void initState() {
     super.initState();
     pageController = PageController(initialPage: GlobalParameters.songNumber);
-    _controller =
-        AnimationController(duration: const Duration(seconds: 1), vsync: this);
-    _controller.repeat(reverse: true);
+    // _controller =
+    //     AnimationController(duration: const Duration(seconds: 1), vsync: this);
+    // _controller.repeat(reverse: true);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    // _controller.dispose();
     super.dispose();
   }
 

@@ -132,27 +132,27 @@ class _BottomMusicPlayerState extends State<BottomMusicPlayer>
                             ),
                             const Spacer(),
                             // TODO: place button on the center of songs' duration
-                            IconButton(
-                              color: Theme.of(context).focusColor,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 0),
-                              splashRadius: 20,
-                              icon: ValueListenableBuilder(
-                                valueListenable: GlobalParameters.playNotifier,
-                                builder: (context, value, __) {
-                                  return AnimatedIcon(
-                                    icon: AnimatedIcons.play_pause,
-                                    size: 30,
-                                    progress: GlobalParameters
-                                        .playAnimationController!,
-                                    color: Theme.of(context).focusColor,
-                                  );
-                                },
-                              ),
-                              onPressed: () {
-                                GlobalParameters.playPauseSong();
-                              },
-                            ),
+                            // IconButton(
+                            //   color: Theme.of(context).focusColor,
+                            //   padding:
+                            //       const EdgeInsets.symmetric(horizontal: 0),
+                            //   splashRadius: 20,
+                            //   icon: ValueListenableBuilder(
+                            //     valueListenable: GlobalParameters.playNotifier,
+                            //     builder: (context, value, __) {
+                            //       return AnimatedIcon(
+                            //         icon: AnimatedIcons.play_pause,
+                            //         size: 30,
+                            //         progress: GlobalParameters
+                            //             .playAnimationController!,
+                            //         color: Theme.of(context).focusColor,
+                            //       );
+                            //     },
+                            //   ),
+                            //   onPressed: () {
+                            //     GlobalParameters.playPauseSong();
+                            //   },
+                            // ),
                           ],
                         ),
                       ),
