@@ -1,0 +1,28 @@
+name: auth_repository
+description: A new Flutter package project.
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ">=2.15.0 <3.0.0"
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  html: ^0.15.0
+  html_unescape: ^2.0.0
+  dio: ^4.0.4
+  equatable: ^2.0.3
+  database_helper:
+    path: ../database_helper
+  session_repository:
+    path: ../session_repository
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^1.0.0
+
+flutter:

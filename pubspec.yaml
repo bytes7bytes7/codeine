@@ -11,18 +11,11 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.3
-  html: ^0.15.0
-  dio: ^4.0.4
-  dio_cookie_manager: ^2.0.0
-  cookie_jar: ^3.0.1
-  connectivity_plus: ^2.0.3
-  path_provider: ^2.0.2
-  sqflite: ^2.0.0+3
-  snapping_sheet: ^3.1.0
-  palette_generator: ^0.3.0
-  animated_text_kit: ^4.2.1
-  html_unescape: ^2.0.0
-  audioplayers: ^0.20.1
+  equatable: ^2.0.3
+  bloc: ^8.0.1
+  flutter_bloc: ^8.0.0
+  auth_repository:
+    path: packages/auth_repository
 
 dev_dependencies:
   flutter_test:

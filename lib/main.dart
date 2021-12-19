@@ -1,8 +1,12 @@
+import 'package:codeine/blocs/auth/auth_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'themes/dark_theme.dart';
-import 'screens/main_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'themes/themes.dart';
+import 'route_generator.dart';
+import 'constants/routes.dart' as constant_routes;
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(
@@ -22,11 +26,27 @@ class MyApp extends StatelessWidget {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
-    return MaterialApp(
-      title: 'CODEINE',
-      debugShowCheckedModeBanner: false,
-      theme: darkTheme,
-      home: const MainScreen(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthBloc>(
+          create: (context) {
+            return AuthBloc()..add(AuthLoadEvent());
+          },
+        ),
+      ],
+      child: MaterialApp(
+        title: 'CODEINE',
+        debugShowCheckedModeBanner: false,
+        theme: darkTheme,
+        initialRoute: constant_routes.preloading,
+        onGenerateInitialRoutes: (String? route) {
+          return [
+            RouteGenerator.generateRoute(
+                const RouteSettings(name: constant_routes.preloading))
+          ];
+        },
+        onGenerateRoute: RouteGenerator.generateRoute,
+      ),
     );
   }
 }
